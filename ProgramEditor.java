@@ -5,9 +5,10 @@ import javax.swing.JLabel;
 import javax.swing.JTextField;
 import javax.swing.BoxLayout;
 
-import sprites.Sprite;
-import sprites.Rect;
-import sprites.Oval;
+import sprites.JSprite;
+import sprites.JRectangle;
+import sprites.JOval;
+import sprites.JPolygon;
 
 import java.awt.Rectangle;
 import java.awt.Graphics;
@@ -28,8 +29,8 @@ import java.io.IOException;
 
 
 class ProgramEditor extends JPanel implements MouseListener, MouseMotionListener, KeyListener {
-    private ArrayList<Sprite> sprites;      // contains all the sprites on the canvas.
-    private Sprite focus;                   // the sprite that is currently focused.
+    private ArrayList<JSprite> sprites;      // contains all the sprites on the canvas.
+    private JSprite focus;                   // the sprite that is currently focused.
     private boolean spriteHeld;             // whether a sprite is held (clicked and held).
     private int dx, dy;                     // x & y displacement of cursor from sprite, used to maintain
                                             // relative cursor position when moving sprites (click and drag).
@@ -37,12 +38,7 @@ class ProgramEditor extends JPanel implements MouseListener, MouseMotionListener
     private DetailsPanel detailsPanel;      // contains information on focused sprites.
     private boolean detailsPanelVisible;    // whether the details panel is visible.
 
-    private Rectangle[] cornerRects;        // an array of four rectangles; each represent one
-                                            // corner of the sprite. Used for resizing sprites with mouse.
-    private int cornerHeld;                 // whether a corner is held (clicked and held).
-                                            // -1 means none held, 0 1 2 3 represent respective corners
-                                            // (top left to bottom right).
-    final private int CORNER_LENGTH = 5;    // length of each corner rectangle.
+    private int dragPointHeld;              // the index of the drag point held. -1 if none are held.
 
     
     public ProgramEditor() {
@@ -52,12 +48,6 @@ class ProgramEditor extends JPanel implements MouseListener, MouseMotionListener
         detailsPanel = new DetailsPanel();
         detailsPanelVisible = false;
 
-        // Initializing corner rectangles
-        cornerRects = new Rectangle[4];
-        for(int i = 0; i < cornerRects.length; i++) {
-            cornerRects[i] = new Rectangle(0, 0, CORNER_LENGTH, CORNER_LENGTH);
-        }
-        
         // Configuring JPanel
         setPreferredSize(new Dimension(400, 400));
         setFocusable(true);
@@ -77,10 +67,13 @@ class ProgramEditor extends JPanel implements MouseListener, MouseMotionListener
     private void createSprite(String type) {
         switch(type) {
             case "rect":
-                sprites.add(new Rect(0, 0, 20, 20));
+                sprites.add(new JRectangle(0, 0, 20, 20));
                 break;
             case "oval":
-                sprites.add(new Oval(0, 0, 20, 20));
+                sprites.add(new JOval(0, 0, 20, 20));
+                break;
+            case "polygon":
+                sprites.add(new JPolygon(0, 0, 0, 0));
                 break;
         }
         setFocus(sprites.get(sprites.size()-1));
@@ -113,7 +106,7 @@ class ProgramEditor extends JPanel implements MouseListener, MouseMotionListener
             pw.println("public void paintComponent(Graphics g)");
             pw.println("{");
             for(int i = 0; i < sprites.size(); i++) {
-                Sprite s = sprites.get(i);
+                JSprite s = sprites.get(i);
                 pw.printf("\tg.setColor(new Color(%s));%n", s.getRGBString());
                 switch(s.getType()) {
                     case "rectangle":
@@ -132,20 +125,11 @@ class ProgramEditor extends JPanel implements MouseListener, MouseMotionListener
     }
 
 
-    // Moves the corner rectangles. Called upon changing focused sprite.
-    private void moveCornerRects(Sprite s) {
-        int l = CORNER_LENGTH;
-        cornerRects[0].setLocation(s.x-l/2, s.y-l/2); // top left
-        cornerRects[1].setLocation(s.x+s.width-l/2, s.y-l/2); // top right
-        cornerRects[2].setLocation(s.x-l/2, s.y+s.height-l/2); // bottom left
-        cornerRects[3].setLocation(s.x+s.width-l/2, s.y+s.height-l/2); // bottom right
-    }
-
 
     // Changes the focused sprite.
-    private void setFocus(Sprite s) {
+    private void setFocus(JSprite s) {
         focus = s;
-        moveCornerRects(s);
+        s.moveDragPoints();
     }
 
 
@@ -161,7 +145,7 @@ class ProgramEditor extends JPanel implements MouseListener, MouseMotionListener
         super.paintComponent(g);
 
         // For-loop which paints each sprite individually.
-        for(Sprite sprite : sprites) {
+        for(JSprite sprite : sprites) {
             g.setColor(sprite.getColor());
             if("rect".equals(sprite.getType())) {
                 g.fillRect(sprite.x, sprite.y, sprite.width, sprite.height);
@@ -169,11 +153,14 @@ class ProgramEditor extends JPanel implements MouseListener, MouseMotionListener
             else if("oval".equals(sprite.getType())) {
                 g.fillOval(sprite.x, sprite.y, sprite.width, sprite.height);
             }
+            else if("polygon".equals(sprite.getType())) {
+                g.fillPolygon(((JPolygon)sprite).getPolygon());
+            }
         }
 
         // If there is a focused sprite, paint the corner rectangles as well (for resizing).
         if(focus != null) {
-            for(Rectangle r : cornerRects) {
+            for(Rectangle r : focus.getDragPoints()) {
                 g.setColor(Color.BLUE);
                 g.fillRect(r.x, r.y, r.width, r.height);
             }
@@ -186,22 +173,22 @@ class ProgramEditor extends JPanel implements MouseListener, MouseMotionListener
     public void mousePressed(MouseEvent e) {
         if(e.getButton() == MouseEvent.BUTTON1) {
             hideDetailsPanel();
-            cornerHeld = -1;
+            dragPointHeld = -1;
             Point p = e.getPoint();
 
             // First, check if the click is on one of the corner rectangles.
             if(focus != null) {
-                for(int i = 0; i < cornerRects.length; i++) {
-                    Rectangle r = cornerRects[i];
+                for(int i = 0; i < focus.getDragPoints().length; i++) {
+                    Rectangle r = focus.getDragPoints()[i];
                     if(r.contains(p)) {
-                        cornerHeld = i;
+                        dragPointHeld = i;
                     }
                 }
             }
 
             // If the click was not on a corner rectangle, check if it was on a sprite.
-            if(cornerHeld == -1) {
-                for(Sprite sprite : sprites) {
+            if(dragPointHeld == -1) {
+                for(JSprite sprite : sprites) {
                     if(sprite.contains(p)) {
                         setFocus(sprite);
                         spriteHeld = true;
@@ -217,50 +204,27 @@ class ProgramEditor extends JPanel implements MouseListener, MouseMotionListener
             }
         }
     }
+
+    @Override
     public void mouseDragged(MouseEvent e) {
         Point p = e.getPoint();
 
         // Handle corner resizing.
-        if(cornerHeld != -1) {
-            if(cornerHeld == 0) {
-                int diffX = focus.x - p.x;
-                focus.width += diffX;
-                focus.x -= diffX;
-
-                int diffY = focus.y - p.y;
-                focus.height += diffY;
-                focus.y -= diffY;
-            }
-            else if(cornerHeld == 1) {
-                focus.width = p.x - focus.x;
-
-                int diffY = focus.y - p.y;
-                focus.height += diffY;
-                focus.y -= diffY;
-            }
-            else if(cornerHeld == 2) {
-                int diffX = focus.x - p.x;
-                focus.width += diffX;
-                focus.x -= diffX;
-
-                focus.height = p.y - focus.y;
-            }
-            else if(cornerHeld == 3) {
-                focus.width = p.x - focus.x;
-                focus.height = p.y - focus.y;
-            }
-            moveCornerRects(focus);
+        if(dragPointHeld != -1) {
+            focus.handleDragPoint(dragPointHeld, p);
+            focus.moveDragPoints();
             repaint();
         }
 
         // Handle sprite click-and-drag movement.
         else if(spriteHeld) {
             focus.setLocation((int)p.getX()-dx, (int)p.getY()-dy);
-            moveCornerRects(focus);
+            focus.moveDragPoints();
             repaint();
         }
     }
 
+    @Override
     public void mouseReleased(MouseEvent e) {
         // Drop sprite.
         if(e.getButton() == MouseEvent.BUTTON1) {
@@ -280,6 +244,7 @@ class ProgramEditor extends JPanel implements MouseListener, MouseMotionListener
 
 
     // Implementing Key Listener methods 
+    @Override
     public void keyReleased(KeyEvent e) {
         // check for commands.
         switch(e.getKeyChar()) {
@@ -291,6 +256,11 @@ class ProgramEditor extends JPanel implements MouseListener, MouseMotionListener
             // 2 -> create new oval.
             case '2':
                 ProgramEditor.this.createSprite("oval");
+                break;
+
+            // 3 -> create new polygon.
+            case '3':
+                ProgramEditor.this.createSprite("polygon");
                 break;
 
             // d -> delete focused sprite.
@@ -349,7 +319,7 @@ class ProgramEditor extends JPanel implements MouseListener, MouseMotionListener
 
 
         // Replaces old rows with new rows which reflect the sprite parameter.
-        public void update(Sprite s) {
+        public void update(JSprite s) {
             clearRows();
             setSize(200, 30*s.getAttributes().size());
 
