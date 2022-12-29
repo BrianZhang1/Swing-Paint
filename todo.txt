@@ -1,0 +1,4 @@
+Finish adding comments
+Add configuable rows, multiple classes, different file?
+Add sprite type to details panel.
+Add polygon sprite.
