@@ -285,6 +285,7 @@ class ProgramEditor extends JPanel implements MouseListener, MouseMotionListener
                 else {
                     showDetailsPanel(0, 0);
                 }
+                break;
         }
     }
 
