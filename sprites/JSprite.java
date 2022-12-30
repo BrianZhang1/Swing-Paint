@@ -16,6 +16,15 @@ public class JSprite extends Rectangle {
 
     public JSprite(int x, int y, int width, int height) {
         super(x, y, width, height);
+        init();
+    }
+
+    public JSprite(Rectangle r) {
+        super(r);
+        init();
+    }
+
+    private void init() {
         attributes = new ArrayList<>();
         attributes.add("x");
         attributes.add("y");

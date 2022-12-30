@@ -11,6 +11,7 @@ import sprites.JOval;
 import sprites.JPolygon;
 
 import java.awt.Rectangle;
+import java.awt.Polygon;
 import java.awt.Graphics;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -73,7 +74,8 @@ class ProgramEditor extends JPanel implements MouseListener, MouseMotionListener
                 sprites.add(new JOval(0, 0, 20, 20));
                 break;
             case "polygon":
-                sprites.add(new JPolygon(0, 0, 0, 0));
+                Polygon polygon = new Polygon(new int[]{0, 10, 5}, new int[]{0, 0, 10}, 3);
+                sprites.add(new JPolygon(polygon));
                 break;
         }
         setFocus(sprites.get(sprites.size()-1));

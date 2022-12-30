@@ -6,11 +6,11 @@ import java.awt.Point;
 public class JPolygon extends JSprite {
     private Polygon polygon;
 
-    public JPolygon(int x, int y, int width, int height) {
-        super(x, y, width, height);
+    public JPolygon(Polygon polygon) {
+        super(polygon.getBounds());
         type = "polygon";
 
-        polygon = new Polygon(new int[]{0, 10, 5}, new int[]{0, 0, 10}, 3);
+        this.polygon = polygon;
     }
 
     @Override
