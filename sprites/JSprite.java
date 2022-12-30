@@ -10,7 +10,7 @@ public class JSprite extends Rectangle {
     protected ArrayList<String> attributes;
     protected Rectangle[] dragPoints;       // an array of rectangles; each represent one handle
                                             // point of the sprite. Used for resizing sprites with mouse.
-    final private int CORNER_LENGTH = 5;    // length of each corner rectangle.
+    final protected int CORNER_LENGTH = 5;    // length of each corner rectangle.
     protected Color color;
     protected String type;
 
@@ -50,6 +50,7 @@ public class JSprite extends Rectangle {
         dragPoints[3].setLocation(x+width-l/2, y+height-l/2); // bottom right
     }
 
+    // Handles resizing of sprite by drag points.
     public void handleDragPoint(int dragPointHeld, Point p) {
         if(dragPointHeld == 0) {
             int diffX = x - p.x;
