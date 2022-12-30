@@ -271,6 +271,7 @@ class ProgramEditor extends JPanel implements MouseListener, MouseMotionListener
                 if(i != -1) {
                     sprites.remove(i);
                     hideDetailsPanel();
+                    removeFocus();
                     repaint();
                 }
                 break;
