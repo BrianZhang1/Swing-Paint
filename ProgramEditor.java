@@ -106,11 +106,17 @@ class ProgramEditor extends JPanel implements MouseListener, MouseMotionListener
     private void export() {
         try(PrintWriter pw = new PrintWriter(new FileWriter("out.txt"))) {
             boolean firstPolygon = true;    // whether the first polygon has been created.
+            String prevRGBString = null;
             pw.println("public void paintComponent(Graphics g)");
             pw.println("{");
             for(int i = 0; i < sprites.size(); i++) {
                 JSprite s = sprites.get(i);
-                pw.printf("\tg.setColor(new Color(%s));%n", s.getRGBString());
+                String RGBString = s.getRGBString();
+                // Skip the color statement if no color change is needed.
+                if(!RGBString.equals(prevRGBString)) {
+                    pw.printf("\tg.setColor(new Color(%s));%n", s.getRGBString());
+                }
+                prevRGBString = RGBString;
                 switch(s.getType()) {
                     case "rectangle":
                         pw.printf("\tg.fillRect(%d, %d, %d, %d);%n", s.x, s.y, s.width, s.height);
