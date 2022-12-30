@@ -70,10 +70,8 @@ public class JPolygon extends JSprite {
     }
     @Override
     public boolean contains(double x, double y) {
-        System.out.println("Check");
         // Change in the line below (!polygon.getBoundingBox() -> !this.getBounds())
         if (polygon.npoints <= 2 || !getBounds().contains(x, y)) {
-            System.out.println("...");
             return false;
         }
         int hits = 0;

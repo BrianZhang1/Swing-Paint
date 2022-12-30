@@ -60,14 +60,14 @@ class ProgramEditor extends JPanel implements MouseListener, MouseMotionListener
         addKeyListener(this);
 
         // Canvas has one initial sprite.
-        createSprite("rect");
+        createSprite("rectangle");
     }
 
 
     // Creates a sprite on the canvas.
     private void createSprite(String type) {
         switch(type) {
-            case "rect":
+            case "rectangle":
                 sprites.add(new JRectangle(0, 0, 20, 20));
                 break;
             case "oval":
@@ -105,6 +105,7 @@ class ProgramEditor extends JPanel implements MouseListener, MouseMotionListener
     // Exports the canvas to a Java Swing code file.
     private void export() {
         try(PrintWriter pw = new PrintWriter(new FileWriter("out.txt"))) {
+            boolean firstPolygon = true;    // whether the first polygon has been created.
             pw.println("public void paintComponent(Graphics g)");
             pw.println("{");
             for(int i = 0; i < sprites.size(); i++) {
@@ -116,6 +117,28 @@ class ProgramEditor extends JPanel implements MouseListener, MouseMotionListener
                         break;
                     case "oval":
                         pw.printf("\tg.fillOval(%d, %d, %d, %d);%n", s.x, s.y, s.width, s.height);
+                        break;
+                    case "polygon":
+                        // Must declare variables if this is the first polygon.
+                        if(firstPolygon) {
+                            pw.println("\tint[] xpoints, ypoints;");
+                            firstPolygon = false;
+                        }
+
+                        // Construct statements as strings to initialize xpoints and ypoints.
+                        Polygon polygon = ((JPolygon)s).getPolygon();
+                        String xPointsString = "\txpoints = new int[]{";
+                        String yPointsString = "\typoints = new int[]{";
+                        for(int j = 0; j < polygon.npoints; j++) {
+                            xPointsString += Integer.toString(polygon.xpoints[j]) + ", ";
+                            yPointsString += Integer.toString(polygon.ypoints[j]) + ", ";
+                        }
+                        xPointsString = xPointsString.substring(0, xPointsString.length()-2) + "};";
+                        yPointsString = yPointsString.substring(0, xPointsString.length()-2) + "};";
+
+                        pw.println(xPointsString);
+                        pw.println(yPointsString);
+                        pw.printf("\tg.fillPolygon(xpoints, ypoints, %d);%n", polygon.npoints);
                         break;
                 }
             }
@@ -149,7 +172,7 @@ class ProgramEditor extends JPanel implements MouseListener, MouseMotionListener
         // For-loop which paints each sprite individually.
         for(JSprite sprite : sprites) {
             g.setColor(sprite.getColor());
-            if("rect".equals(sprite.getType())) {
+            if("rectangle".equals(sprite.getType())) {
                 g.fillRect(sprite.x, sprite.y, sprite.width, sprite.height);
             }
             else if("oval".equals(sprite.getType())) {
@@ -252,7 +275,7 @@ class ProgramEditor extends JPanel implements MouseListener, MouseMotionListener
         switch(e.getKeyChar()) {
             // 1 -> create new rect.
             case '1':
-                ProgramEditor.this.createSprite("rect");
+                ProgramEditor.this.createSprite("rectangle");
                 break;
 
             // 2 -> create new oval.
@@ -279,6 +302,7 @@ class ProgramEditor extends JPanel implements MouseListener, MouseMotionListener
             // e -> export canvas to code.
             case 'e':
                 export();
+                break;
 
             // q -> toggle details panel.
             case 'q':
