@@ -41,4 +41,18 @@ public class JPolygon extends JSprite {
         moveX(dx);
         moveY(dy);
     }
+
+    // Changes the x and y coordinates of each point of the polygon to x and y respectively.
+    public void setXY(int x, int y) {
+        moveX(x - this.x);
+        moveY(y - this.y);
+    }
+
+    // Sets location of Rectangle and Polygon in one method.
+    @Override
+    public void setLocation(int x, int y) {
+        setXY(x, y);
+        super.setLocation(x, y);
+        moveDragPoints();
+    }
 }
