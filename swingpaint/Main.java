@@ -6,6 +6,8 @@ import javax.swing.JPanel;
 import swingpaint.states.ProgramEditor;
 import swingpaint.states.Home;
 
+import java.awt.KeyboardFocusManager;
+
 class Main extends JFrame {
     private JPanel currentState;
     
@@ -18,6 +20,8 @@ class Main extends JFrame {
     }
 
     private void changeState(String newState) {
+        System.out.println(newState);
+
         // Clear current state.
         if(currentState != null) {
             remove(currentState);
@@ -27,10 +31,12 @@ class Main extends JFrame {
         if("ProgramEditor".equals(newState)) {
             currentState = new ProgramEditor(s -> changeState(s));
         } else if("Home".equals(newState)) {
-            currentState = new Home();
+            currentState = new Home(s -> changeState(s));
         }
         add(currentState);
+        currentState.requestFocusInWindow();    // set focus on the new state
         pack();
+        System.out.println(KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner());
     }
     
     public static void main(String[] args) {
