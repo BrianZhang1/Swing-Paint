@@ -1,4 +1,4 @@
-package sprites;
+package swingpaint.sprites;
 
 public class JRectangle extends JSprite {
     public JRectangle(int x, int y, int width, int height) {

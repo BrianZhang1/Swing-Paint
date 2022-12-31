@@ -1,4 +1,4 @@
-package sprites;
+package swingpaint.sprites;
 // Base class for all sprites.
 
 import java.awt.Rectangle;

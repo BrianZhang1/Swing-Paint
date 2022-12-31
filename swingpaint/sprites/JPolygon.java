@@ -1,4 +1,4 @@
-package sprites;
+package swingpaint.sprites;
 
 import java.awt.Polygon;
 import java.awt.Rectangle;

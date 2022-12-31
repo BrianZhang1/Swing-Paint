@@ -1,14 +1,16 @@
+package swingpaint.states;
 import java.util.ArrayList;
 
 import javax.swing.JPanel;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
-import javax.swing.BoxLayout;
 
-import sprites.JSprite;
-import sprites.JRectangle;
-import sprites.JOval;
-import sprites.JPolygon;
+import swingpaint.sprites.JOval;
+import swingpaint.sprites.JPolygon;
+import swingpaint.sprites.JRectangle;
+import swingpaint.sprites.JSprite;
+
+import javax.swing.BoxLayout;
 
 import java.awt.Rectangle;
 import java.awt.Polygon;
@@ -29,7 +31,7 @@ import java.io.PrintWriter;
 import java.io.IOException;
 
 
-class ProgramEditor extends JPanel implements MouseListener, MouseMotionListener, KeyListener {
+public class ProgramEditor extends JPanel implements MouseListener, MouseMotionListener, KeyListener {
     private ArrayList<JSprite> sprites;      // contains all the sprites on the canvas.
     private JSprite focus;                   // the sprite that is currently focused.
     private boolean spriteHeld;             // whether a sprite is held (clicked and held).
