@@ -407,29 +407,33 @@ class ProgramEditor extends JPanel implements MouseListener, MouseMotionListener
 
         // Handle actions, primarily from Text Fields which update getAttributes().
         public void actionPerformed(ActionEvent e) {
-            switch(e.getActionCommand()) {
-                case "set width":
-                    focus.setSize(Integer.parseInt(searchRowByAttribute("width").textField.getText()), (int)focus.getHeight());
-                    ProgramEditor.this.repaint();
-                    break;
-                case "set height":
-                    focus.setSize((int)focus.getWidth(), Integer.parseInt(searchRowByAttribute("height").textField.getText()));
-                    ProgramEditor.this.repaint();
-                    break;
-                case "set x":
-                    focus.setLocation(Integer.parseInt(searchRowByAttribute("x").textField.getText()), (int)focus.getY());
-                    ProgramEditor.this.repaint();
-                    break;
-                case "set y":
-                    focus.setLocation((int)focus.getX(), Integer.parseInt(searchRowByAttribute("y").textField.getText()));
-                    ProgramEditor.this.repaint();
-                    break;
-                case "set color":
-                    String rgbString = searchRowByAttribute("color").textField.getText();
-                    String[] bits = rgbString.split(",");
-                    focus.setRGBString(Integer.parseInt(bits[0]), Integer.parseInt(bits[1]), Integer.parseInt(bits[2]));
-                    ProgramEditor.this.repaint();
-                    break;
+            String[] bits = e.getActionCommand().split(" ");
+            if("set".equals(bits[0])) {
+                switch(bits[1]) {
+                    case "width":
+                        focus.setSize(Integer.parseInt(searchRowByAttribute("width").textField.getText()), (int)focus.getHeight());
+                        ProgramEditor.this.repaint();
+                        break;
+                    case "height":
+                        focus.setSize((int)focus.getWidth(), Integer.parseInt(searchRowByAttribute("height").textField.getText()));
+                        ProgramEditor.this.repaint();
+                        break;
+                    case "x":
+                        focus.setLocation(Integer.parseInt(searchRowByAttribute("x").textField.getText()), (int)focus.getY());
+                        ProgramEditor.this.repaint();
+                        break;
+                    case "y":
+                        focus.setLocation((int)focus.getX(), Integer.parseInt(searchRowByAttribute("y").textField.getText()));
+                        ProgramEditor.this.repaint();
+                        break;
+                    case "color":
+                        String rgbString = searchRowByAttribute("color").textField.getText();
+                        String[] bitss = rgbString.split(",");
+                        focus.setRGBString(Integer.parseInt(bitss[0]), Integer.parseInt(bitss[1]), Integer.parseInt(bitss[2]));
+                        ProgramEditor.this.repaint();
+                        break;
+
+                }
             }
         }
 
