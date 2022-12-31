@@ -1,24 +1,36 @@
 package swingpaint;
 
 import javax.swing.JFrame;
+import javax.swing.JPanel;
 
 import swingpaint.states.ProgramEditor;
+import swingpaint.states.Home;
 
 class Main extends JFrame {
-    private ProgramEditor programEditor;
+    private JPanel currentState;
     
     public Main() {
-        programEditor = new ProgramEditor();
-        
-        init();
-    }
-
-    private void init() {
-        add(programEditor);
-        pack();
+        // Declare initial state.
+        changeState("ProgramEditor");
 
         setTitle("Swing Paint");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    }
+
+    private void changeState(String newState) {
+        // Clear current state.
+        if(currentState != null) {
+            remove(currentState);
+        }
+
+        // Add new state.
+        if("ProgramEditor".equals(newState)) {
+            currentState = new ProgramEditor(s -> changeState(s));
+        } else if("Home".equals(newState)) {
+            currentState = new Home();
+        }
+        add(currentState);
+        pack();
     }
     
     public static void main(String[] args) {

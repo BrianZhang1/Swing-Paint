@@ -4,13 +4,14 @@ import java.util.ArrayList;
 import javax.swing.JPanel;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
+import javax.swing.BoxLayout;
 
 import swingpaint.sprites.JOval;
 import swingpaint.sprites.JPolygon;
 import swingpaint.sprites.JRectangle;
 import swingpaint.sprites.JSprite;
 
-import javax.swing.BoxLayout;
+import java.util.function.Consumer;
 
 import java.awt.Rectangle;
 import java.awt.Polygon;
@@ -43,9 +44,12 @@ public class ProgramEditor extends JPanel implements MouseListener, MouseMotionL
 
     private int dragPointHeld;              // the index of the drag point held. -1 if none are held.
 
+    Consumer<String> changeState;           // Callback function to change state.
+
     
-    public ProgramEditor() {
+    public ProgramEditor(Consumer<String> changeState) {
         // Initializing variables
+        this.changeState = changeState;
         sprites = new ArrayList<>();
         spriteHeld = false;
         detailsPanel = new DetailsPanel();
@@ -326,6 +330,11 @@ public class ProgramEditor extends JPanel implements MouseListener, MouseMotionL
                 else {
                     showDetailsPanel(0, 0);
                 }
+                break;
+
+            // h -> return to home state.
+            case 'h':
+                changeState.accept("Home");
                 break;
         }
     }
