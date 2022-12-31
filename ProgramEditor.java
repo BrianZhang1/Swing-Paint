@@ -367,6 +367,27 @@ class ProgramEditor extends JPanel implements MouseListener, MouseMotionListener
                 String attribute = s.getAttributes().get(i);
 
                 // Create a different row depending on the attribute.
+                // First, check if the attribute defines a point in a polygon.
+                try {
+                    if("point".equals(attribute.substring(0, 5))) {
+                        Polygon polygon = ((JPolygon)s).getPolygon();
+                        String[] bits = attribute.split(" ");
+                        int pointIndex = Integer.parseInt(bits[1]) - 1;
+                        if("x".equals(bits[2])) {
+                            rows.add(new Row(attribute, String.format("Point %s X", bits[1]), 4, Integer.toString(polygon.xpoints[pointIndex]), "set " + attribute));
+                        }
+                        else if("y".equals(bits[2])) {
+                            rows.add(new Row(attribute, String.format("Point %s Y", bits[1]), 4, Integer.toString(polygon.ypoints[pointIndex]), "set " + attribute));
+                        }
+
+                        continue;
+                    }
+                }
+                catch (StringIndexOutOfBoundsException e) {
+                    // Do nothing.
+                }
+
+                // If not a point, then proceed normally.
                 switch(attribute) {
                     case "x":
                         rows.add(new Row(attribute, "X", 4, Integer.toString(s.x), "set x"));
@@ -407,6 +428,7 @@ class ProgramEditor extends JPanel implements MouseListener, MouseMotionListener
 
         // Handle actions, primarily from Text Fields which update getAttributes().
         public void actionPerformed(ActionEvent e) {
+            System.out.println(e.getActionCommand());
             String[] bits = e.getActionCommand().split(" ");
             if("set".equals(bits[0])) {
                 switch(bits[1]) {
@@ -432,7 +454,24 @@ class ProgramEditor extends JPanel implements MouseListener, MouseMotionListener
                         focus.setRGBString(Integer.parseInt(bitss[0]), Integer.parseInt(bitss[1]), Integer.parseInt(bitss[2]));
                         ProgramEditor.this.repaint();
                         break;
-
+                    case "point":
+                        System.out.println("1");
+                        JPolygon polygon = (JPolygon)focus;
+                        int pointIndex = Integer.parseInt(bits[2]) - 1;
+                        if("x".equals(bits[3])) {
+                            System.out.println("2");
+                            int newX = Integer.parseInt(searchRowByAttribute(String.format("%s %s %s", bits[1], bits[2], bits[3])).textField.getText());
+                            polygon.movePoint(pointIndex, newX, polygon.getPolygon().ypoints[pointIndex]);
+                            ProgramEditor.this.repaint();
+                            break;
+                        }
+                        else if("y".equals(bits[3])) {
+                            int newY = Integer.parseInt(searchRowByAttribute(String.format("%s %s %s", bits[1], bits[2], bits[3])).textField.getText());
+                            polygon.movePoint(pointIndex, polygon.getPolygon().xpoints[pointIndex], newY);
+                            ProgramEditor.this.repaint();
+                            break;
+                        }
+                        break;
                 }
             }
         }

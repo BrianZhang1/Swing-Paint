@@ -17,6 +17,14 @@ public class JPolygon extends JSprite {
             dragPoints[i] = new Rectangle(0, 0, CORNER_LENGTH, CORNER_LENGTH);
         }
 
+        // Different attribute list is needed for polygons
+        attributes.clear();
+        attributes.add("color");
+        for(int i = 0; i < polygon.npoints; i++) {
+            attributes.add(String.format("point %d x", i+1));
+            attributes.add(String.format("point %d y", i+1));
+        }
+
         this.polygon = polygon;
     }
 
@@ -37,6 +45,13 @@ public class JPolygon extends JSprite {
         super.setLocation(x, y);
     }
 
+    // Moves the specified point to the specified location.
+    public void movePoint(int index, int x, int y) {
+        polygon.xpoints[index] = x;
+        polygon.ypoints[index] = y;
+        calculateBounds(polygon.xpoints, polygon.ypoints, polygon.npoints);
+    }
+
     @Override
     // Override JSprite method.
     // Moves the drag points. Called upon changing focused sprite.
@@ -53,9 +68,7 @@ public class JPolygon extends JSprite {
     // Handles resizing of sprite by drag points.
     @Override
     public void handleDragPoint(int dragPointHeld, Point p) {
-        polygon.xpoints[dragPointHeld] = p.x;
-        polygon.ypoints[dragPointHeld] = p.y;
-        calculateBounds(polygon.xpoints, polygon.ypoints, polygon.npoints);
+        movePoint(dragPointHeld, p.x, p.y);
     }
 
     /*
