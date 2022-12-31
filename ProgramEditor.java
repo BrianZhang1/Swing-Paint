@@ -170,6 +170,15 @@ class ProgramEditor extends JPanel implements MouseListener, MouseMotionListener
     }
 
 
+    // Removes a sprite given its index in the sprites array.
+    private void removeSprite(int index) {
+        sprites.remove(index);
+        hideDetailsPanel();
+        removeFocus();
+        repaint();
+    }
+
+
     // Paints the sprites on the canvas.
     @Override
     public void paintComponent(Graphics g) {
@@ -298,10 +307,7 @@ class ProgramEditor extends JPanel implements MouseListener, MouseMotionListener
             case 'd':
                 int i = sprites.indexOf(focus);
                 if(i != -1) {
-                    sprites.remove(i);
-                    hideDetailsPanel();
-                    removeFocus();
-                    repaint();
+                    removeSprite(i);
                 }
                 break;
 
