@@ -1,7 +1,4 @@
 package swingpaint;
-//https://docs.oracle.com/javase/tutorial/uiswing/misc/focus.html
-//https://docs.oracle.com/javase/tutorial/uiswing/events/keylistener.html
-//https://zetcode.com/javagames/collision/
 
 import javax.swing.JFrame;
 
