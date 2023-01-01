@@ -5,6 +5,7 @@ import javax.swing.JPanel;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 import javax.swing.BoxLayout;
+import javax.swing.JComboBox;
 
 import swingpaint.sprites.JOval;
 import swingpaint.sprites.JPolygon;
@@ -19,6 +20,10 @@ import java.awt.Graphics;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Point;
+
+import java.awt.image.BufferedImage;
+import javax.imageio.ImageIO;
+
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseEvent;
@@ -30,9 +35,10 @@ import java.awt.event.ActionListener;
 import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.io.IOException;
+import java.io.File;
 
 
-public class ProgramEditor extends JPanel implements MouseListener, MouseMotionListener, KeyListener {
+public class ProgramEditor extends JPanel implements MouseListener, MouseMotionListener, KeyListener, ActionListener {
     private ArrayList<JSprite> sprites;      // contains all the sprites on the canvas.
     private JSprite focus;                   // the sprite that is currently focused.
     private boolean spriteHeld;             // whether a sprite is held (clicked and held).
@@ -46,15 +52,13 @@ public class ProgramEditor extends JPanel implements MouseListener, MouseMotionL
 
     Consumer<String> changeState;           // Callback function to change state.
 
+    private BufferedImage addIcon;          // Icon to add new sprites.
+    private Rectangle addIconRect;          // A rectangle that represents the position and size of the icon.
+
+    private JComboBox<String> spriteSelect;
+
     
     public ProgramEditor(Consumer<String> changeState) {
-        // Initializing variables
-        this.changeState = changeState;
-        sprites = new ArrayList<>();
-        spriteHeld = false;
-        detailsPanel = new DetailsPanel();
-        detailsPanelVisible = false;
-
         // Configuring JPanel
         setPreferredSize(new Dimension(400, 400));
         setFocusable(true);
@@ -64,6 +68,24 @@ public class ProgramEditor extends JPanel implements MouseListener, MouseMotionL
         addMouseListener(this);
         addMouseMotionListener(this);
         addKeyListener(this);
+
+        // Initializing variables
+        this.changeState = changeState;
+        sprites = new ArrayList<>();
+        spriteHeld = false;
+        detailsPanel = new DetailsPanel();
+        detailsPanelVisible = false;
+        spriteSelect = new JComboBox<>(new String[]{"Select", "rectangle", "oval", "polygon"});
+        spriteSelect.addActionListener(this);
+        
+        // Initalizing Images
+        try {
+            addIcon = ImageIO.read(new File(".\\swingpaint\\assets\\addIcon.png"));
+        }
+        catch(IOException e) {
+            e.printStackTrace();
+        }
+        addIconRect = new Rectangle(getPreferredSize().width-addIcon.getWidth()-5, 5, addIcon.getWidth(), addIcon.getHeight());
 
         // Canvas has one initial sprite.
         createSprite("rectangle");
@@ -105,6 +127,30 @@ public class ProgramEditor extends JPanel implements MouseListener, MouseMotionL
         remove(detailsPanel);
         repaint();
         detailsPanelVisible = false;
+    }
+
+
+    // Shows the sprite selection combo box.
+    private void showSpriteSelect() {
+        spriteSelect.setBounds(getWidth()-85, addIconRect.y+addIconRect.height+5, 80, 30);
+        add(spriteSelect);
+        spriteSelect.revalidate();
+        repaint();
+    }
+    
+
+    private void hideSpriteSelect() {
+        remove(spriteSelect);
+        repaint();
+    }
+
+    
+    public void actionPerformed(ActionEvent e) {
+        if("comboBoxChanged".equals(e.getActionCommand())) {
+            String selection = (String)spriteSelect.getSelectedItem();
+            hideSpriteSelect();
+            createSprite(selection);
+        }
     }
 
 
@@ -211,6 +257,9 @@ public class ProgramEditor extends JPanel implements MouseListener, MouseMotionL
                 g.fillRect(r.x, r.y, r.width, r.height);
             }
         }
+
+        // Paint utility icons.
+        g.drawImage(addIcon, addIconRect.x, addIconRect.y, null);
     }
 
 
@@ -222,7 +271,13 @@ public class ProgramEditor extends JPanel implements MouseListener, MouseMotionL
             dragPointHeld = -1;
             Point p = e.getPoint();
 
-            // First, check if the click is on one of the corner rectangles.
+            // Check if the click was on a button.
+            if(addIconRect.contains(p)) {
+                showSpriteSelect();
+            }
+
+
+            // Check if the click is on one of the corner rectangles.
             if(focus != null) {
                 for(int i = 0; i < focus.getDragPoints().length; i++) {
                     Rectangle r = focus.getDragPoints()[i];
@@ -232,7 +287,7 @@ public class ProgramEditor extends JPanel implements MouseListener, MouseMotionL
                 }
             }
 
-            // If the click was not on a corner rectangle, check if it was on a sprite.
+            // Check if the click was on a sprite.
             if(dragPointHeld == -1) {
                 for(JSprite sprite : sprites) {
                     if(sprite.contains(p)) {
