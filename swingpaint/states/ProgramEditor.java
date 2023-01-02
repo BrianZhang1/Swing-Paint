@@ -647,15 +647,12 @@ public class ProgramEditor extends JPanel implements MouseListener, MouseMotionL
         // A row of buttons. Contains buttons related to sprites (delete, duplicate, etc.)
         private class ButtonRow extends JPanel {
             private JButton deleteButton;
-            private ImageIcon deleteIcon;
             private JButton duplicateButton;
-            private ImageIcon duplicateIcon;
 
             public ButtonRow() {
                 setBackground(Color.GRAY);
 
-                deleteIcon = new ImageIcon("swingpaint\\assets\\deleteButton.png");
-                deleteButton = new JButton(deleteIcon);
+                deleteButton = new JButton("Delete");
                 deleteButton.setActionCommand("delete");
                 deleteButton.addActionListener(detailsPanel);
                 
