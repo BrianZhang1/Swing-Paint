@@ -1,4 +1,4 @@
-Finish adding comments
-Add configuable rows, multiple classes, different file?
-Add sprite type to details panel.
-Add polygon sprite.
+Implement project saves.
+- Writing project data to json
+- Storing in data.json file
+- Creating project select screen (load button on homescreen)
