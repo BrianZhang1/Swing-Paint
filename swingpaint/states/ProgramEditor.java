@@ -56,8 +56,11 @@ public class ProgramEditor extends JPanel implements MouseListener, MouseMotionL
 
     private BufferedImage addIcon;          // Icon to add new sprites.
     private Rectangle addIconRect;          // A rectangle that represents the position and size of the icon.
+    private BufferedImage optionsIcon;      // Icon to open options.
+    private Rectangle optionsIconRect;      // A rectangle that represents the position and size of the icon.
 
     private JComboBox<String> spriteSelect;
+    private JComboBox<String> optionsSelect;
 
     
     public ProgramEditor(Consumer<String> changeState) {
@@ -78,16 +81,23 @@ public class ProgramEditor extends JPanel implements MouseListener, MouseMotionL
         detailsPanel = new DetailsPanel();
         detailsPanelVisible = false;
         spriteSelect = new JComboBox<>(new String[]{"Select", "rectangle", "oval", "polygon"});
+        spriteSelect.setActionCommand("add sprite");
         spriteSelect.addActionListener(this);
+        optionsSelect = new JComboBox<>(new String[]{"Select", "Export", "Home"});
+        optionsSelect.setActionCommand("execute option");
+        optionsSelect.addActionListener(this);
         
         // Initalizing Images
         try {
             addIcon = ImageIO.read(new File(".\\swingpaint\\assets\\addIcon.png"));
+            optionsIcon = ImageIO.read(new File(".\\swingpaint\\assets\\optionsIcon.png"));
         }
         catch(IOException e) {
             e.printStackTrace();
         }
+        // Initalize rects for buttons.
         addIconRect = new Rectangle(getPreferredSize().width-addIcon.getWidth()-5, 5, addIcon.getWidth(), addIcon.getHeight());
+        optionsIconRect = new Rectangle(addIconRect.x-optionsIcon.getWidth()-5, addIconRect.y, optionsIcon.getWidth(), optionsIcon.getHeight());
 
         // Canvas has one initial sprite.
         createSprite("rectangle");
@@ -141,17 +151,45 @@ public class ProgramEditor extends JPanel implements MouseListener, MouseMotionL
     }
     
 
+    // Hides the sprite selection combo box.
     private void hideSpriteSelect() {
         remove(spriteSelect);
         repaint();
     }
 
+
+    // Shows the options dropdown list.
+    private void showOptions() {
+        optionsSelect.setBounds(optionsIconRect.x, optionsIconRect.y+optionsIconRect.height+5, 80, 30);
+        add(optionsSelect);
+        optionsSelect.revalidate();
+        repaint();
+    }
+
+
+    // Hides the options dropdown list.
+    private void hideOptions() {
+        remove(optionsSelect);
+        repaint();
+    }
+
     
     public void actionPerformed(ActionEvent e) {
-        if("comboBoxChanged".equals(e.getActionCommand())) {
+        System.out.println(e.getActionCommand());
+        if("add sprite".equals(e.getActionCommand())) {
             String selection = (String)spriteSelect.getSelectedItem();
             hideSpriteSelect();
             createSprite(selection);
+        }
+        else if("execute option".equals(e.getActionCommand())) {
+            String selection = (String)optionsSelect.getSelectedItem();
+            hideOptions();
+            if("Export".equals(selection)) {
+                export();
+            }
+            else if("Home".equals(selection)) {
+                changeState.accept("Home");
+            }
         }
     }
 
@@ -262,6 +300,7 @@ public class ProgramEditor extends JPanel implements MouseListener, MouseMotionL
 
         // Paint utility icons.
         g.drawImage(addIcon, addIconRect.x, addIconRect.y, null);
+        g.drawImage(optionsIcon, optionsIconRect.x, optionsIconRect.y, null);
     }
 
 
@@ -276,6 +315,10 @@ public class ProgramEditor extends JPanel implements MouseListener, MouseMotionL
             // Check if the click was on a button.
             if(addIconRect.contains(p)) {
                 showSpriteSelect();
+                return;
+            }
+            else if(optionsIconRect.contains(p)) {
+                showOptions();
                 return;
             }
 
