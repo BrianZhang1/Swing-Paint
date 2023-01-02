@@ -306,6 +306,17 @@ public class ProgramEditor extends JPanel implements MouseListener, MouseMotionL
                 }
             }
         }
+
+        // Show the details panel if right click on sprite.
+        else if(e.getButton() == MouseEvent.BUTTON3) {
+            Point p = e.getPoint();
+            for(JSprite sprite : sprites) {
+                if(sprite.contains(p)) {
+                    setFocus(sprite);
+                    showDetailsPanel(0, 0);
+                }
+            }
+        }
     }
 
     @Override
