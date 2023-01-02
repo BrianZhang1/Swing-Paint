@@ -274,6 +274,7 @@ public class ProgramEditor extends JPanel implements MouseListener, MouseMotionL
             // Check if the click was on a button.
             if(addIconRect.contains(p)) {
                 showSpriteSelect();
+                return;
             }
 
 
@@ -283,6 +284,7 @@ public class ProgramEditor extends JPanel implements MouseListener, MouseMotionL
                     Rectangle r = focus.getDragPoints()[i];
                     if(r.contains(p)) {
                         dragPointHeld = i;
+                        return;
                     }
                 }
             }
