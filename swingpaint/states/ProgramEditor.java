@@ -583,7 +583,7 @@ public class ProgramEditor extends JPanel implements MouseListener, MouseMotionL
         }
 
 
-        // Defines a single row.
+        // Defines a row which contains a configurable attribute of the focused sprite.
         private class AttributeRow extends JPanel {
             private String attribute;
             private JLabel label;
