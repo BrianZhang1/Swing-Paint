@@ -6,6 +6,8 @@ import javax.swing.JLabel;
 import javax.swing.JTextField;
 import javax.swing.BoxLayout;
 import javax.swing.JComboBox;
+import javax.swing.JButton;
+import javax.swing.ImageIcon;
 
 import swingpaint.sprites.JOval;
 import swingpaint.sprites.JPolygon;
@@ -419,13 +421,13 @@ public class ProgramEditor extends JPanel implements MouseListener, MouseMotionL
 
     // The details panel allows the user to view and edit getAttributes() of a focused sprite.
     private class DetailsPanel extends JPanel implements ActionListener {
-        private ArrayList<Row> rows;    // Each row is assigned an attribute.
+        private ArrayList<AttributeRow> attributeRows;    // Each row is assigned an attribute.
 
         public DetailsPanel() {
-            rows = new ArrayList<>();
+            attributeRows = new ArrayList<>();
 
             setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-            setBounds(0, 0, 200, 30*rows.size());
+            setBounds(0, 0, 200, 30*attributeRows.size());
             setBackground(Color.GREEN);
         }
 
@@ -433,14 +435,13 @@ public class ProgramEditor extends JPanel implements MouseListener, MouseMotionL
         // Clears child components and rows list.
         private void clearRows() {
             removeAll();
-            rows.clear();
+            attributeRows.clear();
         }
 
 
         // Replaces old rows with new rows which reflect the sprite parameter.
         public void update(JSprite s) {
             clearRows();
-            setSize(200, 30*s.getAttributes().size());
 
             for(int i = 0; i < s.getAttributes().size(); i++) {
                 String attribute = s.getAttributes().get(i);
@@ -453,10 +454,10 @@ public class ProgramEditor extends JPanel implements MouseListener, MouseMotionL
                         String[] bits = attribute.split(" ");
                         int pointIndex = Integer.parseInt(bits[1]) - 1;
                         if("x".equals(bits[2])) {
-                            rows.add(new Row(attribute, String.format("Point %s X", bits[1]), 4, Integer.toString(polygon.xpoints[pointIndex]), "set " + attribute));
+                            attributeRows.add(new AttributeRow(attribute, String.format("Point %s X", bits[1]), 4, Integer.toString(polygon.xpoints[pointIndex]), "set " + attribute));
                         }
                         else if("y".equals(bits[2])) {
-                            rows.add(new Row(attribute, String.format("Point %s Y", bits[1]), 4, Integer.toString(polygon.ypoints[pointIndex]), "set " + attribute));
+                            attributeRows.add(new AttributeRow(attribute, String.format("Point %s Y", bits[1]), 4, Integer.toString(polygon.ypoints[pointIndex]), "set " + attribute));
                         }
 
                         continue;
@@ -469,29 +470,29 @@ public class ProgramEditor extends JPanel implements MouseListener, MouseMotionL
                 // If not a point, then proceed normally.
                 switch(attribute) {
                     case "x":
-                        rows.add(new Row(attribute, "X", 4, Integer.toString(s.x), "set x"));
+                        attributeRows.add(new AttributeRow(attribute, "X", 4, Integer.toString(s.x), "set x"));
                         break;
                     case "y":
-                        rows.add(new Row(attribute, "Y", 4, Integer.toString(s.y), "set y"));
+                        attributeRows.add(new AttributeRow(attribute, "Y", 4, Integer.toString(s.y), "set y"));
                         break;
                     case "width":
-                        rows.add(new Row(attribute, "Width", 4,Integer.toString(s.width) ,"set width"));
+                        attributeRows.add(new AttributeRow(attribute, "Width", 4,Integer.toString(s.width) ,"set width"));
                         break;
                     case "height":
-                        rows.add(new Row(attribute, "Height", 4, Integer.toString(s.height), "set height"));
+                        attributeRows.add(new AttributeRow(attribute, "Height", 4, Integer.toString(s.height), "set height"));
                         break;
                     case "color":
-                        rows.add(new Row(attribute, "Color", 8, String.format("%d,%d,%d", s.getColor().getRed(), s.getColor().getGreen(), s.getColor().getBlue()), "set color"));
+                        attributeRows.add(new AttributeRow(attribute, "Color", 8, String.format("%d,%d,%d", s.getColor().getRed(), s.getColor().getGreen(), s.getColor().getBlue()), "set color"));
                         break;
                     case "type":
-                        rows.add(new Row(attribute, "Type", 8, s.getType(), "set type"));
+                        attributeRows.add(new AttributeRow(attribute, "Type", 8, s.getType(), "set type"));
                         break;
                 }
             }
 
             // Make rows alternating colors (orange and pink)
-            for(int i = 0; i < rows.size(); i++) {
-                Row r = rows.get(i);
+            for(int i = 0; i < attributeRows.size(); i++) {
+                AttributeRow r = attributeRows.get(i);
                 if(i%2 == 0) {
                     r.setBackground(Color.ORANGE);
                 }
@@ -502,6 +503,12 @@ public class ProgramEditor extends JPanel implements MouseListener, MouseMotionL
                 r.textField.addActionListener(this);
                 add(r);
             }
+
+            // Add button row.
+            add(new ButtonRow());
+
+            // Set the size of the container.
+            setSize(getPreferredSize());
         }
 
 
@@ -553,12 +560,20 @@ public class ProgramEditor extends JPanel implements MouseListener, MouseMotionL
                         break;
                 }
             }
+
+            // Delete focused sprite upon delete command.
+            else if("delete".equals(bits[0])) {
+                int i = sprites.indexOf(focus);
+                if(i != -1) {
+                    ProgramEditor.this.removeSprite(i);
+                }
+            }
         }
 
 
         // Returns a row given an attribute. Linear search.
-        private Row searchRowByAttribute(String attribute) {
-            for(Row r : rows) {
+        private AttributeRow searchRowByAttribute(String attribute) {
+            for(AttributeRow r : attributeRows) {
                 if(r.attribute.equals(attribute)) {
                     return r;
                 }
@@ -569,12 +584,12 @@ public class ProgramEditor extends JPanel implements MouseListener, MouseMotionL
 
 
         // Defines a single row.
-        private class Row extends JPanel {
+        private class AttributeRow extends JPanel {
             private String attribute;
             private JLabel label;
             private JTextField textField;
 
-            public Row(String attribute, String labelText, int fieldColumns, String fieldText, String command) {
+            public AttributeRow(String attribute, String labelText, int fieldColumns, String fieldText, String command) {
                 this.attribute = attribute;
                 label = new JLabel(labelText);
                 textField = new JTextField(fieldColumns);
@@ -586,6 +601,24 @@ public class ProgramEditor extends JPanel implements MouseListener, MouseMotionL
             }
         }
 
+        // A row of buttons. Contains buttons related to sprites (delete, duplicate, etc.)
+        private class ButtonRow extends JPanel {
+            private JButton deleteButton;
+            private ImageIcon deleteIcon;
+            private JButton duplicateButton;
+            private ImageIcon duplicateIcon;
+
+            public ButtonRow() {
+                setBackground(Color.GRAY);
+
+                deleteIcon = new ImageIcon("swingpaint\\assets\\deleteButton.png");
+                deleteButton = new JButton(deleteIcon);
+                deleteButton.setActionCommand("delete");
+                deleteButton.addActionListener(detailsPanel);
+                
+                add(deleteButton);
+            }
+        }
         
     }
 }
