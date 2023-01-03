@@ -1,0 +1,2 @@
+type=rectangle;x=227;y=185;width=20;height=20
+type=polygon;xpoints=[40,50,53];ypoints=[42,42,134]

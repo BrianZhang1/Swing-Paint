@@ -271,6 +271,19 @@ public class ProgramEditor extends JPanel implements MouseListener, MouseMotionL
     }
 
 
+    // Saves canvas to be edited in the future.
+    private void save() {
+        try(PrintWriter pw = new PrintWriter(new FileWriter("data.txt"))) {
+            for(JSprite s : sprites) {
+                pw.println(s.toString());
+            }
+        }
+        catch(IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
     // Paints the sprites on the canvas.
     @Override
     public void paintComponent(Graphics g) {
@@ -448,6 +461,11 @@ public class ProgramEditor extends JPanel implements MouseListener, MouseMotionL
             // h -> return to home state.
             case 'h':
                 changeState.accept("Home");
+                break;
+
+            // s -> save.
+            case 's':
+                save();
                 break;
         }
     }

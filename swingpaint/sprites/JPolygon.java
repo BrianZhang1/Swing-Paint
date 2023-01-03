@@ -52,6 +52,26 @@ public class JPolygon extends JSprite {
         calculateBounds(polygon.xpoints, polygon.ypoints, polygon.npoints);
     }
 
+    // Provides string representation of this sprite.
+    @Override
+    public String toString() {
+        String xpointsString = "[";
+        for(int x : polygon.xpoints) {
+            xpointsString += Integer.toString(x) + ",";
+        }
+        xpointsString = xpointsString.substring(0, xpointsString.length()-1);
+        xpointsString += "]";
+
+        String ypointsString = "[";
+        for(int y : polygon.ypoints) {
+            ypointsString += Integer.toString(y) + ",";
+        }
+        ypointsString = ypointsString.substring(0, ypointsString.length()-1);
+        ypointsString += "]";
+
+        return String.format("type=%s;xpoints=%s;ypoints=%s", type, xpointsString, ypointsString);
+    }
+
     @Override
     // Override JSprite method.
     // Moves the drag points. Called upon changing focused sprite.
