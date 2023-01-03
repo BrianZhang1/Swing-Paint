@@ -62,8 +62,20 @@ public class ProgramEditor extends JPanel implements MouseListener, MouseMotionL
     private JComboBox<String> spriteSelect;
     private JComboBox<String> optionsSelect;
 
-    
+
     public ProgramEditor(Consumer<String> changeState) {
+        init(changeState);
+
+        // Canvas has one initial sprite.
+        createSprite("rectangle");
+    }
+
+    public ProgramEditor(Consumer<String> changeState, ArrayList<String> data) {
+        init(changeState);
+        importData(data);
+    }
+    
+    public void init(Consumer<String> changeState) {
         // Configuring JPanel
         setPreferredSize(new Dimension(400, 400));
         setFocusable(true);
@@ -98,9 +110,6 @@ public class ProgramEditor extends JPanel implements MouseListener, MouseMotionL
         // Initalize rects for buttons.
         addIconRect = new Rectangle(getPreferredSize().width-addIcon.getWidth()-5, 5, addIcon.getWidth(), addIcon.getHeight());
         optionsIconRect = new Rectangle(addIconRect.x-optionsIcon.getWidth()-5, addIconRect.y, optionsIcon.getWidth(), optionsIcon.getHeight());
-
-        // Canvas has one initial sprite.
-        createSprite("rectangle");
     }
 
 
@@ -193,6 +202,24 @@ public class ProgramEditor extends JPanel implements MouseListener, MouseMotionL
         }
     }
 
+    // Creates sprites from String[] where each element represents a Sprite.
+    private void importData(ArrayList<String> data) {
+        for(String spriteData : data) {
+            String[] bits = spriteData.split(";");
+            String type = bits[0].split("=")[1];
+            switch(type) {
+                case "rectangle":
+                    sprites.add(new JRectangle(JRectangle.rectangleFromString(bits)));
+                    break;
+                case "oval":
+                    sprites.add(new JOval(JRectangle.rectangleFromString(bits)));
+                    break;
+                case "polygon":
+                    sprites.add(new JPolygon(JPolygon.polygonFromString(bits)));
+                    break;
+            }
+        }
+    }
 
     // Exports the canvas to a Java Swing code file.
     private void export() {

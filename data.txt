@@ -1,2 +1,2 @@
-type=rectangle;x=227;y=185;width=20;height=20
-type=polygon;xpoints=[40,50,53];ypoints=[42,42,134]
+type=rectangle;x=149;y=122;width=112;height=20
+type=oval;x=144;y=136;width=101;height=139

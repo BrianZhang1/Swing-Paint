@@ -28,6 +28,7 @@ public class JPolygon extends JSprite {
         this.polygon = polygon;
     }
 
+
     public Polygon getPolygon() {
         return polygon;
     }
@@ -70,6 +71,40 @@ public class JPolygon extends JSprite {
         ypointsString += "]";
 
         return String.format("type=%s;xpoints=%s;ypoints=%s", type, xpointsString, ypointsString);
+    }
+
+    // Creates a Polygon from the given String.
+    // Also see the toString() method.
+    public static Polygon polygonFromString(String[] data) {
+        String xpointsString, ypointsString;
+        int[] xpoints, ypoints;
+        String[] bits;
+
+        xpointsString = data[1];
+        ypointsString = data[2];
+
+        // Value is on the right of the equals sign. Isolate value.
+        xpointsString = xpointsString.split("=")[1];
+        ypointsString = ypointsString.split("=")[1];
+        // Strip the first and last character (square brackets).
+        xpointsString = xpointsString.substring(1, xpointsString.length()-1);
+        ypointsString = ypointsString.substring(1, ypointsString.length()-1);
+
+        // Load values of xpointsString into xpoints.
+        bits = xpointsString.split(",");
+        xpoints = new int[bits.length];
+        for(int i = 0; i < xpoints.length; i++) {
+            xpoints[i] = Integer.parseInt(bits[i]);
+        }
+
+        // Load values of ypointsString into ypoints.
+        bits = ypointsString.split(",");
+        ypoints = new int[bits.length];
+        for(int i = 0; i < ypoints.length; i++) {
+            ypoints[i] = Integer.parseInt(bits[i]);
+        }
+
+        return new Polygon(xpoints, ypoints, xpoints.length);
     }
 
     @Override
