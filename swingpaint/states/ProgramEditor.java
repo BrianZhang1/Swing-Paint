@@ -115,19 +115,23 @@ public class ProgramEditor extends JPanel implements MouseListener, MouseMotionL
 
     // Creates a sprite on the canvas.
     private void createSprite(String type) {
+        // Default will be a rect.
+        JSprite newSprite = new JRectangle(0, 0, 20, 20);
         switch(type) {
             case "rectangle":
-                sprites.add(new JRectangle(0, 0, 20, 20));
+                // do nothing since rect is default.
                 break;
             case "oval":
-                sprites.add(new JOval(0, 0, 20, 20));
+                newSprite = new JOval(0, 0, 20, 20);
                 break;
             case "polygon":
                 Polygon polygon = new Polygon(new int[]{0, 10, 5}, new int[]{0, 0, 10}, 3);
-                sprites.add(new JPolygon(polygon));
+                newSprite = new JPolygon(polygon);
                 break;
         }
-        setFocus(sprites.get(sprites.size()-1));
+
+        sprites.add(newSprite);
+        setFocus(newSprite);
         repaint();
     }
 
@@ -388,9 +392,10 @@ public class ProgramEditor extends JPanel implements MouseListener, MouseMotionL
 
             // Check if the click was on a sprite.
             if(dragPointHeld == -1) {
-                for(JSprite sprite : sprites) {
-                    if(sprite.contains(p)) {
-                        setFocus(sprite);
+                // Loop through backwards so newest sprites get click priority.
+                for(int i = sprites.size()-1; i >= 0; i--) {
+                    if(sprites.get(i).contains(p)) {
+                        setFocus(sprites.get(i));
                         spriteHeld = true;
                         dx = (int)p.getX() - (int)focus.getX();
                         dy = (int)p.getY() - (int)focus.getY();
@@ -407,10 +412,11 @@ public class ProgramEditor extends JPanel implements MouseListener, MouseMotionL
         // Show the details panel if right click on sprite.
         else if(e.getButton() == MouseEvent.BUTTON3) {
             Point p = e.getPoint();
-            for(JSprite sprite : sprites) {
-                if(sprite.contains(p)) {
-                    setFocus(sprite);
+            for(int i = sprites.size()-1; i >= 0; i--) {
+                if(sprites.get(i).contains(p)) {
+                    setFocus(sprites.get(i));
                     showDetailsPanel(0, 0);
+                    break;
                 }
             }
         }
