@@ -37,7 +37,7 @@ class Main extends JFrame {
         }
 
         // Initial State
-        changeState("ProgramEditor");
+        changeState("Home");
     }
 
     private void changeState(String newState) {
@@ -47,14 +47,18 @@ class Main extends JFrame {
         }
 
         // Add new state.
-        if("ProgramEditor".equals(newState)) {
-            if(data == null) {
-                currentState = new ProgramEditor(s -> changeState(s));
-            }
-            else {
+        if("ProgramEditorNew".equals(newState)) {
+            currentState = new ProgramEditor(s -> changeState(s));
+        }
+        else if("ProgramEditorLoad".equals(newState)) {
+            if(data != null) {
                 currentState = new ProgramEditor(s -> changeState(s), data);
             }
-        } else if("Home".equals(newState)) {
+            else {
+                currentState = new ProgramEditor(s -> changeState(s));
+            }
+        }
+        else if("Home".equals(newState)) {
             currentState = new Home(s -> changeState(s));
         }
         add(currentState);
