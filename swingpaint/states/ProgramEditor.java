@@ -209,7 +209,11 @@ public class ProgramEditor extends JPanel implements MouseListener, MouseMotionL
             String type = bits[0].split("=")[1];
             switch(type) {
                 case "rectangle":
-                    sprites.add(new JRectangle(JRectangle.rectangleFromString(bits)));
+                    Rectangle r = JRectangle.rectangleFromString(bits);
+                    JRectangle jr = new JRectangle(r);
+                    String[] bitss = bits[5].split("=")[1].split(",");
+                    jr.setRGBString(Integer.parseInt(bitss[0]), Integer.parseInt(bitss[1]), Integer.parseInt(bitss[2]));
+                    sprites.add(jr);
                     break;
                 case "oval":
                     sprites.add(new JOval(JRectangle.rectangleFromString(bits)));
