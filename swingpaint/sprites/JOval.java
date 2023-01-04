@@ -16,6 +16,7 @@ public class JOval extends JSprite {
     // Provides string representation of this sprite.
     @Override
     public String toString() {
-        return String.format("type=%s;x=%d;y=%d;width=%d;height=%d", type, x, y, width, height);
+        return String.format("type=%s;x=%d;y=%d;width=%d;height=%d;color=%s",
+            type, x, y, width, height, getRGBString());
     }
 }

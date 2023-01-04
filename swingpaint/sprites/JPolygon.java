@@ -70,7 +70,8 @@ public class JPolygon extends JSprite {
         ypointsString = ypointsString.substring(0, ypointsString.length()-1);
         ypointsString += "]";
 
-        return String.format("type=%s;xpoints=%s;ypoints=%s", type, xpointsString, ypointsString);
+        return String.format("type=%s;xpoints=%s;ypoints=%s;color=%s",
+            type, xpointsString, ypointsString, getRGBString());
     }
 
     // Creates a Polygon from the given String.

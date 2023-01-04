@@ -208,19 +208,27 @@ public class ProgramEditor extends JPanel implements MouseListener, MouseMotionL
             String[] bits = spriteData.split(";");
             String type = bits[0].split("=")[1];
             switch(type) {
-                case "rectangle":
-                    // Create Rectangle and set color
-                    Rectangle r = JRectangle.rectangleFromString(bits);
-                    JRectangle jr = new JRectangle(r);
-                    jr.setRGBString(bits[5]);
+                case "rectangle": {
+                    // Create JRectangle and set color
+                    JRectangle jr = new JRectangle(JRectangle.rectangleFromString(bits));
+                    jr.setRGBString(bits[5].split("=")[1]);
                     sprites.add(jr);
                     break;
-                case "oval":
-                    sprites.add(new JOval(JRectangle.rectangleFromString(bits)));
+                }
+                case "oval": {
+                    // Create JOval and set color
+                    JOval jo = new JOval(JRectangle.rectangleFromString(bits));
+                    jo.setRGBString(bits[5].split("=")[1]);
+                    sprites.add(jo);
                     break;
-                case "polygon":
-                    sprites.add(new JPolygon(JPolygon.polygonFromString(bits)));
+                }
+                case "polygon": {
+                    // Create JPolygon and set color
+                    JPolygon jp = new JPolygon(JPolygon.polygonFromString(bits));
+                    jp.setRGBString(bits[3].split("=")[1]);
+                    sprites.add(jp);
                     break;
+                }
             }
         }
     }
