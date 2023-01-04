@@ -1,1 +1,0 @@
-type=rectangle;x=172;y=174;width=62;height=64;color=255,0,0
