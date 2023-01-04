@@ -1,2 +1,1 @@
-type=rectangle;x=149;y=122;width=112;height=20
-type=oval;x=144;y=136;width=101;height=139
+type=rectangle;x=172;y=174;width=62;height=64;color=255,0,0
