@@ -209,10 +209,10 @@ public class ProgramEditor extends JPanel implements MouseListener, MouseMotionL
             String type = bits[0].split("=")[1];
             switch(type) {
                 case "rectangle":
+                    // Create Rectangle and set color
                     Rectangle r = JRectangle.rectangleFromString(bits);
                     JRectangle jr = new JRectangle(r);
-                    String[] bitss = bits[5].split("=")[1].split(",");
-                    jr.setRGBString(Integer.parseInt(bitss[0]), Integer.parseInt(bitss[1]), Integer.parseInt(bitss[2]));
+                    jr.setRGBString(bits[5]);
                     sprites.add(jr);
                     break;
                 case "oval":
@@ -628,8 +628,7 @@ public class ProgramEditor extends JPanel implements MouseListener, MouseMotionL
                         break;
                     case "color":
                         String rgbString = searchRowByAttribute("color").textField.getText();
-                        String[] bitss = rgbString.split(",");
-                        focus.setRGBString(Integer.parseInt(bitss[0]), Integer.parseInt(bitss[1]), Integer.parseInt(bitss[2]));
+                        focus.setRGBString(rgbString);
                         ProgramEditor.this.repaint();
                         break;
                     case "point":

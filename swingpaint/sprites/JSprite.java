@@ -85,8 +85,9 @@ public class JSprite extends Rectangle {
         return String.format("%d,%d,%d", color.getRed(), color.getGreen(), color.getBlue());
     }
 
-    public void setRGBString(int r, int g, int b) {
-        color = new Color(r, g, b);
+    public void setRGBString(String rgbString) {
+        String[] bits = rgbString.split(",");
+        color = new Color(Integer.parseInt(bits[0]), Integer.parseInt(bits[1]), Integer.parseInt(bits[2]));
     }
 
     public String getType() {
