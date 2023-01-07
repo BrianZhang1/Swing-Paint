@@ -66,6 +66,10 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
     private String projectTitle;
     private JTextField projectTitleTextField;
 
+    private JPanel popupPanel;
+    private JLabel popupPanelLabel;
+    private JTextField popupPanelTextField;
+
 
     public ProjectEditor(Consumer<String> changeState, Consumer<String> setTitle) {
         init(changeState, setTitle);
@@ -106,6 +110,14 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
         optionsSelect = new JComboBox<>(new String[]{"Select", "Export", "Home", "Set Title", "Save Project"});
         optionsSelect.setActionCommand("execute option");
         optionsSelect.addActionListener(this);
+
+        // Initalizing popup panel
+        popupPanel = new JPanel();
+        popupPanel.setBackground(Color.WHITE);
+        popupPanelLabel = new JLabel();
+        popupPanelTextField = new JTextField();
+        popupPanel.add(popupPanelLabel);
+        popupPanel.add(popupPanelTextField);
         
         // Initalizing Images
         try {
@@ -200,29 +212,36 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
     }
 
 
-    // Shows the project title text field.
-    private void showProjectTitleTextField() {
-        projectTitleTextField.setBounds(200, 200, 0, 0);
-        projectTitleTextField.setSize(projectTitleTextField.getPreferredSize());
-        add(projectTitleTextField);
-        projectTitleTextField.revalidate();
-        repaint();
-    }
-
-
-    // Hides the project title text field.
-    private void hideProjectTitleTextField() {
-        remove(projectTitleTextField);
-        repaint();
-    }
-
-    
     // Changes the title of the project.
     private void setProjectTitle(String newTitle) {
         projectTitle = newTitle;
 
         // Change the title of the frame to match new title.
         setTitle.accept("Swing Paint - " + newTitle);
+    }
+
+
+    // Shows the popup panel.
+    private void showPopupPanel(String labelText, String textFieldCommand, String textFieldValue) {
+        popupPanelLabel.setText(textFieldValue);
+        popupPanelTextField.setColumns(10);
+        popupPanelTextField.setActionCommand(textFieldCommand);
+        popupPanelTextField.setText(textFieldValue);
+        popupPanelTextField.addActionListener(this);
+
+        popupPanel.setSize(popupPanel.getPreferredSize());
+        // Center the popup panel in frame.
+        popupPanel.setLocation(this.getWidth()/2-popupPanel.getWidth()/2, this.getHeight()/2-popupPanel.getHeight()/2);
+        add(popupPanel);
+        popupPanel.revalidate();
+        repaint();
+    }
+
+
+    // Hides the popup panel.
+    private void hidePopupPanel() {
+        remove(popupPanel);
+        repaint();
     }
 
     
@@ -246,7 +265,7 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
                 changeState.accept("Home");
             }
             else if("Set Title".equals(selection)) {
-                showProjectTitleTextField();
+                showPopupPanel("Project Title", "setTitle", projectTitle);
             }
             else if("Save Project".equals(selection)) {
                 saveProject();
@@ -255,9 +274,9 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
 
         // Set the title.
         else if("setTitle".equals(e.getActionCommand())) {
-            String newTitle = projectTitleTextField.getText();
+            String newTitle = popupPanelTextField.getText();
             setProjectTitle(newTitle);
-            hideProjectTitleTextField();
+            hidePopupPanel();
         }
     }
 
@@ -431,7 +450,6 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
             hideDetailsPanel();
             hideOptions();
             hideSpriteSelect();
-            hideProjectTitleTextField();
 
             dragPointHeld = -1;
             Point p = e.getPoint();
