@@ -53,6 +53,7 @@ public class ProgramEditor extends JPanel implements MouseListener, MouseMotionL
     private int dragPointHeld;              // the index of the drag point held. -1 if none are held.
 
     Consumer<String> changeState;           // Callback function to change state.
+    Consumer<String> setTitle;              // Callback function to set title of frame.
 
     private BufferedImage addIcon;          // Icon to add new sprites.
     private Rectangle addIconRect;          // A rectangle that represents the position and size of the icon.
@@ -62,20 +63,26 @@ public class ProgramEditor extends JPanel implements MouseListener, MouseMotionL
     private JComboBox<String> spriteSelect;
     private JComboBox<String> optionsSelect;
 
+    private String projectTitle;
+    private JTextField projectTitleTextField;
 
-    public ProgramEditor(Consumer<String> changeState) {
-        init(changeState);
+
+    public ProgramEditor(Consumer<String> changeState, Consumer<String> setTitle) {
+        init(changeState, setTitle);
 
         // Canvas has one initial sprite.
         createSprite("rectangle");
+
+        // New projects are initially titled "Untitled".
+        setProjectTitle("Untitled");
     }
 
-    public ProgramEditor(Consumer<String> changeState, ArrayList<String> data) {
-        init(changeState);
+    public ProgramEditor(Consumer<String> changeState, Consumer<String> setTitle, ArrayList<String> data) {
+        init(changeState, setTitle);
         importData(data);
     }
     
-    public void init(Consumer<String> changeState) {
+    public void init(Consumer<String> changeState, Consumer<String> setTitle) {
         // Configuring JPanel
         setPreferredSize(new Dimension(400, 400));
         setFocusable(true);
@@ -88,6 +95,7 @@ public class ProgramEditor extends JPanel implements MouseListener, MouseMotionL
 
         // Initializing variables
         this.changeState = changeState;
+        this.setTitle = setTitle;
         sprites = new ArrayList<>();
         spriteHeld = false;
         detailsPanel = new DetailsPanel();
@@ -95,7 +103,7 @@ public class ProgramEditor extends JPanel implements MouseListener, MouseMotionL
         spriteSelect = new JComboBox<>(new String[]{"Select", "rectangle", "oval", "polygon"});
         spriteSelect.setActionCommand("add sprite");
         spriteSelect.addActionListener(this);
-        optionsSelect = new JComboBox<>(new String[]{"Select", "Export", "Home"});
+        optionsSelect = new JComboBox<>(new String[]{"Select", "Export", "Home", "Set Title"});
         optionsSelect.setActionCommand("execute option");
         optionsSelect.addActionListener(this);
         
@@ -110,6 +118,11 @@ public class ProgramEditor extends JPanel implements MouseListener, MouseMotionL
         // Initalize rects for buttons.
         addIconRect = new Rectangle(getPreferredSize().width-addIcon.getWidth()-5, 5, addIcon.getWidth(), addIcon.getHeight());
         optionsIconRect = new Rectangle(addIconRect.x-optionsIcon.getWidth()-5, addIconRect.y, optionsIcon.getWidth(), optionsIcon.getHeight());
+
+        // Initialize Project Title Text Field which sets the title of the working project.
+        projectTitleTextField = new JTextField(projectTitle, 10);
+        projectTitleTextField.addActionListener(this);
+        projectTitleTextField.setActionCommand("setTitle");
     }
 
 
@@ -186,14 +199,43 @@ public class ProgramEditor extends JPanel implements MouseListener, MouseMotionL
         repaint();
     }
 
+
+    // Shows the project title text field.
+    private void showProjectTitleTextField() {
+        projectTitleTextField.setBounds(200, 200, 0, 0);
+        projectTitleTextField.setSize(projectTitleTextField.getPreferredSize());
+        add(projectTitleTextField);
+        projectTitleTextField.revalidate();
+        repaint();
+    }
+
+
+    // Hides the project title text field.
+    private void hideProjectTitleTextField() {
+        remove(projectTitleTextField);
+        repaint();
+    }
+
     
+    // Changes the title of the project.
+    private void setProjectTitle(String newTitle) {
+        projectTitle = newTitle;
+
+        // Change the title of the frame to match new title.
+        setTitle.accept("Swing Paint - " + newTitle);
+    }
+
+    
+    // Handle the different commands sent to this object by various action listeners.
     public void actionPerformed(ActionEvent e) {
-        System.out.println(e.getActionCommand());
+        // Add a new sprite.
         if("add sprite".equals(e.getActionCommand())) {
             String selection = (String)spriteSelect.getSelectedItem();
             hideSpriteSelect();
             createSprite(selection);
         }
+
+        // Execute an option command.
         else if("execute option".equals(e.getActionCommand())) {
             String selection = (String)optionsSelect.getSelectedItem();
             hideOptions();
@@ -203,13 +245,29 @@ public class ProgramEditor extends JPanel implements MouseListener, MouseMotionL
             else if("Home".equals(selection)) {
                 changeState.accept("Home");
             }
+            else if("Set Title".equals(selection)) {
+                showProjectTitleTextField();
+            }
+        }
+
+        // Set the title.
+        else if("setTitle".equals(e.getActionCommand())) {
+            String newTitle = projectTitleTextField.getText();
+            setProjectTitle(newTitle);
+            hideProjectTitleTextField();
         }
     }
 
     // Creates sprites from String[] where each element represents a Sprite.
     private void importData(ArrayList<String> data) {
-        for(String spriteData : data) {
-            String[] bits = spriteData.split(";");
+        String[] bits;
+
+        // The first line contains the project title.
+        setProjectTitle(data.get(0).split(";")[1]);
+
+        // The remaining lines contain sprite data.
+        for(int i = 1; i < data.size(); i++) {
+            bits = data.get(i).split(";");
             String type = bits[0].split("=")[1];
             switch(type) {
                 case "rectangle": {
@@ -314,12 +372,14 @@ public class ProgramEditor extends JPanel implements MouseListener, MouseMotionL
     }
 
 
-    // Saves canvas to be edited in the future.
+    // Saves project to be edited in the future.
     private void save() {
-        try(PrintWriter pw = new PrintWriter(new FileWriter("data.txt"))) {
+        try(PrintWriter pw = new PrintWriter(new FileWriter("data.txt", true))) {
+            pw.println(String.format("ProjectStart;title=%s", projectTitle));     
             for(JSprite s : sprites) {
                 pw.println(s.toString());
             }
+            pw.println("ProjectEnd");
         }
         catch(IOException e) {
             e.printStackTrace();

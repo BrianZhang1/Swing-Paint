@@ -20,7 +20,7 @@ class Main extends JFrame {
         setTitle("Swing Paint");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        // Load data.txt file
+        // Load data file
         this.data = new ArrayList<>();
         try(BufferedReader br = new BufferedReader(new FileReader("data.txt"))) {
             String line = br.readLine();
@@ -48,14 +48,14 @@ class Main extends JFrame {
 
         // Add new state.
         if("ProgramEditorNew".equals(newState)) {
-            currentState = new ProgramEditor(s -> changeState(s));
+            currentState = new ProgramEditor(s -> changeState(s), s -> setTitle(s));
         }
         else if("ProgramEditorLoad".equals(newState)) {
             if(data != null) {
-                currentState = new ProgramEditor(s -> changeState(s), data);
+                currentState = new ProgramEditor(s -> changeState(s), s -> setTitle(s),  data);
             }
             else {
-                currentState = new ProgramEditor(s -> changeState(s));
+                currentState = new ProgramEditor(s -> changeState(s), s -> setTitle(s));
             }
         }
         else if("Home".equals(newState)) {
