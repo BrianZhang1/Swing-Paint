@@ -298,7 +298,7 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
         String[] bits;
 
         // The first line contains the project title.
-        setProjectTitle(data.get(0).split(";")[1]);
+        setProjectTitle(data.get(0).split(";")[1].split("=")[1]);
 
         // The remaining lines contain sprite data.
         for(int i = 1; i < data.size(); i++) {
