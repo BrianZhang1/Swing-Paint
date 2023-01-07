@@ -368,7 +368,7 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
                             yPointsString += Integer.toString(polygon.ypoints[j]) + ", ";
                         }
                         xPointsString = xPointsString.substring(0, xPointsString.length()-2) + "};";
-                        yPointsString = yPointsString.substring(0, xPointsString.length()-2) + "};";
+                        yPointsString = yPointsString.substring(0, yPointsString.length()-2) + "};";
 
                         pw.println(xPointsString);
                         pw.println(yPointsString);
