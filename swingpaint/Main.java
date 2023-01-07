@@ -25,7 +25,14 @@ class Main extends JFrame {
         // Initialize variables.
         selectedProjectData = null;
 
-        // Load data file
+        loadData();
+
+        // Initial State
+        changeState("Home");
+    }
+
+    // Loads data file.
+    private void loadData() {
         this.data = new ArrayList<>();
         try(BufferedReader br = new BufferedReader(new FileReader("data.txt"))) {
             String line = br.readLine();
@@ -41,8 +48,6 @@ class Main extends JFrame {
             e.printStackTrace();
         }
 
-        // Initial State
-        changeState("Home");
     }
 
     private void changeState(String newState) {
@@ -59,6 +64,7 @@ class Main extends JFrame {
             currentState = new ProjectEditor(s -> changeState(s), s -> setTitle(s),  selectedProjectData);
         }
         else if("Home".equals(newState)) {
+            loadData();
             currentState = new Home(s -> changeState(s));
         }
         else if("ProjectSelect".equals(newState)) {
