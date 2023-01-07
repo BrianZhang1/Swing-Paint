@@ -427,7 +427,12 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
     @Override
     public void mousePressed(MouseEvent e) {
         if(e.getButton() == MouseEvent.BUTTON1) {
+            // Menus should disappear upon a click which is not on the menu.
             hideDetailsPanel();
+            hideOptions();
+            hideSpriteSelect();
+            hideProjectTitleTextField();
+
             dragPointHeld = -1;
             Point p = e.getPoint();
 
