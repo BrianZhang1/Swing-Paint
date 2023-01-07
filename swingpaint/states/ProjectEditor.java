@@ -102,16 +102,19 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
         this.setTitle = setTitle;
         sprites = new ArrayList<>();
         spriteHeld = false;
+
+        // Initializing menus.
         detailsPanel = new DetailsPanel();
         detailsPanelVisible = false;
+
         spriteSelect = new JComboBox<>(new String[]{"Select", "rectangle", "oval", "polygon"});
         spriteSelect.setActionCommand("add sprite");
         spriteSelect.addActionListener(this);
+
         optionsSelect = new JComboBox<>(new String[]{"Select", "Export", "Home", "Set Title", "Save Project"});
         optionsSelect.setActionCommand("execute option");
         optionsSelect.addActionListener(this);
 
-        // Initalizing popup panel
         popupPanel = new JPanel();
         popupPanel.setBackground(Color.WHITE);
         popupPanelLabel = new JLabel();
