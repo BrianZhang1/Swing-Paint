@@ -1,4 +1,7 @@
-Implement project saves.
-- Writing project data to json
-- Storing in data.json file
-- Creating project select screen (load button on homescreen)
+- Add save project to options.
+- runtime data should update after project is saved.
+- comboboxes should close on click somewhere else.
+- add more vertices option to polygon.
+- add images.
+
+- revise comments and prettify!
