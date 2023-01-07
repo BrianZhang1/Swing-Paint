@@ -119,6 +119,7 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
         popupPanel.setBackground(Color.WHITE);
         popupPanelLabel = new JLabel();
         popupPanelTextField = new JTextField();
+        popupPanelTextField.addActionListener(this);
         popupPanel.add(popupPanelLabel);
         popupPanel.add(popupPanelTextField);
         
@@ -143,23 +144,25 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
 
     // Creates a sprite on the canvas.
     private void createSprite(String type) {
-        // Default will be a rect.
-        JSprite newSprite = new JRectangle(0, 0, 20, 20);
+        JSprite newSprite;
+
         switch(type) {
             case "rectangle":
-                // do nothing since rect is default.
+                newSprite = new JRectangle(0, 0, 20, 20);
+                sprites.add(newSprite);
+                setFocus(newSprite);
                 break;
             case "oval":
                 newSprite = new JOval(0, 0, 20, 20);
+                sprites.add(newSprite);
+                setFocus(newSprite);
                 break;
             case "polygon":
-                Polygon polygon = new Polygon(new int[]{0, 10, 5}, new int[]{0, 0, 10}, 3);
-                newSprite = new JPolygon(polygon);
+                // Show the popup panel and ask user for number of points on polygon.
+                showPopupPanel("Number of Points", "createPolygon", "3");
                 break;
         }
 
-        sprites.add(newSprite);
-        setFocus(newSprite);
         repaint();
     }
 
@@ -226,11 +229,10 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
 
     // Shows the popup panel.
     private void showPopupPanel(String labelText, String textFieldCommand, String textFieldValue) {
-        popupPanelLabel.setText(textFieldValue);
+        popupPanelLabel.setText(labelText);
         popupPanelTextField.setColumns(10);
         popupPanelTextField.setActionCommand(textFieldCommand);
         popupPanelTextField.setText(textFieldValue);
-        popupPanelTextField.addActionListener(this);
 
         popupPanel.setSize(popupPanel.getPreferredSize());
         // Center the popup panel in frame.
@@ -279,6 +281,14 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
         else if("setTitle".equals(e.getActionCommand())) {
             String newTitle = popupPanelTextField.getText();
             setProjectTitle(newTitle);
+            hidePopupPanel();
+        }
+
+        // Creates a polygon with specified number of points in popup panel text field.
+        else if("createPolygon".equals(e.getActionCommand())) {
+            JSprite newSprite = new JPolygon(JPolygon.createDefaultPolygon(Integer.parseInt(popupPanelTextField.getText())));
+            sprites.add(newSprite);
+            setFocus(newSprite);
             hidePopupPanel();
         }
     }

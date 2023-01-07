@@ -108,6 +108,22 @@ public class JPolygon extends JSprite {
         return new Polygon(xpoints, ypoints, xpoints.length);
     }
 
+    // Creates a polygon with n points.
+    public static Polygon createDefaultPolygon(int n) {
+        int[] xpoints = new int[n];
+        int[] ypoints = new int[n];
+        for(int i = 0; i < (n+1)/2; i++) {
+            xpoints[i] = i*20;
+            ypoints[i] = (i%2)*5;
+        }
+        for(int i = 0; i < n/2; i++) {
+            xpoints[i+(n+1)/2] = xpoints[(n+1)/2 - i - 1];
+            ypoints[i+(n+1)/2] = (i%2)*5 + 20;
+        }
+
+        return new Polygon(xpoints, ypoints, n);
+    }
+
     @Override
     // Override JSprite method.
     // Moves the drag points. Called upon changing focused sprite.
