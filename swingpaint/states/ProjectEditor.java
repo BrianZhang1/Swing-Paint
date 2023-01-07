@@ -103,7 +103,7 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
         spriteSelect = new JComboBox<>(new String[]{"Select", "rectangle", "oval", "polygon"});
         spriteSelect.setActionCommand("add sprite");
         spriteSelect.addActionListener(this);
-        optionsSelect = new JComboBox<>(new String[]{"Select", "Export", "Home", "Set Title"});
+        optionsSelect = new JComboBox<>(new String[]{"Select", "Export", "Home", "Set Title", "Save Project"});
         optionsSelect.setActionCommand("execute option");
         optionsSelect.addActionListener(this);
         
@@ -248,6 +248,9 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
             else if("Set Title".equals(selection)) {
                 showProjectTitleTextField();
             }
+            else if("Save Project".equals(selection)) {
+                saveProject();
+            }
         }
 
         // Set the title.
@@ -373,7 +376,7 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
 
 
     // Saves project to be edited in the future.
-    private void save() {
+    private void saveProject() {
         try(PrintWriter pw = new PrintWriter(new FileWriter("data.txt", true))) {
             pw.println(String.format("ProjectStart;title=%s", projectTitle));     
             for(JSprite s : sprites) {
@@ -570,7 +573,7 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
 
             // s -> save.
             case 's':
-                save();
+                saveProject();
                 break;
         }
     }
