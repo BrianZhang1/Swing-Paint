@@ -3,7 +3,7 @@ package swingpaint;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-import swingpaint.states.ProgramEditor;
+import swingpaint.states.ProjectEditor;
 import swingpaint.states.Home;
 import swingpaint.states.ProjectSelect;
 
@@ -53,10 +53,10 @@ class Main extends JFrame {
 
         // Add new state.
         if("ProgramEditorNew".equals(newState)) {
-            currentState = new ProgramEditor(s -> changeState(s), s -> setTitle(s));
+            currentState = new ProjectEditor(s -> changeState(s), s -> setTitle(s));
         }
         else if("ProgramEditorLoad".equals(newState)) {
-            currentState = new ProgramEditor(s -> changeState(s), s -> setTitle(s),  selectedProjectData);
+            currentState = new ProjectEditor(s -> changeState(s), s -> setTitle(s),  selectedProjectData);
         }
         else if("Home".equals(newState)) {
             currentState = new Home(s -> changeState(s));

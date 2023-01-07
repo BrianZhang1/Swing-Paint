@@ -40,7 +40,7 @@ import java.io.IOException;
 import java.io.File;
 
 
-public class ProgramEditor extends JPanel implements MouseListener, MouseMotionListener, KeyListener, ActionListener {
+public class ProjectEditor extends JPanel implements MouseListener, MouseMotionListener, KeyListener, ActionListener {
     private ArrayList<JSprite> sprites;      // contains all the sprites on the canvas.
     private JSprite focus;                   // the sprite that is currently focused.
     private boolean spriteHeld;             // whether a sprite is held (clicked and held).
@@ -67,7 +67,7 @@ public class ProgramEditor extends JPanel implements MouseListener, MouseMotionL
     private JTextField projectTitleTextField;
 
 
-    public ProgramEditor(Consumer<String> changeState, Consumer<String> setTitle) {
+    public ProjectEditor(Consumer<String> changeState, Consumer<String> setTitle) {
         init(changeState, setTitle);
 
         // Canvas has one initial sprite.
@@ -77,7 +77,7 @@ public class ProgramEditor extends JPanel implements MouseListener, MouseMotionL
         setProjectTitle("Untitled");
     }
 
-    public ProgramEditor(Consumer<String> changeState, Consumer<String> setTitle, ArrayList<String> data) {
+    public ProjectEditor(Consumer<String> changeState, Consumer<String> setTitle, ArrayList<String> data) {
         init(changeState, setTitle);
         importData(data);
     }
@@ -527,17 +527,17 @@ public class ProgramEditor extends JPanel implements MouseListener, MouseMotionL
         switch(e.getKeyChar()) {
             // 1 -> create new rect.
             case '1':
-                ProgramEditor.this.createSprite("rectangle");
+                ProjectEditor.this.createSprite("rectangle");
                 break;
 
             // 2 -> create new oval.
             case '2':
-                ProgramEditor.this.createSprite("oval");
+                ProjectEditor.this.createSprite("oval");
                 break;
 
             // 3 -> create new polygon.
             case '3':
-                ProgramEditor.this.createSprite("polygon");
+                ProjectEditor.this.createSprite("polygon");
                 break;
 
             // d -> delete focused sprite.
@@ -686,24 +686,24 @@ public class ProgramEditor extends JPanel implements MouseListener, MouseMotionL
                 switch(bits[1]) {
                     case "width":
                         focus.setSize(Integer.parseInt(searchRowByAttribute("width").textField.getText()), (int)focus.getHeight());
-                        ProgramEditor.this.repaint();
+                        ProjectEditor.this.repaint();
                         break;
                     case "height":
                         focus.setSize((int)focus.getWidth(), Integer.parseInt(searchRowByAttribute("height").textField.getText()));
-                        ProgramEditor.this.repaint();
+                        ProjectEditor.this.repaint();
                         break;
                     case "x":
                         focus.setLocation(Integer.parseInt(searchRowByAttribute("x").textField.getText()), (int)focus.getY());
-                        ProgramEditor.this.repaint();
+                        ProjectEditor.this.repaint();
                         break;
                     case "y":
                         focus.setLocation((int)focus.getX(), Integer.parseInt(searchRowByAttribute("y").textField.getText()));
-                        ProgramEditor.this.repaint();
+                        ProjectEditor.this.repaint();
                         break;
                     case "color":
                         String rgbString = searchRowByAttribute("color").textField.getText();
                         focus.setRGBString(rgbString);
-                        ProgramEditor.this.repaint();
+                        ProjectEditor.this.repaint();
                         break;
                     case "point":
                         System.out.println("1");
@@ -713,13 +713,13 @@ public class ProgramEditor extends JPanel implements MouseListener, MouseMotionL
                             System.out.println("2");
                             int newX = Integer.parseInt(searchRowByAttribute(String.format("%s %s %s", bits[1], bits[2], bits[3])).textField.getText());
                             polygon.movePoint(pointIndex, newX, polygon.getPolygon().ypoints[pointIndex]);
-                            ProgramEditor.this.repaint();
+                            ProjectEditor.this.repaint();
                             break;
                         }
                         else if("y".equals(bits[3])) {
                             int newY = Integer.parseInt(searchRowByAttribute(String.format("%s %s %s", bits[1], bits[2], bits[3])).textField.getText());
                             polygon.movePoint(pointIndex, polygon.getPolygon().xpoints[pointIndex], newY);
-                            ProgramEditor.this.repaint();
+                            ProjectEditor.this.repaint();
                             break;
                         }
                         break;
@@ -730,7 +730,7 @@ public class ProgramEditor extends JPanel implements MouseListener, MouseMotionL
             else if("delete".equals(bits[0])) {
                 int i = sprites.indexOf(focus);
                 if(i != -1) {
-                    ProgramEditor.this.removeSprite(i);
+                    ProjectEditor.this.removeSprite(i);
                 }
             }
         }
