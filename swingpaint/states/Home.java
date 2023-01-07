@@ -35,7 +35,7 @@ public class Home extends JPanel implements ActionListener {
                 changeState.accept("ProgramEditorNew");
                 break;
             case "loadSave":
-                changeState.accept("ProgramEditorLoad");
+                changeState.accept("ProjectSelect");
                 break;
         }
     }
