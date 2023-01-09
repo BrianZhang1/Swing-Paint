@@ -1,7 +1,6 @@
-- Add save project to options.
-- runtime data should update after project is saved.
-- comboboxes should close on click somewhere else.
-- add more vertices option to polygon.
-- add images.
+- implement saves and exports with images
+- add canvas resize option
+- add layer reordering (move to front/back)
+- add more options to ProjectSelect (delete, back to home)
 
 - revise comments and prettify!
