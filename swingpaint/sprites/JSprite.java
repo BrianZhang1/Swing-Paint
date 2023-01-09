@@ -81,6 +81,20 @@ public class JSprite extends Rectangle {
         }
     }
 
+    // Drag points should adjust to resizes.
+    @Override
+    public void setSize(int width, int height) {
+        super.setSize(width, height);
+        moveDragPoints();
+    }
+
+    // Drag points should adjust to new location.
+    @Override
+    public void setLocation(int x, int y) {
+        super.setLocation(x, y);
+        moveDragPoints();
+    }
+
     public String getRGBString() {
         return String.format("%d,%d,%d", color.getRed(), color.getGreen(), color.getBlue());
     }
