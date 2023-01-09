@@ -11,6 +11,7 @@ import javax.swing.ImageIcon;
 
 import swingpaint.sprites.JOval;
 import swingpaint.sprites.JPolygon;
+import swingpaint.sprites.JImage;
 import swingpaint.sprites.JRectangle;
 import swingpaint.sprites.JSprite;
 
@@ -107,7 +108,7 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
         detailsPanel = new DetailsPanel();
         detailsPanelVisible = false;
 
-        spriteSelect = new JComboBox<>(new String[]{"Select", "rectangle", "oval", "polygon"});
+        spriteSelect = new JComboBox<>(new String[]{"Select", "rectangle", "oval", "polygon", "image"});
         spriteSelect.setActionCommand("add sprite");
         spriteSelect.addActionListener(this);
 
@@ -160,6 +161,10 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
             case "polygon":
                 // Show the popup panel and ask user for number of points on polygon.
                 showPopupPanel("Number of Points", "createPolygon", "3");
+                break;
+            case "image":
+                // Show the popup panel and ask user for the path to the image file.
+                showPopupPanel("Image Path", "createImage", "");
                 break;
         }
 
@@ -289,6 +294,14 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
             JSprite newSprite = new JPolygon(JPolygon.createDefaultPolygon(Integer.parseInt(popupPanelTextField.getText())));
             sprites.add(newSprite);
             setFocus(newSprite);
+            hidePopupPanel();
+        }
+
+        // Creates an image sprite with the specified image path.
+        else if("createImage".equals(e.getActionCommand())) {
+            JImage image = new JImage(JImage.imageFromPath(popupPanelTextField.getText()));
+            sprites.add(image);
+            setFocus(image);
             hidePopupPanel();
         }
     }
@@ -438,6 +451,9 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
             }
             else if("polygon".equals(sprite.getType())) {
                 g.fillPolygon(((JPolygon)sprite).getPolygon());
+            }
+            else if("image".equals(sprite.getType())) {
+                g.drawImage(((JImage)sprite).getImage(), sprite.x, sprite.y, null);
             }
         }
 
