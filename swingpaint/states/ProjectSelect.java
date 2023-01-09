@@ -24,38 +24,41 @@ public class ProjectSelect extends JPanel implements ActionListener {
         projectButtons = new ArrayList<>();
         this.loadProject = loadProject;
 
-        // Process data into separate projects.
-        ArrayList<String> projectData;
-        projectData = new ArrayList<>();
-        for(String line : data) {
-            try {
-                if("ProjectStart".equals(line.substring(0, "ProjectStart".length()))) {
-                    // Extract the title from the project header string.
-                    projectTitles.add(line.split(";")[1].split("=")[1]);
+
+        if(data != null) {
+            // Process data into separate projects.
+            ArrayList<String> projectData;
+            projectData = new ArrayList<>();
+            for(String line : data) {
+                try {
+                    if("ProjectStart".equals(line.substring(0, "ProjectStart".length()))) {
+                        // Extract the title from the project header string.
+                        projectTitles.add(line.split(";")[1].split("=")[1]);
+                        projectData.add(line);
+                        continue;   // skip the rest of the if statements.
+                    }
+                }
+                catch(StringIndexOutOfBoundsException e) {
+                    // do nothing.
+                }
+                if("ProjectEnd".equals(line)) {
+                    projects.add(projectData);
+                    projectData = new ArrayList<>();
+                }
+                else {
                     projectData.add(line);
-                    continue;   // skip the rest of the if statements.
                 }
             }
-            catch(StringIndexOutOfBoundsException e) {
-                // do nothing.
-            }
-            if("ProjectEnd".equals(line)) {
-                projects.add(projectData);
-                projectData = new ArrayList<>();
-            }
-            else {
-                projectData.add(line);
-            }
-        }
 
-        // Create a button for each project.
-        for(int i = 0; i < projectTitles.size(); i++) {
-            String title = projectTitles.get(i);
-            JButton button = new JButton(title);
-            button.setActionCommand(Integer.toString(i));
-            button.addActionListener(this);
-            projectButtons.add(new JButton(title));
-            add(button);
+            // Create a button for each project.
+            for(int i = 0; i < projectTitles.size(); i++) {
+                String title = projectTitles.get(i);
+                JButton button = new JButton(title);
+                button.setActionCommand(Integer.toString(i));
+                button.addActionListener(this);
+                projectButtons.add(new JButton(title));
+                add(button);
+            }
         }
     }
 
