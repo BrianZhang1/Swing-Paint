@@ -16,6 +16,8 @@ import swingpaint.sprites.JRectangle;
 import swingpaint.sprites.JSprite;
 
 import java.util.function.Consumer;
+import java.util.function.BiConsumer;
+import swingpaint.helpers.VoidCallback;
 
 import java.awt.Rectangle;
 import java.awt.Polygon;
@@ -55,6 +57,7 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
 
     Consumer<String> changeState;           // Callback function to change state.
     Consumer<String> setTitle;              // Callback function to set title of frame.
+    VoidCallback framePack;                 // Callback function to pack frame. Used for resizing.
 
     private BufferedImage addIcon;          // Icon to add new sprites.
     private Rectangle addIconRect;          // A rectangle that represents the position and size of the icon.
@@ -72,8 +75,8 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
     private JTextField popupPanelTextField;
 
 
-    public ProjectEditor(Consumer<String> changeState, Consumer<String> setTitle) {
-        init(changeState, setTitle);
+    public ProjectEditor(Consumer<String> changeState, Consumer<String> setTitle, VoidCallback framePack) {
+        init(changeState, setTitle, framePack);
 
         // Canvas has one initial sprite.
         createSprite("rectangle");
@@ -82,12 +85,12 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
         setProjectTitle("Untitled");
     }
 
-    public ProjectEditor(Consumer<String> changeState, Consumer<String> setTitle, ArrayList<String> data) {
-        init(changeState, setTitle);
+    public ProjectEditor(Consumer<String> changeState, Consumer<String> setTitle, VoidCallback framePack, ArrayList<String> data) {
+        init(changeState, setTitle, framePack);
         importData(data);
     }
     
-    public void init(Consumer<String> changeState, Consumer<String> setTitle) {
+    public void init(Consumer<String> changeState, Consumer<String> setTitle, VoidCallback framePack) {
         // Configuring JPanel
         setPreferredSize(new Dimension(400, 400));
         setFocusable(true);
@@ -101,6 +104,7 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
         // Initializing variables
         this.changeState = changeState;
         this.setTitle = setTitle;
+        this.framePack = framePack;
         sprites = new ArrayList<>();
         spriteHeld = false;
 
@@ -112,7 +116,7 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
         spriteSelect.setActionCommand("add sprite");
         spriteSelect.addActionListener(this);
 
-        optionsSelect = new JComboBox<>(new String[]{"Select", "Export", "Home", "Set Title", "Save Project"});
+        optionsSelect = new JComboBox<>(new String[]{"Select", "Export", "Home", "Set Title", "Save Project", "Resize Canvas"});
         optionsSelect.setActionCommand("execute option");
         optionsSelect.addActionListener(this);
 
@@ -282,6 +286,10 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
             else if("Save Project".equals(selection)) {
                 saveProject();
             }
+            else if("Resize Canvas".equals(selection)) {
+                String currentCanvasSize = String.format("%s,%s", Integer.toString(getWidth()), Integer.toString(getHeight()));
+                showPopupPanel("New Dimensions (width,height)", "setCanvasSize", currentCanvasSize);
+            }
         }
 
         // Set the title.
@@ -304,6 +312,12 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
             JImage image = new JImage(JImage.imageFromPath(popupPanelTextField.getText()));
             sprites.add(image);
             setFocus(image);
+            hidePopupPanel();
+        }
+
+        // Sets the canvas size.
+        else if("setCanvasSize".equals(e.getActionCommand())) {
+            resizeCanvas();
             hidePopupPanel();
         }
     }
@@ -434,6 +448,17 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
         catch(IOException e) {
             e.printStackTrace();
         }
+    }
+
+
+    // Resizes the canvas to width and height in text field.
+    private void resizeCanvas() {
+        String input = popupPanelTextField.getText();
+        String[] bits = input.split(",");
+        int width = Integer.parseInt(bits[0]);
+        int height = Integer.parseInt(bits[1]);
+        setPreferredSize(new Dimension(width, height));
+        framePack.accept();
     }
 
 

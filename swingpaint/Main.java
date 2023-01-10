@@ -21,6 +21,7 @@ class Main extends JFrame {
     public Main() {
         setTitle("Swing Paint");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setResizable(false);
 
         // Initialize variables.
         selectedProjectData = null;
@@ -58,10 +59,10 @@ class Main extends JFrame {
 
         // Add new state.
         if("ProgramEditorNew".equals(newState)) {
-            currentState = new ProjectEditor(s -> changeState(s), s -> setTitle(s));
+            currentState = new ProjectEditor(s -> changeState(s), s -> setTitle(s), () -> pack());
         }
         else if("ProgramEditorLoad".equals(newState)) {
-            currentState = new ProjectEditor(s -> changeState(s), s -> setTitle(s),  selectedProjectData);
+            currentState = new ProjectEditor(s -> changeState(s), s -> setTitle(s), () -> pack(), selectedProjectData);
         }
         else if("Home".equals(newState)) {
             loadData();
