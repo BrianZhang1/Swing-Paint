@@ -7,6 +7,7 @@ import swingpaint.states.ProjectEditor;
 import swingpaint.states.Home;
 import swingpaint.states.ProjectSelect;
 
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.BufferedReader;
@@ -26,14 +27,18 @@ class Main extends JFrame {
         // Initialize variables.
         selectedProjectData = null;
 
-        loadData();
-
         // Initial State
         changeState("Home");
     }
 
     // Loads data file.
     private void loadData() {
+        // Create userImages folder if it does not exist.
+        File userImagesDirectory = new File("userImages");
+        if(!userImagesDirectory.exists()) {
+            userImagesDirectory.mkdir();
+        }
+
         this.data = new ArrayList<>();
         try(BufferedReader br = new BufferedReader(new FileReader("data.txt"))) {
             String line = br.readLine();

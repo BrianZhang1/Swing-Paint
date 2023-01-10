@@ -176,7 +176,7 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
                 break;
             case "image":
                 // Show the popup panel and ask user for the path to the image file.
-                showPopupPanel("Image Path", "createImage", "");
+                showPopupPanel("Image Name", "createImage", "");
                 break;
         }
 
@@ -317,7 +317,7 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
 
         // Creates an image sprite with the specified image path.
         else if("createImage".equals(e.getActionCommand())) {
-            JImage image = new JImage(JImage.imageFromPath(popupPanelTextField.getText()));
+            JImage image = new JImage(JImage.imageFromPath("userImages\\" + popupPanelTextField.getText()));
             sprites.add(image);
             setFocus(image);
             hidePopupPanel();
