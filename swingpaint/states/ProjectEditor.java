@@ -383,13 +383,15 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
                 }
                 prevRGBString = RGBString;
                 switch(s.getType()) {
-                    case "rectangle":
+                    case "rectangle": {
                         pw.printf("\tg.fillRect(%d, %d, %d, %d);%n", s.x, s.y, s.width, s.height);
                         break;
-                    case "oval":
+                    }
+                    case "oval": {
                         pw.printf("\tg.fillOval(%d, %d, %d, %d);%n", s.x, s.y, s.width, s.height);
                         break;
-                    case "polygon":
+                    }
+                    case "polygon": {
                         // Must declare variables if this is the first polygon.
                         if(firstPolygon) {
                             pw.println("\tint[] xpoints, ypoints;");
@@ -411,6 +413,13 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
                         pw.println(yPointsString);
                         pw.printf("\tg.fillPolygon(xpoints, ypoints, %d);%n", polygon.npoints);
                         break;
+                    }
+
+                    case "image": {
+                        // TODO: implement image in saves
+
+                        break;
+                    }
                 }
             }
             pw.println("}");
