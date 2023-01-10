@@ -245,6 +245,8 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
         add(popupPanel);
         popupPanel.revalidate();
         repaint();
+
+        popupPanelTextField.requestFocusInWindow();
     }
 
 
