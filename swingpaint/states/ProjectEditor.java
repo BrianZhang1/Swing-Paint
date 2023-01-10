@@ -137,13 +137,21 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
             e.printStackTrace();
         }
         // Initalize rects for buttons.
-        addIconRect = new Rectangle(getPreferredSize().width-addIcon.getWidth()-5, 5, addIcon.getWidth(), addIcon.getHeight());
-        optionsIconRect = new Rectangle(addIconRect.x-optionsIcon.getWidth()-5, addIconRect.y, optionsIcon.getWidth(), optionsIcon.getHeight());
+        addIconRect = new Rectangle(0, 0, addIcon.getWidth(), addIcon.getHeight());
+        optionsIconRect = new Rectangle(0, 0, optionsIcon.getWidth(), optionsIcon.getHeight());
+        layoutComponents();
 
         // Initialize Project Title Text Field which sets the title of the working project.
         projectTitleTextField = new JTextField(projectTitle, 10);
         projectTitleTextField.addActionListener(this);
         projectTitleTextField.setActionCommand("setTitle");
+    }
+
+
+    // Lays out components.
+    private void layoutComponents() {
+        addIconRect.setLocation(getPreferredSize().width-addIcon.getWidth()-5, 5);
+        optionsIconRect.setLocation(addIconRect.x-optionsIcon.getWidth()-5, addIconRect.y);
     }
 
 
@@ -458,6 +466,7 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
         int width = Integer.parseInt(bits[0]);
         int height = Integer.parseInt(bits[1]);
         setPreferredSize(new Dimension(width, height));
+        layoutComponents();
         framePack.accept();
     }
 
