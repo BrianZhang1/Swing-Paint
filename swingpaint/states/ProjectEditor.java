@@ -317,7 +317,8 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
 
         // Creates an image sprite with the specified image path.
         else if("createImage".equals(e.getActionCommand())) {
-            JImage image = new JImage(JImage.imageFromPath("userImages\\" + popupPanelTextField.getText()));
+            String imageName = popupPanelTextField.getText();
+            JImage image = new JImage(JImage.imageFromPath("userImages\\" + imageName), imageName);
             sprites.add(image);
             setFocus(image);
             hidePopupPanel();
@@ -362,6 +363,11 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
                     jp.setRGBString(bits[3].split("=")[1]);
                     sprites.add(jp);
                     break;
+                }
+                case "image": {
+                    // Create JImage
+                    JImage ji = new JImage(JImage.imageFromPath(bits[5]), bits[5]);
+                    // TODO: finish adding JImage to save
                 }
             }
         }

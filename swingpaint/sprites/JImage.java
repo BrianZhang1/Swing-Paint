@@ -11,14 +11,28 @@ import java.awt.Point;
 public class JImage extends JSprite {
     private BufferedImage originalImage;    // Store the original image for resizing purposes.
     private BufferedImage image;            // The current image being drawn.
+    private String imageName;               // Stored for saving purposes.
 
 
-    public JImage(BufferedImage image) {
+    public JImage(BufferedImage image, String imageName) {
         super(0, 0, image.getWidth(), image.getHeight());
         
         type = "image";
         this.originalImage = image;
         this.image = originalImage;
+        this.imageName = imageName;
+    }
+
+
+    public JImage(BufferedImage image, String imageName, int x, int y, int width, int height) {
+        super(0, 0, image.getWidth(), image.getHeight());
+        
+        type = "image";
+        this.originalImage = image;
+        this.image = originalImage;
+        this.imageName = imageName;
+
+        // TODO: resize based on arguments
     }
 
 
@@ -66,5 +80,13 @@ public class JImage extends JSprite {
     // Returns this sprite's image.
     public BufferedImage getImage() {
         return image;
+    }
+
+
+    // Provides string representation of this sprite.
+    @Override
+    public String toString() {
+        return String.format("type=%s;x=%d;y=%d;width=%d;height=%d;imageName=%s",
+            type, x, y, width, height, imageName);
     }
 }
