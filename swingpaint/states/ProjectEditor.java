@@ -369,39 +369,73 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
 
     // Exports the canvas to a Java Swing code file.
     private void export() {
-        try(PrintWriter pw = new PrintWriter(new FileWriter("out.txt"))) {
+        File userImagesDirectory = new File("export");
+        if(!userImagesDirectory.exists()) {
+            userImagesDirectory.mkdir();
+        }
+
+        try(PrintWriter pw = new PrintWriter(new FileWriter(".\\export\\Program.java"))) {
+            // Begin by constructing boilerplate code for java program.
+            pw.println("import javax.swing.JFrame;");
+            pw.println("import javax.swing.JPanel;");
+            pw.println("import java.awt.Graphics;");
+            pw.println("import java.awt.Color;");
+            pw.println("import java.awt.Dimension;");
+            pw.println("");
+            pw.println("public class Program extends JFrame {");
+            pw.println("\tpublic Program() {");
+            pw.println("\t\tsetDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);");
+            pw.printf("\t\tsetTitle(\"%s\");%n", projectTitle);
+            pw.println("\t\tsetResizable(false);");
+            pw.println("\t\tadd(new Canvas());");
+            pw.println("\t\tpack();");
+            pw.println("\t}");
+            pw.println("\tpublic static void main(String[] args) {");
+            pw.println("\t\tProgram program = new Program();");
+            pw.println("\t\tprogram.setVisible(true);");
+            pw.println("\t}");
+            pw.println("}");
+            pw.println("");
+            pw.println("class Canvas extends JPanel {");
+            pw.println("\tpublic Canvas() {");
+            pw.printf("\t\tsetPreferredSize(new Dimension(%d, %d));%n", getWidth(), getHeight());
+            pw.println("\t}");
+            pw.println("\tpublic void paintComponent(Graphics g) {");
+
+            // Initialize some variables in preparation for implementing paintComponent.
             boolean firstPolygon = true;    // whether the first polygon has been created.
+            boolean firstImage = true;      // whether the first image has been created.
             String prevRGBString = null;
-            pw.println("public void paintComponent(Graphics g)");
-            pw.println("{");
+
+            // Now, convert each sprite into java swing code.
             for(int i = 0; i < sprites.size(); i++) {
                 JSprite s = sprites.get(i);
                 String RGBString = s.getRGBString();
                 // Skip the color statement if no color change is needed.
                 if(!RGBString.equals(prevRGBString)) {
-                    pw.printf("\tg.setColor(new Color(%s));%n", s.getRGBString());
+                    pw.printf("\t\tg.setColor(new Color(%s));%n", s.getRGBString());
                 }
                 prevRGBString = RGBString;
                 switch(s.getType()) {
                     case "rectangle": {
-                        pw.printf("\tg.fillRect(%d, %d, %d, %d);%n", s.x, s.y, s.width, s.height);
+                        pw.printf("\t\tg.fillRect(%d, %d, %d, %d);%n", s.x, s.y, s.width, s.height);
                         break;
                     }
                     case "oval": {
-                        pw.printf("\tg.fillOval(%d, %d, %d, %d);%n", s.x, s.y, s.width, s.height);
+                        pw.printf("\t\tg.fillOval(%d, %d, %d, %d);%n", s.x, s.y, s.width, s.height);
                         break;
                     }
                     case "polygon": {
                         // Must declare variables if this is the first polygon.
                         if(firstPolygon) {
-                            pw.println("\tint[] xpoints, ypoints;");
+                            pw.println("\t\tint[] xpoints, ypoints;");
                             firstPolygon = false;
                         }
 
                         // Construct statements as strings to initialize xpoints and ypoints.
                         Polygon polygon = ((JPolygon)s).getPolygon();
-                        String xPointsString = "\txpoints = new int[]{";
-                        String yPointsString = "\typoints = new int[]{";
+                        String xPointsString = "\t\txpoints = new int[]{";
+                        String yPointsString = "\t\typoints = new int[]{";
                         for(int j = 0; j < polygon.npoints; j++) {
                             xPointsString += Integer.toString(polygon.xpoints[j]) + ", ";
                             yPointsString += Integer.toString(polygon.ypoints[j]) + ", ";
@@ -411,17 +445,18 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
 
                         pw.println(xPointsString);
                         pw.println(yPointsString);
-                        pw.printf("\tg.fillPolygon(xpoints, ypoints, %d);%n", polygon.npoints);
+                        pw.printf("\t\tg.fillPolygon(xpoints, ypoints, %d);%n", polygon.npoints);
                         break;
                     }
 
                     case "image": {
-                        // TODO: implement image in saves
+                        // TODO: implement image in export (1. format and export image files to directory | 2. create image loader)
 
                         break;
                     }
                 }
             }
+            pw.println("\t}");
             pw.println("}");
         }
         catch(IOException e) {
@@ -455,6 +490,7 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
 
     // Saves project to be edited in the future.
     private void saveProject() {
+        // TODO: add project size and images
         try(PrintWriter pw = new PrintWriter(new FileWriter("data.txt", true))) {
             pw.println(String.format("ProjectStart;title=%s", projectTitle));     
             for(JSprite s : sprites) {
