@@ -89,6 +89,18 @@ public class JImage extends JSprite {
     }
 
 
+    // Returns this sprite's image's name.
+    public String getImageName() {
+        return imageName;
+    }
+
+
+    // Returns this sprite's image's file extension (e.g., jpg, png, etc.).
+    public String getImageFileExtension() {
+        return imageName.substring(imageName.length()-3, imageName.length());
+    }
+
+
     // Provides string representation of this sprite.
     @Override
     public String toString() {

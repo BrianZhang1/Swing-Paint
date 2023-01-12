@@ -383,19 +383,67 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
 
     // Exports the canvas to a Java Swing code file.
     private void export() {
-        File userImagesDirectory = new File("export");
-        if(!userImagesDirectory.exists()) {
-            userImagesDirectory.mkdir();
+        // Create parent directory for exported files.
+        File exportDirectory = new File("export");
+        if(!exportDirectory.exists()) {
+            exportDirectory.mkdir();
         }
 
+        // Initialize some variables and gather some sprite information
+        // in preparation for implementing paintComponent.
+        boolean containsPolygon = false;     // whether the exported data contains a polygon sprite.
+        boolean containsImage = false;       // whether the exported data contains an image sprite.
+        ArrayList<JImage> jImageList = new ArrayList<>();   // contains all the JImage sprites.
+        String prevRGBString = null;
+        int curImgIndex = 0;                // Tracks which image is currently being loaded.
+        for(JSprite s : sprites) {
+            if("polygon".equals(s.getType())) {
+                containsPolygon = true;
+            }
+            else if("image".equals(s.getType())) {
+                containsImage = true;
+                jImageList.add((JImage)s);
+            }
+        }
+
+        // Export image files.
+        if(containsImage) {
+            // Create images directory if does not exist.
+            File exportImagesDirectory = new File("export\\images");
+            if(!exportImagesDirectory.exists()) {
+                exportImagesDirectory.mkdir();
+            }
+
+            // Export image files to images directory.
+            for(JImage jimg : jImageList) {
+                File destination = new File("export\\images\\" + jimg.getImageName());
+                try {
+                    ImageIO.write(jimg.getImage(), jimg.getImageFileExtension(), destination);
+                }
+                catch(IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+
         try(PrintWriter pw = new PrintWriter(new FileWriter(".\\export\\Program.java"))) {
-            // Begin by constructing boilerplate code for java program.
+            // Begin constructing java program.
             pw.println("import javax.swing.JFrame;");
             pw.println("import javax.swing.JPanel;");
             pw.println("import java.awt.Graphics;");
             pw.println("import java.awt.Color;");
             pw.println("import java.awt.Dimension;");
+            if(containsImage) {
+                // import packages needed to handle images.
+                pw.println("import java.util.ArrayList;");
+                pw.println("import javax.imageio.ImageIO;");
+                pw.println("import java.io.File;");
+                pw.println("import java.io.IOException;");
+                pw.println("import java.awt.image.BufferedImage;");
+            }
             pw.println("");
+
             pw.println("public class Program extends JFrame {");
             pw.println("\tpublic Program() {");
             pw.println("\t\tsetDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);");
@@ -403,23 +451,48 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
             pw.println("\t\tsetResizable(false);");
             pw.println("\t\tadd(new Canvas());");
             pw.println("\t\tpack();");
+
             pw.println("\t}");
+            pw.println("");
             pw.println("\tpublic static void main(String[] args) {");
             pw.println("\t\tProgram program = new Program();");
             pw.println("\t\tprogram.setVisible(true);");
             pw.println("\t}");
             pw.println("}");
             pw.println("");
+
             pw.println("class Canvas extends JPanel {");
+            if(containsImage) {
+                // Create List to store images.
+                pw.println("\tArrayList<BufferedImage> imgs;");
+            }
+            pw.println("");
             pw.println("\tpublic Canvas() {");
             pw.printf("\t\tsetPreferredSize(new Dimension(%d, %d));%n", getWidth(), getHeight());
+            if(containsImage) {
+                pw.println("");
+                // Initialize List to store images.
+                pw.println("\t\timgs = new ArrayList<>();");
+                pw.println("\t\ttry {");
+                
+                // Load images into ArrayList.
+                for(JImage jimg : jImageList) {
+                    pw.printf("\t\t\timgs.add(ImageIO.read(new File(\"images\\\\%s\")));%n", jimg.getImageName());
+                }
+
+                pw.println("\t\t}");
+                pw.println("\t\tcatch(IOException e) {");
+                pw.println("\t\t\te.printStackTrace();");
+                pw.println("\t\t}");
+            }
             pw.println("\t}");
             pw.println("\tpublic void paintComponent(Graphics g) {");
 
-            // Initialize some variables in preparation for implementing paintComponent.
-            boolean firstPolygon = true;    // whether the first polygon has been created.
-            boolean firstImage = true;      // whether the first image has been created.
-            String prevRGBString = null;
+            
+            // Create xpoints/ypoints arrays for polygon implementation.
+            if(containsPolygon) {
+                pw.println("\t\tint[] xpoints, ypoints;");
+            }
 
             // Now, convert each sprite into java swing code.
             for(int i = 0; i < sprites.size(); i++) {
@@ -440,12 +513,6 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
                         break;
                     }
                     case "polygon": {
-                        // Must declare variables if this is the first polygon.
-                        if(firstPolygon) {
-                            pw.println("\t\tint[] xpoints, ypoints;");
-                            firstPolygon = false;
-                        }
-
                         // Construct statements as strings to initialize xpoints and ypoints.
                         Polygon polygon = ((JPolygon)s).getPolygon();
                         String xPointsString = "\t\txpoints = new int[]{";
@@ -464,7 +531,8 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
                     }
 
                     case "image": {
-                        // TODO: implement image in export (1. format and export image files to directory | 2. create image loader)
+                        pw.printf("\t\tg.drawImage(imgs.get(%d), %d, %d, null);%n", curImgIndex, s.x, s.y);
+                        curImgIndex++;
 
                         break;
                     }
