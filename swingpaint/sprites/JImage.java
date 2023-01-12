@@ -25,14 +25,14 @@ public class JImage extends JSprite {
 
 
     public JImage(BufferedImage image, String imageName, int x, int y, int width, int height) {
-        super(0, 0, image.getWidth(), image.getHeight());
+        super(x, y, width, height);
         
         type = "image";
         this.originalImage = image;
         this.image = originalImage;
         this.imageName = imageName;
 
-        // TODO: resize based on arguments
+        fitImage();
     }
 
 
@@ -48,6 +48,12 @@ public class JImage extends JSprite {
         }
 
         return image;
+    }
+
+
+    // Returns a BufferedImage given an image name, assuming it is in the appropriate directory.
+    public static BufferedImage imageFromName(String imageName) {
+        return imageFromPath(".\\userImages\\" + imageName);
     }
 
 

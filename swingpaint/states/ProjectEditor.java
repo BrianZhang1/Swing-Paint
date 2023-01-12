@@ -365,9 +365,17 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
                     break;
                 }
                 case "image": {
+                    // Extract attributes.
+                    int x = Integer.parseInt(bits[1].split("=")[1]);
+                    int y = Integer.parseInt(bits[2].split("=")[1]);
+                    int width = Integer.parseInt(bits[3].split("=")[1]);
+                    int height = Integer.parseInt(bits[4].split("=")[1]);
+                    String imageName = bits[5].split("=")[1];
+
                     // Create JImage
-                    JImage ji = new JImage(JImage.imageFromPath(bits[5]), bits[5]);
-                    // TODO: finish adding JImage to save
+                    JImage ji = new JImage(JImage.imageFromName(imageName), imageName, x, y, width, height);
+                    sprites.add(ji);
+                    break;
                 }
             }
         }
@@ -816,6 +824,7 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
 
 
         // Handle actions, primarily from Text Fields which update getAttributes().
+        // TODO: images must refit upon change of size
         public void actionPerformed(ActionEvent e) {
             String[] bits = e.getActionCommand().split(" ");
             if("set".equals(bits[0])) {
