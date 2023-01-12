@@ -207,6 +207,7 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
     private void showSpriteSelect() {
         spriteSelect.setBounds(getWidth()-85, addIconRect.y+addIconRect.height+5, 80, 30);
         add(spriteSelect);
+        spriteSelect.showPopup();
         spriteSelect.revalidate();
         repaint();
     }
@@ -221,8 +222,9 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
 
     // Shows the options dropdown list.
     private void showOptions() {
-        optionsSelect.setBounds(optionsIconRect.x, optionsIconRect.y+optionsIconRect.height+5, 80, 30);
+        optionsSelect.setBounds(getWidth()-85, addIconRect.y+addIconRect.height+5, 80, 30);
         add(optionsSelect);
+        optionsSelect.showPopup();
         optionsSelect.revalidate();
         repaint();
     }
@@ -793,7 +795,7 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
         }
     }
 
-    // Unused key listener methods. Adapter to be implemented.
+    // Unused key listener methods. TODO: Adapter.
     public void keyPressed(KeyEvent e) {
     }
     public void keyTyped(KeyEvent e) {

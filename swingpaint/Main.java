@@ -1,3 +1,5 @@
+// TODO: Error handling.
+// TODO: Reorganize option combo boxes.
 package swingpaint;
 
 import javax.swing.JFrame;
