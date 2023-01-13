@@ -329,7 +329,11 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
 
         // Sets the canvas size.
         else if("setCanvasSize".equals(e.getActionCommand())) {
-            resizeCanvas();
+            String input = popupPanelTextField.getText();
+            String[] bits = input.split(",");
+            int width = Integer.parseInt(bits[0]);
+            int height = Integer.parseInt(bits[1]);
+            resizeCanvas(width, height);
             hidePopupPanel();
         }
     }
@@ -338,8 +342,14 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
     private void importData(ArrayList<String> data) {
         String[] bits;
 
-        // The first line contains the project title.
-        setProjectTitle(data.get(0).split(";")[1].split("=")[1]);
+        // The first line contains the project meta data.
+        bits = data.get(0).split(";");
+        String projectTitle = bits[1].split("=")[1];
+        String projectSizeBits = bits[2].split("=")[1];
+        int projectWidth = Integer.parseInt(projectSizeBits.split(",")[0]);
+        int projectHeight = Integer.parseInt(projectSizeBits.split(",")[1]);
+        setProjectTitle(projectTitle);
+        resizeCanvas(projectWidth, projectHeight);
 
         // The remaining lines contain sprite data.
         for(int i = 1; i < data.size(); i++) {
@@ -575,9 +585,8 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
 
     // Saves project to be edited in the future.
     private void saveProject() {
-        // TODO: add project size and images
         try(PrintWriter pw = new PrintWriter(new FileWriter("data.txt", true))) {
-            pw.println(String.format("ProjectStart;title=%s", projectTitle));     
+            pw.println(String.format("ProjectStart;title=%s;size=%d,%d", projectTitle, getWidth(), getHeight()));     
             for(JSprite s : sprites) {
                 pw.println(s.toString());
             }
@@ -590,11 +599,7 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
 
 
     // Resizes the canvas to width and height in text field.
-    private void resizeCanvas() {
-        String input = popupPanelTextField.getText();
-        String[] bits = input.split(",");
-        int width = Integer.parseInt(bits[0]);
-        int height = Integer.parseInt(bits[1]);
+    private void resizeCanvas(int width, int height) {
         setPreferredSize(new Dimension(width, height));
         layoutComponents();
         framePack.accept();
@@ -895,7 +900,6 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
 
 
         // Handle actions, primarily from Text Fields which update getAttributes().
-        // TODO: images must refit upon change of size
         public void actionPerformed(ActionEvent e) {
             String[] bits = e.getActionCommand().split(" ");
             if("set".equals(bits[0])) {
