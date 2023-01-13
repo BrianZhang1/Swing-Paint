@@ -62,6 +62,14 @@ public class JImage extends JSprite {
         super.handleDragPoint(dragPointHeld, p);
         fitImage();
     }
+    
+    
+    // setSize should refit image.
+    @Override
+    public void setSize(int width, int height) {
+        super.setSize(width, height);
+        fitImage();
+    }
 
 
     // Fits the image to the bounds of this sprite's rectangle.
