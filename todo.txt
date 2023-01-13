@@ -1,5 +1,0 @@
-- implement saves and exports with images
-- add layer reordering (move to front/back)
-- add more options to ProjectSelect (delete, back to home, sort) and make list format
-
-- revise comments and prettify! (constructor/method/class/file comments, as well as overall explanation)

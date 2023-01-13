@@ -175,6 +175,7 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
                 showPopupPanel("Number of Points", "createPolygon", "3");
                 break;
             case "image":
+                // TODO: selection pane
                 // Show the popup panel and ask user for the path to the image file.
                 showPopupPanel("Image Name", "createImage", "");
                 break;
