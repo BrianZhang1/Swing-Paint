@@ -58,6 +58,7 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
     Consumer<String> changeState;           // Callback function to change state.
     Consumer<String> setTitle;              // Callback function to set title of frame.
     VoidCallback framePack;                 // Callback function to pack frame. Used for resizing.
+    Consumer<ArrayList<String>> saveProjectCallback;            // Callback function to save project.
 
     private BufferedImage addIcon;          // Icon to add new sprites.
     private Rectangle addIconRect;          // A rectangle that represents the position and size of the icon.
@@ -75,8 +76,8 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
     private JTextField popupPanelTextField;
 
 
-    public ProjectEditor(Consumer<String> changeState, Consumer<String> setTitle, VoidCallback framePack) {
-        init(changeState, setTitle, framePack);
+    public ProjectEditor(Consumer<String> changeState, Consumer<String> setTitle, VoidCallback framePack, Consumer<ArrayList<String>> saveProjectCallback) {
+        init(changeState, setTitle, framePack, saveProjectCallback);
 
         // Canvas has one initial sprite.
         createSprite("rectangle");
@@ -85,12 +86,12 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
         setProjectTitle("Untitled");
     }
 
-    public ProjectEditor(Consumer<String> changeState, Consumer<String> setTitle, VoidCallback framePack, ArrayList<String> data) {
-        init(changeState, setTitle, framePack);
+    public ProjectEditor(Consumer<String> changeState, Consumer<String> setTitle, VoidCallback framePack, Consumer<ArrayList<String>> saveProjectCallback, ArrayList<String> data) {
+        init(changeState, setTitle, framePack, saveProjectCallback);
         importData(data);
     }
     
-    public void init(Consumer<String> changeState, Consumer<String> setTitle, VoidCallback framePack) {
+    public void init(Consumer<String> changeState, Consumer<String> setTitle, VoidCallback framePack, Consumer<ArrayList<String>> saveProjectCallback) {
         // Configuring JPanel
         setPreferredSize(new Dimension(400, 400));
         setFocusable(true);
@@ -105,6 +106,7 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
         this.changeState = changeState;
         this.setTitle = setTitle;
         this.framePack = framePack;
+        this.saveProjectCallback = saveProjectCallback;
         sprites = new ArrayList<>();
         spriteHeld = false;
 
@@ -585,16 +587,15 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
 
     // Saves project to be edited in the future.
     private void saveProject() {
-        try(PrintWriter pw = new PrintWriter(new FileWriter("data.txt", true))) {
-            pw.println(String.format("ProjectStart;title=%s;size=%d,%d", projectTitle, getWidth(), getHeight()));     
-            for(JSprite s : sprites) {
-                pw.println(s.toString());
-            }
-            pw.println("ProjectEnd");
+        ArrayList<String> projectData = new ArrayList<>();
+
+        projectData.add(String.format("ProjectStart;title=%s;size=%d,%d", projectTitle, getWidth(), getHeight()));     
+        for(JSprite s : sprites) {
+            projectData.add(s.toString());
         }
-        catch(IOException e) {
-            e.printStackTrace();
-        }
+        projectData.add("ProjectEnd");
+
+        saveProjectCallback.accept(projectData);
     }
 
 

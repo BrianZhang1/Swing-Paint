@@ -16,6 +16,8 @@ import swingpaint.states.ProjectSelect;
 
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.PrintWriter;
 import java.io.IOException;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -63,6 +65,18 @@ class Main extends JFrame {
 
     }
 
+    // Writes data to data file.
+    private void writeData() {
+        try(PrintWriter pw = new PrintWriter(new FileWriter("data.txt"))) {
+            for(String line : data) {
+                pw.println(line);
+            }
+        }
+        catch(IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     private void changeState(String newState) {
         // Clear current state.
         if(currentState != null) {
@@ -71,17 +85,17 @@ class Main extends JFrame {
 
         // Add new state.
         if("ProgramEditorNew".equals(newState)) {
-            currentState = new ProjectEditor(s -> changeState(s), s -> setTitle(s), () -> pack());
+            currentState = new ProjectEditor(s -> changeState(s), s -> setTitle(s), () -> pack(), s -> saveProject(s));
         }
         else if("ProgramEditorLoad".equals(newState)) {
-            currentState = new ProjectEditor(s -> changeState(s), s -> setTitle(s), () -> pack(), selectedProjectData);
+            currentState = new ProjectEditor(s -> changeState(s), s -> setTitle(s), () -> pack(), s -> saveProject(s), selectedProjectData);
         }
         else if("Home".equals(newState)) {
             loadData();
             currentState = new Home(s -> changeState(s));
         }
         else if("ProjectSelect".equals(newState)) {
-            currentState = new ProjectSelect(data, s -> loadProject(s));
+            currentState = new ProjectSelect(data, s -> loadProject(s), () -> changeState("Home"), () -> changeState("ProjectSelect"), i -> deleteProject(i));
         }
         add(currentState);
         currentState.requestFocusInWindow();    // set focus on the new state
@@ -92,6 +106,54 @@ class Main extends JFrame {
     private void loadProject(ArrayList<String> projectData) {
         selectedProjectData = projectData;
         changeState("ProgramEditorLoad");
+    }
+
+    // Saves a project by appending it to the end of the data file.
+    private void saveProject(ArrayList<String> projectData) {
+        try(PrintWriter pw = new PrintWriter(new FileWriter("data.txt", true))) {
+            for(String line : projectData) {
+                pw.println(line);
+            }
+        }
+        catch(IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // Deletes a project by copying data through iteration, but excluding the selected project.
+    private void deleteProject(int targetIndex) {
+        ArrayList<String> newData = new ArrayList<>();  // Stores the new data.
+        int curIndex = -1;                              // represents the current project index.
+        boolean deleting = false;                       // whether currently deleting lines.
+
+        for(String line : data) {
+            // Read if line starts signals beginning of new project.
+            try{
+                if("ProjectStart".equals(line.substring(0, "ProjectStart".length()))) {
+                    curIndex++;
+                }
+            }
+            catch(StringIndexOutOfBoundsException e) {
+                // do nothing.
+            }
+
+            // Check conditions to begin/end deleting.
+            if(targetIndex == curIndex) {
+                deleting = true;
+            } 
+            else {
+                deleting = false;
+            }
+
+            // Add the new line if not currently deleting.
+            if(!deleting) {
+                newData.add(line);
+            }
+        }
+
+        // Replace data.
+        data = newData;
+        writeData();
     }
     
     public static void main(String[] args) {
