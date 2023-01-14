@@ -93,7 +93,7 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
     
     public void init(Consumer<String> changeState, Consumer<String> setTitle, VoidCallback framePack, Consumer<ArrayList<String>> saveProjectCallback) {
         // Configuring JPanel
-        setPreferredSize(new Dimension(400, 400));
+        setPreferredSize(new Dimension(1280, 800));
         setFocusable(true);
         setLayout(null);
 
