@@ -196,8 +196,8 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
 
         // Set maximum height for details panel so it doesn't go off the window.
         int height = detailsPanel.scrollPane.getPreferredSize().height;
-        if(height > 800) {
-            height = 750;
+        if(height > getSize().height) {
+            height = getSize().height;
         }
         detailsPanel.scrollPane.setSize(detailsPanel.scrollPane.getPreferredSize().width, height);
 
