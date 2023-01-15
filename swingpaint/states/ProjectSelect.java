@@ -17,6 +17,7 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
 import swingpaint.helpers.VoidCallback;
@@ -27,16 +28,25 @@ public class ProjectSelect extends JPanel implements ActionListener {
     // Data structures
     private ArrayList<ArrayList<String>> projects;  // Each element is an array of Strings containing the
                                                     // data of one project.
-    private ArrayList<String> projectTitles;        // A list related (parallel indices) to projects which
-                                                    // contains the title of each project.
+
 
     // UI
     private JLabel screenTitleLabel;    // Title.
+    private JPanel contentPanel;        // Contains all components in the center.
+
+    private JButton sortByNameButton;   // Sorts projects by name, alphabetically.
+    
+    private JPanel searchPanel;         // Panel for search components.
+    private JLabel searchLabel;
+    private JTextField searchTextField; // Searches projects by name.
+
     private JPanel projectsPanelContainer;  // Contains project panel.
     private JPanel projectsPanel;           // Contains project rows.
     private JPanel projectsPanelSpacer;     // Takes up remaining space in projects panel container for layout manager purposes.
     private JScrollPane projectsPanelScrollPane;    // Scrollbar for projectsPanel
+
     private JButton homeButton;         
+
 
     // Callbacks
     private Consumer<ArrayList<String>> loadProject;           // Callback method to load a project in the ProgramEditor.
@@ -47,7 +57,6 @@ public class ProjectSelect extends JPanel implements ActionListener {
     public ProjectSelect(ArrayList<String> data, Consumer<ArrayList<String>> loadProject, VoidCallback returnHome, VoidCallback reloadProjectSelect, Consumer<Integer> deleteProjectCallback) {
         // Initialize variables.
         projects = new ArrayList<>();
-        projectTitles = new ArrayList<>();
         this.loadProject = loadProject;
         this.returnHome = returnHome;
         this.reloadProjectSelect = reloadProjectSelect;
@@ -58,14 +67,36 @@ public class ProjectSelect extends JPanel implements ActionListener {
         setLayout(new BorderLayout());
         setPreferredSize(new Dimension(1280, 800));
         setBorder(new EmptyBorder(20, 20, 20, 20));
+        GridBagConstraints c;
 
         screenTitleLabel = new JLabel("Project Select");
         screenTitleLabel.setFont(new Font("Dialog", Font.BOLD, 40));
         add(screenTitleLabel, BorderLayout.PAGE_START);
 
+        contentPanel = new JPanel();
+        contentPanel.setLayout(new GridBagLayout());
+        c = new GridBagConstraints();
+
+        sortByNameButton = new JButton("Sort by Name");
+        sortByNameButton.setActionCommand("sortByName");
+        sortByNameButton.addActionListener(this);
+        c.anchor = GridBagConstraints.LINE_START;
+        contentPanel.add(sortByNameButton, c);
+
+        searchPanel = new JPanel();
+        searchLabel = new JLabel("Search");
+        searchTextField = new JTextField(12);
+        searchTextField.setActionCommand("search");
+        searchTextField.addActionListener(this);
+        searchTextField.setAlignmentX(JTextField.LEFT_ALIGNMENT);
+        searchPanel.add(searchLabel);
+        searchPanel.add(searchTextField);
+        c.gridy = 1;
+        contentPanel.add(searchPanel, c);
+
         projectsPanelContainer = new JPanel();
         projectsPanelContainer.setLayout(new GridBagLayout());
-        GridBagConstraints c = new GridBagConstraints();
+        c = new GridBagConstraints();
 
         projectsPanel = new JPanel();
         projectsPanel.setLayout(new BoxLayout(projectsPanel, BoxLayout.Y_AXIS));
@@ -79,8 +110,15 @@ public class ProjectSelect extends JPanel implements ActionListener {
 
         projectsPanelScrollPane = new JScrollPane(projectsPanelContainer);
         projectsPanelScrollPane.getVerticalScrollBar().setUnitIncrement(16);
-        add(projectsPanelScrollPane, BorderLayout.CENTER);
-        
+
+        c = new GridBagConstraints();
+        c.gridy = 2;
+        c.weightx = 1;
+        c.weighty = 1;
+        c.fill = GridBagConstraints.BOTH;
+        contentPanel.add(projectsPanelScrollPane, c);
+
+        add(contentPanel, BorderLayout.CENTER);
 
         homeButton = new JButton("Back to Home");
         homeButton.setActionCommand("returnHome");
@@ -96,8 +134,6 @@ public class ProjectSelect extends JPanel implements ActionListener {
             for(String line : data) {
                 try {
                     if("ProjectStart".equals(line.substring(0, "ProjectStart".length()))) {
-                        // Extract the title from the project header string.
-                        projectTitles.add(line.split(";")[1].split("=")[1]);
                         projectData.add(line);
                         continue;   // skip the rest of the if statements.
                     }
@@ -114,13 +150,20 @@ public class ProjectSelect extends JPanel implements ActionListener {
                 }
             }
 
-            // Create a button for each project.
-            for(int i = 0; i < projectTitles.size(); i++) {
-                String title = projectTitles.get(i);
-                ProjectRow pr = new ProjectRow(title, Integer.toString(i));
-                projectsPanel.add(pr);
-            }
+            // Display all projects.
+            displayProjects(projects);
         }
+    }
+
+    // Displays a row for each project in projects.
+    private void displayProjects(ArrayList<ArrayList<String>> projects) {
+        for(int i = 0; i < projects.size(); i++) {
+            // Extract project title (in first line of project data).
+            String title = projects.get(i).get(0).split(";")[1].split("=")[1];
+            ProjectRow pr = new ProjectRow(title, Integer.toString(i));
+            projectsPanel.add(pr);
+        }
+
     }
 
     @Override
