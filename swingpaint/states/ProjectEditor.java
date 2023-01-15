@@ -119,7 +119,7 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
         spriteSelect.setActionCommand("add sprite");
         spriteSelect.addActionListener(this);
 
-        optionsSelect = new JComboBox<>(new String[]{"Select", "Export", "Home", "Set Title", "Save Project", "Resize Canvas"});
+        optionsSelect = new JComboBox<>(new String[]{"Select", "Set Title", "Resize Canvas", "Save Project", "Export", "Return Home"});
         optionsSelect.setActionCommand("execute option");
         optionsSelect.addActionListener(this);
 
@@ -302,7 +302,7 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
             if("Export".equals(selection)) {
                 export();
             }
-            else if("Home".equals(selection)) {
+            else if("Return Home".equals(selection)) {
                 changeState.accept("Home");
             }
             else if("Set Title".equals(selection)) {
