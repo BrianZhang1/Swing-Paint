@@ -2,6 +2,7 @@ package swingpaint.states;
 import java.util.ArrayList;
 
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 import javax.swing.BoxLayout;
@@ -189,9 +190,18 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
 
     // Shows the details panel.
     private void showDetailsPanel(int x, int y) {
-        detailsPanel.setLocation(x, y);
+        // Update, resize, and relocate.
         detailsPanel.update(focus);
-        add(detailsPanel);
+        detailsPanel.scrollPane.setLocation(x, y);
+
+        // Set maximum height for details panel so it doesn't go off the window.
+        int height = detailsPanel.scrollPane.getPreferredSize().height;
+        if(height > 800) {
+            height = 750;
+        }
+        detailsPanel.scrollPane.setSize(detailsPanel.scrollPane.getPreferredSize().width, height);
+
+        add(detailsPanel.scrollPane);
         detailsPanel.revalidate();
         repaint();
         detailsPanelVisible = true;
@@ -200,7 +210,7 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
 
     // Hides the details panel.
     private void hideDetailsPanel() {
-        remove(detailsPanel);
+        remove(detailsPanel.scrollPane);
         repaint();
         detailsPanelVisible = false;
     }
@@ -815,9 +825,11 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
     // The details panel allows the user to view and edit getAttributes() of a focused sprite.
     private class DetailsPanel extends JPanel implements ActionListener {
         private ArrayList<AttributeRow> attributeRows;    // Each row is assigned an attribute.
+        private JScrollPane scrollPane;
 
         public DetailsPanel() {
             attributeRows = new ArrayList<>();
+            scrollPane = new JScrollPane(this);
 
             setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
             setBounds(0, 0, 200, 30*attributeRows.size());
