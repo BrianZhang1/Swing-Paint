@@ -743,6 +743,7 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
         // Drop sprite.
         if(e.getButton() == MouseEvent.BUTTON1) {
             spriteHeld = false;
+            dragPointHeld = -1;
         }
     }
 

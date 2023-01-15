@@ -4,6 +4,7 @@
  * TODO: Comments and prettify! (constructor/method/class/file comments, as well as overall explanation)
  * TODO: Add more options to ProjectSelect (delete, back to home, sort) and make list format
  * TODO: Add layer reordering (move to front/back)
+ * TODO: Add duplicate sprite button.
  */
 package swingpaint;
 
