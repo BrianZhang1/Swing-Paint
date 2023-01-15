@@ -218,7 +218,8 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
 
     // Shows the sprite selection combo box.
     private void showSpriteSelect() {
-        spriteSelect.setBounds(getWidth()-85, addIconRect.y+addIconRect.height+5, 80, 30);
+        spriteSelect.setSize(spriteSelect.getPreferredSize());
+        spriteSelect.setLocation(getWidth()-spriteSelect.getSize().width-5, addIconRect.y+addIconRect.height+5);
         add(spriteSelect);
         spriteSelect.showPopup();
         spriteSelect.revalidate();
@@ -235,7 +236,8 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
 
     // Shows the options dropdown list.
     private void showOptions() {
-        optionsSelect.setBounds(getWidth()-85, addIconRect.y+addIconRect.height+5, 80, 30);
+        optionsSelect.setSize(optionsSelect.getPreferredSize());
+        optionsSelect.setLocation(getWidth()-optionsSelect.getSize().width-5, addIconRect.y+addIconRect.height+5);
         add(optionsSelect);
         optionsSelect.showPopup();
         optionsSelect.revalidate();

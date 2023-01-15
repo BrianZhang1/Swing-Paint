@@ -5,6 +5,7 @@
  * TODO: Add more options to ProjectSelect (delete, back to home, sort) and make list format
  * TODO: Add layer reordering (move to front/back)
  * TODO: Add duplicate sprite button.
+ * TODO: Add tutorial and demo.
  */
 package swingpaint;
 
