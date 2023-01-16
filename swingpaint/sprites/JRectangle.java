@@ -14,6 +14,10 @@ public class JRectangle extends JSprite {
         type = "rectangle";
     }
 
+    public JRectangle(JRectangle jrect) {
+        super(jrect);
+    }
+
     // Provides string representation of this sprite.
     @Override
     public String toString() {

@@ -41,7 +41,7 @@ public class JSprite extends Rectangle {
         }
 
         // Clone color.
-        color = new Color(s.color.getRGB());
+        color = new Color(s.color.getRed(), s.color.getGreen(), s.color.getBlue());
         
         // Clone type.
         type = s.type;

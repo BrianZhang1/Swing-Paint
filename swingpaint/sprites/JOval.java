@@ -12,4 +12,8 @@ public class JOval extends JRectangle {
         super(r);
         type = "oval";
     }
+
+    public JOval(JOval joval) {
+        super(joval);
+    }
 }
