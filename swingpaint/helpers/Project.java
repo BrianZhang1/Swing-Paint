@@ -13,6 +13,7 @@ public class Project {
     private int width, height;  // dimensions of project.
     private ArrayList<JSprite> sprites;  // contains all sprites in project.
 
+
     // Constructor to initialize attributes.
     public Project() {
         sprites = new ArrayList<>();

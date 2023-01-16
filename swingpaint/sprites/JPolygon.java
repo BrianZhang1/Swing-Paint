@@ -1,12 +1,14 @@
 package swingpaint.sprites;
 
+import java.awt.Point;
 import java.awt.Polygon;
 import java.awt.Rectangle;
-import java.awt.Point;
 
 public class JPolygon extends JSprite {
     private Polygon polygon;
 
+
+    // Construct from polygon.
     public JPolygon(Polygon polygon) {
         super(polygon.getBounds());
         type = "polygon";
@@ -43,29 +45,13 @@ public class JPolygon extends JSprite {
     }
 
 
-    public Polygon getPolygon() {
-        return polygon;
-    }
-
-
-    // Changes the x and y coordinates of each point of the polygon to x and y respectively.
-    public void setXY(int x, int y) {
-        polygon.translate(x - this.x, y - this.y);
-    }
-
-    // Sets location of Rectangle and Polygon in one method.
-    @Override
-    public void setLocation(int x, int y) {
-        setXY(x, y);
-        super.setLocation(x, y);
-    }
-
     // Moves the specified point to the specified location.
     public void movePoint(int index, int x, int y) {
         polygon.xpoints[index] = x;
         polygon.ypoints[index] = y;
         calculateBounds(polygon.xpoints, polygon.ypoints, polygon.npoints);
     }
+
 
     // Provides string representation of this sprite.
     @Override
@@ -87,6 +73,7 @@ public class JPolygon extends JSprite {
         return String.format("type=%s;xpoints=%s;ypoints=%s;color=%s",
             type, xpointsString, ypointsString, getRGBString());
     }
+
 
     // Creates a Polygon from the given String.
     // Also see the toString() method.
@@ -122,6 +109,7 @@ public class JPolygon extends JSprite {
         return new Polygon(xpoints, ypoints, xpoints.length);
     }
 
+
     // Creates a polygon with n points.
     public static Polygon createDefaultPolygon(int n) {
         int[] xpoints = new int[n];
@@ -138,6 +126,7 @@ public class JPolygon extends JSprite {
         return new Polygon(xpoints, ypoints, n);
     }
 
+
     @Override
     // Override JSprite method.
     // Moves the drag points. Called upon changing focused sprite.
@@ -150,12 +139,14 @@ public class JPolygon extends JSprite {
         }
     }
 
+
     // Override JSprite method.
     // Handles resizing of sprite by drag points.
     @Override
     public void handleDragPoint(int dragPointHeld, Point p) {
         movePoint(dragPointHeld, p.x, p.y);
     }
+
 
     /*
      * The source code for the contains() method java.awt.Polygon class
@@ -232,6 +223,7 @@ public class JPolygon extends JSprite {
         return ((hits & 1) != 0);
     }
 
+
     // Calculates bounds of polygon as a Rectangle.
     void calculateBounds(int[] xpoints, int[] ypoints, int npoints) {
         int boundsMinX = Integer.MAX_VALUE;
@@ -256,5 +248,25 @@ public class JPolygon extends JSprite {
         y = bounds.y;
         width = bounds.width;
         height = bounds.height;
+    }
+
+
+    // Getters and setters.
+    public Polygon getPolygon() {
+        return polygon;
+    }
+
+
+    // Changes the x and y coordinates of each point of the polygon to x and y respectively.
+    public void setXY(int x, int y) {
+        polygon.translate(x - this.x, y - this.y);
+    }
+
+
+    // Sets location of Rectangle and Polygon in one method.
+    @Override
+    public void setLocation(int x, int y) {
+        setXY(x, y);
+        super.setLocation(x, y);
     }
 }

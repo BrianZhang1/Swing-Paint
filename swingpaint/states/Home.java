@@ -1,27 +1,34 @@
 package swingpaint.states;
 
-import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
-import javax.swing.JButton;
-import javax.swing.BoxLayout;
+import java.awt.Dimension;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.Dimension;
 import java.util.function.Consumer;
 
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
+
+
+// The Home state is the screen the user begins on.
 public class Home extends JPanel implements ActionListener {
+    // UI Variables.
     private JPanel centerPanel;
     private JButton newProjectButton;
     private JButton loadSaveButton;
     private Consumer<String> changeState;
 
     public Home(Consumer<String> changeState) {
+        // Initialize variables.
         this.changeState = changeState;
 
+        // Configure JPanel.
         setPreferredSize(new Dimension(1280, 800));
         setLayout(new GridBagLayout());
 
+        // Create UI elements.
         centerPanel = new JPanel();
         centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));
 
@@ -42,6 +49,8 @@ public class Home extends JPanel implements ActionListener {
         add(centerPanel);
     }
 
+
+    // Handle actions.
     public void actionPerformed(ActionEvent e) {
         String command = e.getActionCommand();
 

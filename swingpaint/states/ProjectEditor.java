@@ -1,95 +1,82 @@
 package swingpaint.states;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Point;
+import java.awt.Polygon;
+import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.function.Consumer;
 
+import javax.imageio.ImageIO;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JLabel;
 import javax.swing.JTextField;
-import javax.swing.border.CompoundBorder;
-import javax.swing.border.EmptyBorder;
-import javax.swing.BoxLayout;
-import javax.swing.JComboBox;
-import javax.swing.JButton;
-import javax.swing.ImageIcon;
 
+import swingpaint.helpers.Project;
+import swingpaint.helpers.VoidCallback;
+import swingpaint.sprites.JImage;
 import swingpaint.sprites.JOval;
 import swingpaint.sprites.JPolygon;
-import swingpaint.sprites.JImage;
 import swingpaint.sprites.JRectangle;
 import swingpaint.sprites.JSprite;
 
-import java.util.function.Consumer;
-import java.util.function.BiConsumer;
-import swingpaint.helpers.VoidCallback;
-import swingpaint.helpers.Project;
 
-import java.awt.Rectangle;
-import java.awt.Polygon;
-import java.awt.Graphics;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Point;
-
-import java.awt.image.BufferedImage;
-import javax.imageio.ImageIO;
-
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import java.io.FileWriter;
-import java.io.PrintWriter;
-import java.io.IOException;
-import java.io.File;
-
-
-public class ProjectEditor extends JPanel implements MouseListener, MouseMotionListener, KeyListener, ActionListener {
+// This state handles all project editing. The main state of the program.
+public class ProjectEditor extends JPanel implements MouseListener, MouseMotionListener, ActionListener {
+    // Core variables.
     private ArrayList<JSprite> sprites;      // contains all the sprites on the canvas.
     private JSprite focus;                   // the sprite that is currently focused.
     private boolean spriteHeld;             // whether a sprite is held (clicked and held).
     private int dx, dy;                     // x & y displacement of cursor from sprite, used to maintain
                                             // relative cursor position when moving sprites (click and drag).
-
-    private DetailsPanel detailsPanel;      // contains information on focused sprites.
-    private boolean detailsPanelVisible;    // whether the details panel is visible.
-
     private int dragPointHeld;              // the index of the drag point held. -1 if none are held.
 
+    // Callback variables.
     Consumer<String> changeState;           // Callback function to change state.
     Consumer<String> setTitle;              // Callback function to set title of frame.
     VoidCallback framePack;                 // Callback function to pack frame. Used for resizing.
     Consumer<Project> saveProjectCallback;            // Callback function to save project.
 
+    // UI Elements.
     private BufferedImage addIcon;          // Icon to add new sprites.
     private Rectangle addIconRect;          // A rectangle that represents the position and size of the icon.
     private BufferedImage optionsIcon;      // Icon to open options.
     private Rectangle optionsIconRect;      // A rectangle that represents the position and size of the icon.
-
+    private DetailsPanel detailsPanel;      // contains information on focused sprites.
+    private boolean detailsPanelVisible;    // whether the details panel is visible.
     private JComboBox<String> spriteSelect;
     private JComboBox<String> optionsSelect;
-
     private String projectTitle;
     private JTextField projectTitleTextField;
-
     private JPanel popupPanel;
     private JLabel popupPanelLabel;
     private JTextField popupPanelTextField;
-
     private JPanel confirmSavePanel;
     private JLabel confirmSaveLabel;
     private JButton confirmSaveButton1;
     private JButton confirmSaveButton2;
     private VoidCallback confirmSaveCallback;
-
     private JPanel imageSelectPanel;
     private JLabel imageSelectLabel;
     private ArrayList<JButton> imageSelectButtons;
 
 
+    // Constructor for new project.
     public ProjectEditor(Consumer<String> changeState,
         Consumer<String> setTitle,
         VoidCallback framePack,
@@ -105,6 +92,7 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
         setProjectTitle("Untitled");
     }
 
+
     // Initialize from existing project.
     public ProjectEditor(Consumer<String> changeState,
         Consumer<String> setTitle,
@@ -117,6 +105,8 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
         importProject(project);
     }
     
+
+    // Initializes variables and UI.
     public void init(Consumer<String> changeState,
         Consumer<String> setTitle,
         VoidCallback framePack,
@@ -132,7 +122,6 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
         // Adding Listeners
         addMouseListener(this);
         addMouseMotionListener(this);
-        addKeyListener(this);
 
         // Initializing variables
         this.changeState = changeState;
@@ -142,7 +131,7 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
         sprites = new ArrayList<>();
         spriteHeld = false;
 
-        // Initializing menus.
+        // Creating UI
         detailsPanel = new DetailsPanel();
         detailsPanelVisible = false;
 
@@ -221,7 +210,7 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
     }
 
 
-    // Lays out components.
+    // Lays out components. Used mainly after resizing of project.
     private void layoutComponents() {
         addIconRect.setLocation(getPreferredSize().width-addIcon.getWidth()-5, 5);
         optionsIconRect.setLocation(addIconRect.x-optionsIcon.getWidth()-5, addIconRect.y);
@@ -450,12 +439,14 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
         }
     }
 
+
     // Imports Project data.
     private void importProject(Project project) {
         setProjectTitle(project.getTitle());
         resizeCanvas(project.getWidth(), project.getHeight());
         sprites = project.getSprites();
     }
+
 
     // Exports the canvas to a Java Swing code file.
     private void export() {
@@ -819,72 +810,8 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
     }
 
 
-    // Implementing Key Listener methods 
-    @Override
-    public void keyReleased(KeyEvent e) {
-        // check for commands.
-        switch(e.getKeyChar()) {
-            // 1 -> create new rect.
-            case '1':
-                ProjectEditor.this.createSprite("rectangle");
-                break;
 
-            // 2 -> create new oval.
-            case '2':
-                ProjectEditor.this.createSprite("oval");
-                break;
-
-            // 3 -> create new polygon.
-            case '3':
-                ProjectEditor.this.createSprite("polygon");
-                break;
-
-            // d -> delete focused sprite.
-            case 'd':
-                int i = sprites.indexOf(focus);
-                if(i != -1) {
-                    removeSprite(i);
-                }
-                break;
-
-            // e -> export canvas to code.
-            case 'e':
-                export();
-                break;
-
-            // q -> toggle details panel.
-            case 'q':
-                if(detailsPanelVisible) {
-                    hideDetailsPanel();
-                }
-                else {
-                    showDetailsPanel(0, 0);
-                }
-                break;
-
-            // h -> return to home state.
-            case 'h':
-                changeState.accept("Home");
-                break;
-
-            // s -> save.
-            case 's':
-                saveProject();
-                break;
-        }
-    }
-
-    // Unused key listener methods. 
-    public void keyPressed(KeyEvent e) {
-    }
-    public void keyTyped(KeyEvent e) {
-    }
-
-
-
-
-
-    // The details panel allows the user to view and edit getAttributes() of a focused sprite.
+    // The details panel allows the user to view and edit attributes of a focused sprite.
     private class DetailsPanel extends JPanel implements ActionListener {
         private ArrayList<AttributeRow> attributeRows;    // Each row is assigned an attribute.
         private JScrollPane scrollPane;
@@ -1059,10 +986,10 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
             }
         }
 
+
         // A row of buttons. Contains buttons related to sprites (delete, duplicate, etc.)
         private class ButtonRow extends JPanel {
             private JButton deleteButton;
-            private JButton duplicateButton;
 
             public ButtonRow() {
                 setBackground(Color.GRAY);

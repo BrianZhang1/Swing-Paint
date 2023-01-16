@@ -1,11 +1,12 @@
 package swingpaint.sprites;
-// Base class for all sprites.
 
-import java.awt.Rectangle;
-import java.awt.Point;
 import java.awt.Color;
+import java.awt.Point;
+import java.awt.Rectangle;
 import java.util.ArrayList;
 
+
+// Base class for all sprites.
 public class JSprite extends Rectangle {
     protected ArrayList<String> attributes;
     protected Rectangle[] dragPoints;       // an array of rectangles; each represent one handle
@@ -14,15 +15,20 @@ public class JSprite extends Rectangle {
     protected Color color;
     protected String type;
 
+
+    // Construct from individual dimensions.
     public JSprite(int x, int y, int width, int height) {
         super(x, y, width, height);
         init();
     }
 
+
+    // Construct from rectangle.
     public JSprite(Rectangle r) {
         super(r);
         init();
     }
+
 
     // Clone constructor.
     public JSprite(JSprite s) {
@@ -48,7 +54,10 @@ public class JSprite extends Rectangle {
 
     }
 
+
+    // Initialize JSprite.
     private void init() {
+        // Adding default attributes.
         attributes = new ArrayList<>();
         attributes.add("x");
         attributes.add("y");
@@ -65,6 +74,7 @@ public class JSprite extends Rectangle {
         }
     }
 
+
     // Moves the drag points. Called upon changing focused sprite.
     public void moveDragPoints() {
         int l = CORNER_LENGTH;
@@ -73,6 +83,7 @@ public class JSprite extends Rectangle {
         dragPoints[2].setLocation(x-l/2, y+height-l/2); // bottom left
         dragPoints[3].setLocation(x+width-l/2, y+height-l/2); // bottom right
     }
+
 
     // Handles resizing of sprite by drag points.
     public void handleDragPoint(int dragPointHeld, Point p) {
@@ -105,12 +116,14 @@ public class JSprite extends Rectangle {
         }
     }
 
+
     // Drag points should adjust to resizes.
     @Override
     public void setSize(int width, int height) {
         super.setSize(width, height);
         moveDragPoints();
     }
+
 
     // Drag points should adjust to new location.
     @Override
@@ -119,6 +132,8 @@ public class JSprite extends Rectangle {
         moveDragPoints();
     }
 
+
+    // Getters and setters.
     public String getRGBString() {
         return String.format("%d,%d,%d", color.getRed(), color.getGreen(), color.getBlue());
     }

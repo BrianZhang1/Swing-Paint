@@ -1,19 +1,23 @@
 package swingpaint.sprites;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.awt.Image;
 import java.awt.Graphics2D;
-import java.io.IOException;
-import java.io.File;
+import java.awt.Image;
 import java.awt.Point;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 
+import javax.imageio.ImageIO;
+
+
+// Image sprite.
 public class JImage extends JSprite {
     private BufferedImage originalImage;    // Store the original image for resizing purposes.
     private BufferedImage image;            // The current image being drawn.
     private String imageName;               // Stored for saving purposes.
 
 
+    // Construct from image.
     public JImage(BufferedImage image, String imageName) {
         super(0, 0, image.getWidth(), image.getHeight());
         
@@ -24,6 +28,7 @@ public class JImage extends JSprite {
     }
 
 
+    // Construct from image and dimensions.
     public JImage(BufferedImage image, String imageName, int x, int y, int width, int height) {
         super(x, y, width, height);
         
@@ -76,6 +81,7 @@ public class JImage extends JSprite {
     }
 
 
+    // Images must resize when drag points are moved.
     @Override
     public void handleDragPoint(int dragPointHeld, Point p) {
         super.handleDragPoint(dragPointHeld, p);
@@ -110,18 +116,6 @@ public class JImage extends JSprite {
     }
 
 
-    // Returns this sprite's image.
-    public BufferedImage getImage() {
-        return image;
-    }
-
-
-    // Returns this sprite's image's name.
-    public String getImageName() {
-        return imageName;
-    }
-
-
     // Returns this sprite's image's file extension (e.g., jpg, png, etc.).
     public String getImageFileExtension() {
         return imageName.substring(imageName.length()-3, imageName.length());
@@ -133,5 +127,15 @@ public class JImage extends JSprite {
     public String toString() {
         return String.format("type=%s;x=%d;y=%d;width=%d;height=%d;imageName=%s",
             type, x, y, width, height, imageName);
+    }
+
+
+    // Getters and setters.
+    public BufferedImage getImage() {
+        return image;
+    }
+
+    public String getImageName() {
+        return imageName;
     }
 }

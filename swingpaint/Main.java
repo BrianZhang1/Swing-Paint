@@ -1,6 +1,5 @@
 /*
  * TODO: Error handling (inputs mainly).
- * TODO: Comments and prettify! (constructor/method/class/file comments, line spacing)
  * TODO: Add tutorial and demo, including where examples of where all key concepts are used, project explanation/overview.
  * TODO: update journal with github commits
 
@@ -11,28 +10,27 @@
  */
 package swingpaint;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-import swingpaint.states.ProjectEditor;
-import swingpaint.states.Home;
-import swingpaint.states.ProjectSelect;
 import swingpaint.helpers.Project;
+import swingpaint.sprites.JImage;
 import swingpaint.sprites.JOval;
 import swingpaint.sprites.JPolygon;
-import swingpaint.sprites.JImage;
 import swingpaint.sprites.JRectangle;
 import swingpaint.sprites.JSprite;
-
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.PrintWriter;
-import java.io.IOException;
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-
-import java.util.ArrayList;
+import swingpaint.states.Home;
+import swingpaint.states.ProjectEditor;
+import swingpaint.states.ProjectSelect;
 
 
 
@@ -79,9 +77,9 @@ class Main extends JFrame {
                 }
             }
         }
-        System.out.println(userImages.size());
 
 
+        // Read project data.
         Project project = new Project();    // stores current project while reading data.
         String bits[];                      // for splitting.
         try(BufferedReader br = new BufferedReader(new FileReader("data.txt"))) {
@@ -180,6 +178,7 @@ class Main extends JFrame {
 
     }
 
+
     // Writes projects to data file.
     private void writeData() {
         try(PrintWriter pw = new PrintWriter(new FileWriter("data.txt"))) {
@@ -201,6 +200,8 @@ class Main extends JFrame {
         }
     }
 
+
+    // Changes the state (screen) to newState.
     private void changeState(String newState) {
         // Clear current state.
         if(currentState != null) {
@@ -225,24 +226,28 @@ class Main extends JFrame {
         pack();
     }
 
+
     // Called by the ProjectSelect state. Loads the given project.
     private void loadProject(Project project) {
         selectedProject = project;
         changeState("ProgramEditorLoad");
     }
 
-    // Saves a project by appending it to the end of the data file.
+
+    // Saves a project.
     private void saveProject(Project project) {
         projects.add(project);
         writeData();
     }
 
-    // Deletes a project by copying data through iteration, but excluding the selected project.
+    // Deletes a project.
     private void deleteProject(int targetIndex) {
         projects.remove(targetIndex);
         writeData();
     }
     
+
+    // Program starts here.
     public static void main(String[] args) {
         Main root = new Main();
         root.setVisible(true);

@@ -3,20 +3,26 @@ package swingpaint.sprites;
 import java.awt.Rectangle;
 
 
+// A rectangle sprite.
 public class JRectangle extends JSprite {
     public JRectangle(int x, int y, int width, int height) {
         super(x, y, width, height);
         type = "rectangle";
     }
 
+
+    // Rectangle constructor.
     public JRectangle(Rectangle r) {
         super(r);
         type = "rectangle";
     }
 
+
+    // Clone constructor.
     public JRectangle(JRectangle jrect) {
         super(jrect);
     }
+
 
     // Provides string representation of this sprite.
     @Override
@@ -24,6 +30,7 @@ public class JRectangle extends JSprite {
         return String.format("type=%s;x=%d;y=%d;width=%d;height=%d;color=%s",
             type, x, y, width, height, getRGBString());
     }
+
 
     // Creates a Rectangle from the given String.
     // Also see the toString() method.
