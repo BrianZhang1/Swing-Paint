@@ -5,6 +5,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.EmptyBorder;
 import javax.swing.BoxLayout;
 import javax.swing.JComboBox;
 import javax.swing.JButton;
@@ -102,7 +104,7 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
     
     public void init(Consumer<String> changeState, Consumer<String> setTitle, VoidCallback framePack, Consumer<Project> saveProjectCallback) {
         // Configuring JPanel
-        setPreferredSize(new Dimension(1280, 800));
+        setPreferredSize(new Dimension(800, 600));
         setFocusable(true);
         setLayout(null);
 
@@ -140,6 +142,7 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
         popupPanel.add(popupPanelTextField);
 
         confirmSavePanel = new JPanel();
+        confirmSavePanel.setLayout(new BoxLayout(confirmSavePanel, BoxLayout.X_AXIS));
         confirmSaveLabel = new JLabel("Save project?");
         confirmSaveButton1 = new JButton("Save");
         confirmSaveButton1.setActionCommand("confirmSaveYes");
@@ -148,9 +151,15 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
         confirmSaveButton2.setActionCommand("confirmSaveNo");
         confirmSaveButton2.addActionListener(this);
         confirmSavePanel.add(confirmSaveLabel);
+        JPanel spacer = new JPanel();
+        spacer.setSize(10, 10);
+        confirmSavePanel.add(spacer);
         confirmSavePanel.add(confirmSaveButton1);
+        spacer = new JPanel();
+        spacer.setSize(10, 10);
+        confirmSavePanel.add(spacer);
         confirmSavePanel.add(confirmSaveButton2);
-        confirmSavePanel.setSize(confirmSavePanel.getPreferredSize());
+        confirmSavePanel.setSize(confirmSavePanel.getPreferredSize().width+10, confirmSavePanel.getPreferredSize().height);
         confirmSaveCallback = null;
         
         // Initalizing Images
