@@ -58,7 +58,6 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
     private BufferedImage optionsIcon;      // Icon to open options.
     private Rectangle optionsIconRect;      // A rectangle that represents the position and size of the icon.
     private DetailsPanel detailsPanel;      // contains information on focused sprites.
-    private boolean detailsPanelVisible;    // whether the details panel is visible.
     private JComboBox<String> spriteSelect;
     private JComboBox<String> optionsSelect;
     private String projectTitle;
@@ -133,7 +132,6 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
 
         // Creating UI
         detailsPanel = new DetailsPanel();
-        detailsPanelVisible = false;
 
         spriteSelect = new JComboBox<>(new String[]{"Select", "rectangle", "oval", "polygon", "image"});
         spriteSelect.setActionCommand("add sprite");
@@ -262,7 +260,6 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
         add(detailsPanel.scrollPane);
         detailsPanel.revalidate();
         repaint();
-        detailsPanelVisible = true;
     }
 
 
@@ -270,7 +267,6 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
     private void hideDetailsPanel() {
         remove(detailsPanel.scrollPane);
         repaint();
-        detailsPanelVisible = false;
     }
 
 

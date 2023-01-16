@@ -63,7 +63,7 @@ public class ProjectSelect extends JPanel implements ActionListener {
 
         // Create UI
         setLayout(new BorderLayout());
-        setPreferredSize(new Dimension(1280, 800));
+        setPreferredSize(new Dimension(800, 600));
         setBorder(new EmptyBorder(20, 20, 20, 20));
         GridBagConstraints c;
 

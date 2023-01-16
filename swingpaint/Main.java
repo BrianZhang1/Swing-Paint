@@ -208,6 +208,9 @@ class Main extends JFrame {
             remove(currentState);
         }
 
+        // Reset frame title.
+        setTitle("Swing Paint");
+
         // Add new state.
         if("ProgramEditorNew".equals(newState)) {
             currentState = new ProjectEditor(s -> changeState(s), s -> setTitle(s), () -> pack(), s -> saveProject(s), userImages);
