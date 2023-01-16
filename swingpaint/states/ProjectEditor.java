@@ -200,7 +200,6 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
                 showPopupPanel("Number of Points", "createPolygon", "3");
                 break;
             case "image":
-                // TODO: selection pane
                 // Show the popup panel and ask user for the path to the image file.
                 showPopupPanel("Image Name", "createImage", "");
                 break;
@@ -806,7 +805,7 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
         }
     }
 
-    // Unused key listener methods. TODO: Adapter.
+    // Unused key listener methods. 
     public void keyPressed(KeyEvent e) {
     }
     public void keyTyped(KeyEvent e) {

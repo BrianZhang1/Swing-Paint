@@ -1,11 +1,13 @@
 /*
- * TODO: Error handling.
- * TODO: Comments and prettify! (constructor/method/class/file comments, as well as overall explanation)
- * TODO: Add more options to ProjectSelect (delete, back to home, sort) and make list format
+ * TODO: Error handling (inputs mainly).
+ * TODO: Comments and prettify! (constructor/method/class/file comments, line spacing)
+ * TODO: Add tutorial and demo, including where examples of where all key concepts are used, project explanation/overview.
+ * TODO: update journal with github commits
+
  * TODO: Add layer reordering (move to front/back)
  * TODO: Add duplicate sprite button.
- * TODO: Add tutorial and demo, including where examples of where all key concepts are used.
- * TODO: Confirm if haven't saved before close/return to home from project editor.
+ * TODO: selection pane
+ * TODO: Adapters for listeners instead of unused methods.
  */
 package swingpaint;
 
