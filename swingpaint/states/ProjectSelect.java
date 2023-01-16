@@ -35,6 +35,7 @@ public class ProjectSelect extends JPanel implements ActionListener {
     private JPanel contentPanel;        // Contains all components in the center.
 
     private JButton sortByNameButton;   // Sorts projects by name, alphabetically.
+    private boolean sortAscending;      // Whether to sort by name ascending or descending.
     
     private JPanel searchPanel;         // Panel for search components.
     private JLabel searchLabel;
@@ -61,6 +62,7 @@ public class ProjectSelect extends JPanel implements ActionListener {
         this.returnHome = returnHome;
         this.reloadProjectSelect = reloadProjectSelect;
         this.deleteProjectCallback = deleteProjectCallback;
+        sortAscending = true;
 
 
         // Create UI
@@ -136,10 +138,14 @@ public class ProjectSelect extends JPanel implements ActionListener {
 
     // Displays a row for each project in projects.
     private void displayProjects(ArrayList<Project> projects) {
+        projectsPanel.removeAll();
+
         for(int i = 0; i < projects.size(); i++) {
             ProjectRow pr = new ProjectRow(projects.get(i).getTitle(), Integer.toString(i));
             projectsPanel.add(pr);
         }
+
+        projectsPanel.revalidate();
 
     }
 
@@ -161,6 +167,12 @@ public class ProjectSelect extends JPanel implements ActionListener {
         else if("returnHome".equals(bits[0])) {
             returnHome.accept();
         }
+        else if("sortByName".equals(bits[0])) {
+            sortByName(sortAscending);
+        }
+        else if("search".equals(bits[0])) {
+            search(searchTextField.getText());
+        }
     }
 
 
@@ -168,6 +180,70 @@ public class ProjectSelect extends JPanel implements ActionListener {
     private void deleteProject(int index) {
         deleteProjectCallback.accept(index);
         reloadProjectSelect.accept();
+    }
+
+
+    // Sorts and displays projects in alphabetical order. Uses bubble sort.
+    private void sortByName(boolean ascending) {
+        if(projects.size() < 2) {
+            // do nothing.
+            return;
+        }
+
+        // Implement optimized bubble sort.
+        boolean swapped = true;    // tracks whether a swap was made in each loop.
+        while(swapped) {
+            swapped = false;
+            for(int i = 1; i < projects.size(); i++) {
+                // compare lexographically.
+                if(ascending) {
+                    if(projects.get(i).getTitle().compareTo(projects.get(i-1).getTitle()) < 0) {
+                        // swap the two projects.
+                        Project temp = projects.get(i);
+                        projects.remove(i);
+                        projects.add(i, projects.get(i-1));
+                        projects.remove(i-1);
+                        projects.add(i-1, temp);
+                        swapped = true;
+                    }
+                }
+                else {
+                    if(projects.get(i).getTitle().compareTo(projects.get(i-1).getTitle()) > 0) {
+                        // swap the two projects.
+                        Project temp = projects.get(i);
+                        projects.remove(i);
+                        projects.add(i, projects.get(i-1));
+                        projects.remove(i-1);
+                        projects.add(i-1, temp);
+                        swapped = true;
+                    }
+                }
+            }
+        }
+
+        // Toggle ascending.
+        if(ascending) {
+            sortAscending = false;
+        }
+        else {
+            sortAscending = true;
+        }
+
+        // Redisplay rows.
+        displayProjects(projects);
+    }
+
+
+    // Displays projects that meet search criteria.
+    private void search(String criteria) {
+        ArrayList<Project> passedProjects = new ArrayList<>();  // projects that pass the search criteria.
+        for(Project p : projects) {
+            if(p.getTitle().contains(criteria)) {
+                passedProjects.add(p);
+            }
+        }
+
+        displayProjects(passedProjects);
     }
 
 

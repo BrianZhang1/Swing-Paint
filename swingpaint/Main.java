@@ -6,7 +6,7 @@
  * TODO: Add duplicate sprite button.
  * TODO: Add tutorial and demo, including where examples of where all key concepts are used.
  * TODO: Create project objects.
- * TODO: Implement search/sort.
+ * TODO: Confirm if haven't saved before close/return to home from project editor.
  */
 package swingpaint;
 
