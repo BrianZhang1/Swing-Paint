@@ -77,6 +77,12 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
     private JLabel popupPanelLabel;
     private JTextField popupPanelTextField;
 
+    private JPanel confirmSavePanel;
+    private JLabel confirmSaveLabel;
+    private JButton confirmSaveButton1;
+    private JButton confirmSaveButton2;
+    private VoidCallback confirmSaveCallback;
+
 
     public ProjectEditor(Consumer<String> changeState, Consumer<String> setTitle, VoidCallback framePack, Consumer<Project> saveProjectCallback) {
         init(changeState, setTitle, framePack, saveProjectCallback);
@@ -132,6 +138,20 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
         popupPanelTextField.addActionListener(this);
         popupPanel.add(popupPanelLabel);
         popupPanel.add(popupPanelTextField);
+
+        confirmSavePanel = new JPanel();
+        confirmSaveLabel = new JLabel("Save project?");
+        confirmSaveButton1 = new JButton("Save");
+        confirmSaveButton1.setActionCommand("confirmSaveYes");
+        confirmSaveButton1.addActionListener(this);
+        confirmSaveButton2 = new JButton("Don't Save");
+        confirmSaveButton2.setActionCommand("confirmSaveNo");
+        confirmSaveButton2.addActionListener(this);
+        confirmSavePanel.add(confirmSaveLabel);
+        confirmSavePanel.add(confirmSaveButton1);
+        confirmSavePanel.add(confirmSaveButton2);
+        confirmSavePanel.setSize(confirmSavePanel.getPreferredSize());
+        confirmSaveCallback = null;
         
         // Initalizing Images
         try {
@@ -305,7 +325,7 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
                 export();
             }
             else if("Return Home".equals(selection)) {
-                changeState.accept("Home");
+                showConfirmSave(() -> changeState.accept("Home"));
             }
             else if("Set Title".equals(selection)) {
                 showPopupPanel("Project Title", "setTitle", projectTitle);
@@ -351,6 +371,15 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
             int height = Integer.parseInt(bits[1]);
             resizeCanvas(width, height);
             hidePopupPanel();
+        }
+
+        // Reacts to confirm save response.
+        else if("confirmSaveYes".equals(e.getActionCommand())) {
+            saveProject();
+            confirmSaveCallback.accept();
+        }
+        else if("confirmSaveNo".equals(e.getActionCommand())) {
+            confirmSaveCallback.accept();
         }
     }
 
@@ -568,6 +597,16 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
         setPreferredSize(new Dimension(width, height));
         layoutComponents();
         framePack.accept();
+    }
+
+
+    // Asks user whether they would like to save and calls callback upon answer.
+    private void showConfirmSave(VoidCallback callback) {
+        confirmSavePanel.setLocation(getWidth()/2-confirmSavePanel.getWidth()/2,
+            getHeight()/2-confirmSavePanel.getHeight()/2);
+        add(confirmSavePanel);
+        confirmSavePanel.revalidate();
+        confirmSaveCallback = callback;
     }
 
 
