@@ -903,20 +903,40 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
             if("set".equals(bits[0])) {
                 switch(bits[1]) {
                     case "width":
-                        focus.setSize(Integer.parseInt(searchRowByAttribute("width").textField.getText()), (int)focus.getHeight());
-                        ProjectEditor.this.repaint();
+                        try {
+                            focus.setSize(Integer.parseInt(searchRowByAttribute("width").textField.getText()), (int)focus.getHeight());
+                            ProjectEditor.this.repaint();
+                        }
+                        catch(NumberFormatException ex) {
+                            System.out.println("Value must be an integer.");
+                        }
                         break;
                     case "height":
-                        focus.setSize((int)focus.getWidth(), Integer.parseInt(searchRowByAttribute("height").textField.getText()));
-                        ProjectEditor.this.repaint();
+                        try {
+                            focus.setSize((int)focus.getWidth(), Integer.parseInt(searchRowByAttribute("height").textField.getText()));
+                            ProjectEditor.this.repaint();
+                        }
+                        catch(NumberFormatException ex) {
+                            System.out.println("Value must be an integer.");
+                        }
                         break;
                     case "x":
-                        focus.setLocation(Integer.parseInt(searchRowByAttribute("x").textField.getText()), (int)focus.getY());
-                        ProjectEditor.this.repaint();
+                        try {
+                            focus.setLocation(Integer.parseInt(searchRowByAttribute("x").textField.getText()), (int)focus.getY());
+                            ProjectEditor.this.repaint();
+                        }
+                        catch(NumberFormatException ex) {
+                            System.out.println("Value must be an integer.");
+                        }
                         break;
                     case "y":
-                        focus.setLocation((int)focus.getX(), Integer.parseInt(searchRowByAttribute("y").textField.getText()));
-                        ProjectEditor.this.repaint();
+                        try {
+                            focus.setLocation((int)focus.getX(), Integer.parseInt(searchRowByAttribute("y").textField.getText()));
+                            ProjectEditor.this.repaint();
+                        }
+                        catch(NumberFormatException ex) {
+                            System.out.println("Value must be an integer.");
+                        }
                         break;
                     case "color":
                         String rgbString = searchRowByAttribute("color").textField.getText();
@@ -927,15 +947,25 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
                         JPolygon polygon = (JPolygon)focus;
                         int pointIndex = Integer.parseInt(bits[2]) - 1;
                         if("x".equals(bits[3])) {
-                            int newX = Integer.parseInt(searchRowByAttribute(String.format("%s %s %s", bits[1], bits[2], bits[3])).textField.getText());
-                            polygon.movePoint(pointIndex, newX, polygon.getPolygon().ypoints[pointIndex]);
-                            ProjectEditor.this.repaint();
+                            try {
+                                int newX = Integer.parseInt(searchRowByAttribute(String.format("%s %s %s", bits[1], bits[2], bits[3])).textField.getText());
+                                polygon.movePoint(pointIndex, newX, polygon.getPolygon().ypoints[pointIndex]);
+                                ProjectEditor.this.repaint();
+                            }
+                            catch(NumberFormatException ex) {
+                                System.out.println("Value must be an integer.");
+                            }
                             break;
                         }
                         else if("y".equals(bits[3])) {
-                            int newY = Integer.parseInt(searchRowByAttribute(String.format("%s %s %s", bits[1], bits[2], bits[3])).textField.getText());
-                            polygon.movePoint(pointIndex, polygon.getPolygon().xpoints[pointIndex], newY);
-                            ProjectEditor.this.repaint();
+                            try {
+                                int newY = Integer.parseInt(searchRowByAttribute(String.format("%s %s %s", bits[1], bits[2], bits[3])).textField.getText());
+                                polygon.movePoint(pointIndex, polygon.getPolygon().xpoints[pointIndex], newY);
+                                ProjectEditor.this.repaint();
+                            }
+                            catch(NumberFormatException ex) {
+                                System.out.println("Value must be an integer.");
+                            }
                             break;
                         }
                         break;

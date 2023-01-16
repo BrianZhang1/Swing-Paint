@@ -140,7 +140,15 @@ public class JSprite extends Rectangle {
 
     public void setRGBString(String rgbString) {
         String[] bits = rgbString.split(",");
-        color = new Color(Integer.parseInt(bits[0]), Integer.parseInt(bits[1]), Integer.parseInt(bits[2]));
+        try {
+            color = new Color(Integer.parseInt(bits[0]), Integer.parseInt(bits[1]), Integer.parseInt(bits[2]));
+        }
+        catch(NumberFormatException e) {
+            System.out.println("Improper color formatting. Must be formatted as r,g,b.");
+        }
+        catch(IllegalArgumentException e) {
+            System.out.println("Color value out of bounds. Must be within the range 0-255.");
+        }
     }
 
     public String getType() {
