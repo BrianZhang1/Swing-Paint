@@ -36,6 +36,15 @@ public class JImage extends JSprite {
     }
 
 
+    // Clone constructor.
+    public JImage(JImage jimg) {
+        super(jimg);
+        originalImage = JImage.copyImage(jimg.originalImage);
+        image = JImage.copyImage(jimg.image);
+        imageName = jimg.imageName;
+    }
+
+
     // Returns a BufferedImage given an image path.
     public static BufferedImage imageFromPath(String imagePath) {
         BufferedImage image = null;
@@ -54,6 +63,16 @@ public class JImage extends JSprite {
     // Returns a BufferedImage given an image name, assuming it is in the appropriate directory.
     public static BufferedImage imageFromName(String imageName) {
         return imageFromPath(".\\userImages\\" + imageName);
+    }
+
+
+    // Returns a copy of given BufferedImage.
+    public static BufferedImage copyImage(BufferedImage img){
+        BufferedImage newImg = new BufferedImage(img.getWidth(), img.getHeight(), img.getType());
+        Graphics2D g = newImg.createGraphics();
+        g.drawImage(img, 0, 0, null);
+        g.dispose();
+        return newImg;
     }
 
 

@@ -21,13 +21,13 @@ import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
 import swingpaint.helpers.VoidCallback;
+import swingpaint.helpers.Project;
 
 
 // A screen where the user can select one of the saved projects to edit.
 public class ProjectSelect extends JPanel implements ActionListener {
     // Data structures
-    private ArrayList<ArrayList<String>> projects;  // Each element is an array of Strings containing the
-                                                    // data of one project.
+    private ArrayList<Project> projects;  // contains all projects.
 
 
     // UI
@@ -49,14 +49,14 @@ public class ProjectSelect extends JPanel implements ActionListener {
 
 
     // Callbacks
-    private Consumer<ArrayList<String>> loadProject;           // Callback method to load a project in the ProgramEditor.
+    private Consumer<Project> loadProject;           // Callback method to load a project in the ProgramEditor.
     private VoidCallback returnHome;                // Callback method to return to home page.
     private VoidCallback reloadProjectSelect;       // Callback method to reload project select page.
     private Consumer<Integer> deleteProjectCallback;       // Callback method to reload project select page.
 
-    public ProjectSelect(ArrayList<String> data, Consumer<ArrayList<String>> loadProject, VoidCallback returnHome, VoidCallback reloadProjectSelect, Consumer<Integer> deleteProjectCallback) {
+    public ProjectSelect(ArrayList<Project> projects, Consumer<Project> loadProject, VoidCallback returnHome, VoidCallback reloadProjectSelect, Consumer<Integer> deleteProjectCallback) {
         // Initialize variables.
-        projects = new ArrayList<>();
+        this.projects = projects;
         this.loadProject = loadProject;
         this.returnHome = returnHome;
         this.reloadProjectSelect = reloadProjectSelect;
@@ -128,39 +128,16 @@ public class ProjectSelect extends JPanel implements ActionListener {
 
 
         // Process data into separate projects.
-        if(data != null) {
-            ArrayList<String> projectData;
-            projectData = new ArrayList<>();
-            for(String line : data) {
-                try {
-                    if("ProjectStart".equals(line.substring(0, "ProjectStart".length()))) {
-                        projectData.add(line);
-                        continue;   // skip the rest of the if statements.
-                    }
-                }
-                catch(StringIndexOutOfBoundsException e) {
-                    // do nothing.
-                }
-                if("ProjectEnd".equals(line)) {
-                    projects.add(projectData);
-                    projectData = new ArrayList<>();
-                }
-                else {
-                    projectData.add(line);
-                }
-            }
-
+        if(projects != null) {
             // Display all projects.
             displayProjects(projects);
         }
     }
 
     // Displays a row for each project in projects.
-    private void displayProjects(ArrayList<ArrayList<String>> projects) {
+    private void displayProjects(ArrayList<Project> projects) {
         for(int i = 0; i < projects.size(); i++) {
-            // Extract project title (in first line of project data).
-            String title = projects.get(i).get(0).split(";")[1].split("=")[1];
-            ProjectRow pr = new ProjectRow(title, Integer.toString(i));
+            ProjectRow pr = new ProjectRow(projects.get(i).getTitle(), Integer.toString(i));
             projectsPanel.add(pr);
         }
 
@@ -173,6 +150,7 @@ public class ProjectSelect extends JPanel implements ActionListener {
         bits = e.getActionCommand().split(" ");
 
         if("load".equals(bits[0])) {
+            System.out.println(bits[1]);
             int selectedProjectIndex = Integer.parseInt(bits[1]);
             loadProject.accept(projects.get(selectedProjectIndex));
         }

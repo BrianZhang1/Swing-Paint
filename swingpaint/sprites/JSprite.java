@@ -24,6 +24,30 @@ public class JSprite extends Rectangle {
         init();
     }
 
+    // Clone constructor.
+    public JSprite(JSprite s) {
+        super(s.x, s.y, s.width, s.height);
+
+        // Clone attributes.
+        attributes = new ArrayList<>();
+        for(String attribute : s.attributes) {
+            attributes.add(attribute);
+        }
+
+        // Clone dragPoints.
+        dragPoints = new Rectangle[s.dragPoints.length];
+        for(int i = 0; i < s.dragPoints.length; i++) {
+            dragPoints[i] = new Rectangle(s.dragPoints[i]);
+        }
+
+        // Clone color.
+        color = new Color(s.color.getRGB());
+        
+        // Clone type.
+        type = s.type;
+
+    }
+
     private void init() {
         attributes = new ArrayList<>();
         attributes.add("x");

@@ -16,6 +16,12 @@ import javax.swing.JPanel;
 import swingpaint.states.ProjectEditor;
 import swingpaint.states.Home;
 import swingpaint.states.ProjectSelect;
+import swingpaint.helpers.Project;
+import swingpaint.sprites.JOval;
+import swingpaint.sprites.JPolygon;
+import swingpaint.sprites.JImage;
+import swingpaint.sprites.JRectangle;
+import swingpaint.sprites.JSprite;
 
 import java.io.File;
 import java.io.FileReader;
@@ -28,8 +34,8 @@ import java.util.ArrayList;
 
 class Main extends JFrame {
     private JPanel currentState;
-    ArrayList<String> data;                 // All saved data.
-    ArrayList<String> selectedProjectData;  // The data for the selected project (selected in ProjectSelect).
+    ArrayList<Project> projects; // All projects.
+    Project selectedProject;  // The data for the selected project (selected in ProjectSelect).
     
     public Main() {
         setTitle("Swing Paint");
@@ -37,7 +43,11 @@ class Main extends JFrame {
         setResizable(false);
 
         // Initialize variables.
-        selectedProjectData = null;
+        selectedProject = null;
+        projects = new ArrayList<>();
+
+        // Load data.
+        loadData();
 
         // Initial State
         changeState("Home");
@@ -51,16 +61,97 @@ class Main extends JFrame {
             userImagesDirectory.mkdir();
         }
 
-        this.data = new ArrayList<>();
+        Project project = new Project();    // stores current project while reading data.
+        String bits[];                      // for splitting.
         try(BufferedReader br = new BufferedReader(new FileReader("data.txt"))) {
             String line = br.readLine();
             while(line != null) {
-                data.add(line);
+                // Check if starts new project.
+                try {
+                    if("ProjectStart".equals(line.substring(0, "ProjectStart".length()))) {
+                        // Load metadata.
+                        bits = line.split(";");
+                        project.setTitle(bits[1].split("=")[1]);
+                        String projectSizeBits = bits[2].split("=")[1];
+                        project.setWidth(Integer.parseInt(projectSizeBits.split(",")[0]));
+                        project.setHeight(Integer.parseInt(projectSizeBits.split(",")[1]));
+                        line = br.readLine();
+                        continue;
+                    }
+                }
+                catch(StringIndexOutOfBoundsException e) {
+                    // do nothing. Raised by String.substring().
+                }
+
+                try {
+                    if("ProjectEnd".equals(line.substring(0, "ProjectEnd".length()))) {
+                        // End of project data.
+                        projects.add(project);
+                        project = new Project();
+                        line = br.readLine();
+                        continue;
+                    }
+                }
+                catch(StringIndexOutOfBoundsException e) {
+                    // do nothing. Raised by String.substring().
+                }
+
+                // Read sprite data.
+                bits = line.split(";");
+                String type = bits[0].split("=")[1];
+                JSprite sprite = null;
+                switch(type) {
+                    case "rectangle": {
+                        // Create JRectangle and set color
+                        JRectangle jr = new JRectangle(JRectangle.rectangleFromString(bits));
+                        jr.setRGBString(bits[5].split("=")[1]);
+                        sprite = jr;
+                        break;
+                    }
+                    case "oval": {
+                        // Create JOval and set color
+                        JOval jo = new JOval(JRectangle.rectangleFromString(bits));
+                        jo.setRGBString(bits[5].split("=")[1]);
+                        sprite = jo;
+                        break;
+                    }
+                    case "polygon": {
+                        // Create JPolygon and set color
+                        JPolygon jp = new JPolygon(JPolygon.polygonFromString(bits));
+                        jp.setRGBString(bits[3].split("=")[1]);
+                        sprite = jp;
+                        break;
+                    }
+                    case "image": {
+                        // Extract attributes.
+                        int x = Integer.parseInt(bits[1].split("=")[1]);
+                        int y = Integer.parseInt(bits[2].split("=")[1]);
+                        int width = Integer.parseInt(bits[3].split("=")[1]);
+                        int height = Integer.parseInt(bits[4].split("=")[1]);
+                        String imageName = bits[5].split("=")[1];
+
+                        // Create JImage
+                        JImage ji = new JImage(JImage.imageFromName(imageName), imageName, x, y, width, height);
+                        sprite = ji;
+                        break;
+                    }
+                }
+
+                // add sprite to project sprites.
+                if(sprite != null) {
+                    project.addSprite(sprite);
+                }
+                else {
+                    // Error.
+                    System.out.println("An error has occured while loading data (null sprite).");
+                }
+                
+                // Read next line.
                 line = br.readLine();
             }
         }
         catch(FileNotFoundException e) {
-            data = null;
+            // do nothing. Leave projects empty.
         }
         catch(IOException e) {
             e.printStackTrace();
@@ -68,11 +159,20 @@ class Main extends JFrame {
 
     }
 
-    // Writes data to data file.
+    // Writes projects to data file.
     private void writeData() {
         try(PrintWriter pw = new PrintWriter(new FileWriter("data.txt"))) {
-            for(String line : data) {
-                pw.println(line);
+            for(Project project : projects) {
+                // Write header metadata.
+                pw.println(String.format("ProjectStart;title=%s;size=%d,%d", project.getTitle(), project.getWidth(), project.getHeight()));     
+
+                // Write sprite data.
+                for(JSprite sprite : project.getSprites()) {
+                    pw.println(sprite.toString());
+                }
+
+                // Mark end of this project.
+                pw.println("ProjectEnd");
             }
         }
         catch(IOException e) {
@@ -91,14 +191,13 @@ class Main extends JFrame {
             currentState = new ProjectEditor(s -> changeState(s), s -> setTitle(s), () -> pack(), s -> saveProject(s));
         }
         else if("ProgramEditorLoad".equals(newState)) {
-            currentState = new ProjectEditor(s -> changeState(s), s -> setTitle(s), () -> pack(), s -> saveProject(s), selectedProjectData);
+            currentState = new ProjectEditor(s -> changeState(s), s -> setTitle(s), () -> pack(), s -> saveProject(s), new Project(selectedProject));
         }
         else if("Home".equals(newState)) {
-            loadData();
             currentState = new Home(s -> changeState(s));
         }
         else if("ProjectSelect".equals(newState)) {
-            currentState = new ProjectSelect(data, s -> loadProject(s), () -> changeState("Home"), () -> changeState("ProjectSelect"), i -> deleteProject(i));
+            currentState = new ProjectSelect(projects, s -> loadProject(s), () -> changeState("Home"), () -> changeState("ProjectSelect"), i -> deleteProject(i));
         }
         add(currentState);
         currentState.requestFocusInWindow();    // set focus on the new state
@@ -106,56 +205,20 @@ class Main extends JFrame {
     }
 
     // Called by the ProjectSelect state. Loads the given project.
-    private void loadProject(ArrayList<String> projectData) {
-        selectedProjectData = projectData;
+    private void loadProject(Project project) {
+        selectedProject = project;
         changeState("ProgramEditorLoad");
     }
 
     // Saves a project by appending it to the end of the data file.
-    private void saveProject(ArrayList<String> projectData) {
-        try(PrintWriter pw = new PrintWriter(new FileWriter("data.txt", true))) {
-            for(String line : projectData) {
-                pw.println(line);
-            }
-        }
-        catch(IOException e) {
-            e.printStackTrace();
-        }
+    private void saveProject(Project project) {
+        projects.add(project);
+        writeData();
     }
 
     // Deletes a project by copying data through iteration, but excluding the selected project.
     private void deleteProject(int targetIndex) {
-        ArrayList<String> newData = new ArrayList<>();  // Stores the new data.
-        int curIndex = -1;                              // represents the current project index.
-        boolean deleting = false;                       // whether currently deleting lines.
-
-        for(String line : data) {
-            // Read if line starts signals beginning of new project.
-            try{
-                if("ProjectStart".equals(line.substring(0, "ProjectStart".length()))) {
-                    curIndex++;
-                }
-            }
-            catch(StringIndexOutOfBoundsException e) {
-                // do nothing.
-            }
-
-            // Check conditions to begin/end deleting.
-            if(targetIndex == curIndex) {
-                deleting = true;
-            } 
-            else {
-                deleting = false;
-            }
-
-            // Add the new line if not currently deleting.
-            if(!deleting) {
-                newData.add(line);
-            }
-        }
-
-        // Replace data.
-        data = newData;
+        projects.remove(targetIndex);
         writeData();
     }
     

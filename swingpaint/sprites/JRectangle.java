@@ -1,7 +1,6 @@
 package swingpaint.sprites;
 
 import java.awt.Rectangle;
-import java.awt.Color;
 
 
 public class JRectangle extends JSprite {

@@ -29,6 +29,20 @@ public class JPolygon extends JSprite {
     }
 
 
+    // Clone constructor.
+    public JPolygon(JPolygon jpolygon) {
+        super(jpolygon);
+        polygon = new Polygon();
+        polygon.xpoints = new int[jpolygon.polygon.npoints];
+        polygon.ypoints = new int[jpolygon.polygon.npoints];
+        for(int i = 0; i < jpolygon.polygon.npoints; i++) {
+            polygon.xpoints[i] = jpolygon.polygon.xpoints[i];
+            polygon.ypoints[i] = jpolygon.polygon.ypoints[i];
+        }
+        polygon.npoints = jpolygon.polygon.npoints;
+    }
+
+
     public Polygon getPolygon() {
         return polygon;
     }

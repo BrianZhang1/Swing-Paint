@@ -19,6 +19,7 @@ import swingpaint.sprites.JSprite;
 import java.util.function.Consumer;
 import java.util.function.BiConsumer;
 import swingpaint.helpers.VoidCallback;
+import swingpaint.helpers.Project;
 
 import java.awt.Rectangle;
 import java.awt.Polygon;
@@ -59,7 +60,7 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
     Consumer<String> changeState;           // Callback function to change state.
     Consumer<String> setTitle;              // Callback function to set title of frame.
     VoidCallback framePack;                 // Callback function to pack frame. Used for resizing.
-    Consumer<ArrayList<String>> saveProjectCallback;            // Callback function to save project.
+    Consumer<Project> saveProjectCallback;            // Callback function to save project.
 
     private BufferedImage addIcon;          // Icon to add new sprites.
     private Rectangle addIconRect;          // A rectangle that represents the position and size of the icon.
@@ -77,7 +78,7 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
     private JTextField popupPanelTextField;
 
 
-    public ProjectEditor(Consumer<String> changeState, Consumer<String> setTitle, VoidCallback framePack, Consumer<ArrayList<String>> saveProjectCallback) {
+    public ProjectEditor(Consumer<String> changeState, Consumer<String> setTitle, VoidCallback framePack, Consumer<Project> saveProjectCallback) {
         init(changeState, setTitle, framePack, saveProjectCallback);
 
         // Canvas has one initial sprite.
@@ -87,12 +88,13 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
         setProjectTitle("Untitled");
     }
 
-    public ProjectEditor(Consumer<String> changeState, Consumer<String> setTitle, VoidCallback framePack, Consumer<ArrayList<String>> saveProjectCallback, ArrayList<String> data) {
+    // Initialize from existing project.
+    public ProjectEditor(Consumer<String> changeState, Consumer<String> setTitle, VoidCallback framePack, Consumer<Project> saveProjectCallback, Project project) {
         init(changeState, setTitle, framePack, saveProjectCallback);
-        importData(data);
+        importProject(project);
     }
     
-    public void init(Consumer<String> changeState, Consumer<String> setTitle, VoidCallback framePack, Consumer<ArrayList<String>> saveProjectCallback) {
+    public void init(Consumer<String> changeState, Consumer<String> setTitle, VoidCallback framePack, Consumer<Project> saveProjectCallback) {
         // Configuring JPanel
         setPreferredSize(new Dimension(1280, 800));
         setFocusable(true);
@@ -352,60 +354,11 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
         }
     }
 
-    // Creates sprites from String[] where each element represents a Sprite.
-    private void importData(ArrayList<String> data) {
-        String[] bits;
-
-        // The first line contains the project meta data.
-        bits = data.get(0).split(";");
-        String projectTitle = bits[1].split("=")[1];
-        String projectSizeBits = bits[2].split("=")[1];
-        int projectWidth = Integer.parseInt(projectSizeBits.split(",")[0]);
-        int projectHeight = Integer.parseInt(projectSizeBits.split(",")[1]);
-        setProjectTitle(projectTitle);
-        resizeCanvas(projectWidth, projectHeight);
-
-        // The remaining lines contain sprite data.
-        for(int i = 1; i < data.size(); i++) {
-            bits = data.get(i).split(";");
-            String type = bits[0].split("=")[1];
-            switch(type) {
-                case "rectangle": {
-                    // Create JRectangle and set color
-                    JRectangle jr = new JRectangle(JRectangle.rectangleFromString(bits));
-                    jr.setRGBString(bits[5].split("=")[1]);
-                    sprites.add(jr);
-                    break;
-                }
-                case "oval": {
-                    // Create JOval and set color
-                    JOval jo = new JOval(JRectangle.rectangleFromString(bits));
-                    jo.setRGBString(bits[5].split("=")[1]);
-                    sprites.add(jo);
-                    break;
-                }
-                case "polygon": {
-                    // Create JPolygon and set color
-                    JPolygon jp = new JPolygon(JPolygon.polygonFromString(bits));
-                    jp.setRGBString(bits[3].split("=")[1]);
-                    sprites.add(jp);
-                    break;
-                }
-                case "image": {
-                    // Extract attributes.
-                    int x = Integer.parseInt(bits[1].split("=")[1]);
-                    int y = Integer.parseInt(bits[2].split("=")[1]);
-                    int width = Integer.parseInt(bits[3].split("=")[1]);
-                    int height = Integer.parseInt(bits[4].split("=")[1]);
-                    String imageName = bits[5].split("=")[1];
-
-                    // Create JImage
-                    JImage ji = new JImage(JImage.imageFromName(imageName), imageName, x, y, width, height);
-                    sprites.add(ji);
-                    break;
-                }
-            }
-        }
+    // Imports Project data.
+    private void importProject(Project project) {
+        setProjectTitle(project.getTitle());
+        resizeCanvas(project.getWidth(), project.getHeight());
+        sprites = project.getSprites();
     }
 
     // Exports the canvas to a Java Swing code file.
@@ -599,15 +552,14 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
 
     // Saves project to be edited in the future.
     private void saveProject() {
-        ArrayList<String> projectData = new ArrayList<>();
+        // Create project object with all this projects data and call callback.
+        Project project = new Project();
+        project.setTitle(projectTitle);
+        project.setWidth(getWidth());
+        project.setHeight(getHeight());
+        project.setSprites(sprites);
 
-        projectData.add(String.format("ProjectStart;title=%s;size=%d,%d", projectTitle, getWidth(), getHeight()));     
-        for(JSprite s : sprites) {
-            projectData.add(s.toString());
-        }
-        projectData.add("ProjectEnd");
-
-        saveProjectCallback.accept(projectData);
+        saveProjectCallback.accept(project);
     }
 
 
