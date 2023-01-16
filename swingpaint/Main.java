@@ -31,13 +31,20 @@ import java.io.PrintWriter;
 import java.io.IOException;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
+
 import java.util.ArrayList;
 
+
+
+// Class that handles higher-level functions (switching between states, file handling).
 class Main extends JFrame {
-    private JPanel currentState;
-    ArrayList<Project> projects; // All projects.
-    Project selectedProject;  // The data for the selected project (selected in ProjectSelect).
+    private JPanel currentState;    // the current state
+    ArrayList<Project> projects;    // All projects.
+    Project selectedProject;        // The data for the selected project (selected in ProjectSelect).
+    ArrayList<String> userImages;     // The names of all the images in the userImage directory.
     
+
+    // Initialize frame.
     public Main() {
         setTitle("Swing Paint");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -46,6 +53,7 @@ class Main extends JFrame {
         // Initialize variables.
         selectedProject = null;
         projects = new ArrayList<>();
+        userImages = new ArrayList<>();
 
         // Load data.
         loadData();
@@ -54,6 +62,7 @@ class Main extends JFrame {
         changeState("Home");
     }
 
+
     // Loads data file.
     private void loadData() {
         // Create userImages folder if it does not exist.
@@ -61,6 +70,17 @@ class Main extends JFrame {
         if(!userImagesDirectory.exists()) {
             userImagesDirectory.mkdir();
         }
+        // Read user images.
+        else {
+            File[] files = userImagesDirectory.listFiles();
+            if(files != null) {
+                for(File file : files) {
+                    userImages.add(file.getName());
+                }
+            }
+        }
+        System.out.println(userImages.size());
+
 
         Project project = new Project();    // stores current project while reading data.
         String bits[];                      // for splitting.
@@ -189,10 +209,10 @@ class Main extends JFrame {
 
         // Add new state.
         if("ProgramEditorNew".equals(newState)) {
-            currentState = new ProjectEditor(s -> changeState(s), s -> setTitle(s), () -> pack(), s -> saveProject(s));
+            currentState = new ProjectEditor(s -> changeState(s), s -> setTitle(s), () -> pack(), s -> saveProject(s), userImages);
         }
         else if("ProgramEditorLoad".equals(newState)) {
-            currentState = new ProjectEditor(s -> changeState(s), s -> setTitle(s), () -> pack(), s -> saveProject(s), new Project(selectedProject));
+            currentState = new ProjectEditor(s -> changeState(s), s -> setTitle(s), () -> pack(), s -> saveProject(s), new Project(selectedProject), userImages);
         }
         else if("Home".equals(newState)) {
             currentState = new Home(s -> changeState(s));

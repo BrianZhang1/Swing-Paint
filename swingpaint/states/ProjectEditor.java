@@ -85,9 +85,18 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
     private JButton confirmSaveButton2;
     private VoidCallback confirmSaveCallback;
 
+    private JPanel imageSelectPanel;
+    private JLabel imageSelectLabel;
+    private ArrayList<JButton> imageSelectButtons;
 
-    public ProjectEditor(Consumer<String> changeState, Consumer<String> setTitle, VoidCallback framePack, Consumer<Project> saveProjectCallback) {
-        init(changeState, setTitle, framePack, saveProjectCallback);
+
+    public ProjectEditor(Consumer<String> changeState,
+        Consumer<String> setTitle,
+        VoidCallback framePack,
+        Consumer<Project> saveProjectCallback,
+        ArrayList<String> userImages) {
+
+        init(changeState, setTitle, framePack, saveProjectCallback, userImages);
 
         // Canvas has one initial sprite.
         createSprite("rectangle");
@@ -97,12 +106,24 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
     }
 
     // Initialize from existing project.
-    public ProjectEditor(Consumer<String> changeState, Consumer<String> setTitle, VoidCallback framePack, Consumer<Project> saveProjectCallback, Project project) {
-        init(changeState, setTitle, framePack, saveProjectCallback);
+    public ProjectEditor(Consumer<String> changeState,
+        Consumer<String> setTitle,
+        VoidCallback framePack,
+        Consumer<Project> saveProjectCallback,
+        Project project,
+        ArrayList<String> userImages) {
+
+        init(changeState, setTitle, framePack, saveProjectCallback, userImages);
         importProject(project);
     }
     
-    public void init(Consumer<String> changeState, Consumer<String> setTitle, VoidCallback framePack, Consumer<Project> saveProjectCallback) {
+    public void init(Consumer<String> changeState,
+        Consumer<String> setTitle,
+        VoidCallback framePack,
+        Consumer<Project> saveProjectCallback,
+        ArrayList<String> userImages
+        ) {
+
         // Configuring JPanel
         setPreferredSize(new Dimension(800, 600));
         setFocusable(true);
@@ -161,6 +182,24 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
         confirmSavePanel.add(confirmSaveButton2);
         confirmSavePanel.setSize(confirmSavePanel.getPreferredSize().width+10, confirmSavePanel.getPreferredSize().height);
         confirmSaveCallback = null;
+
+        imageSelectPanel = new JPanel();
+        imageSelectPanel.setLayout(new BoxLayout(imageSelectPanel, BoxLayout.X_AXIS));
+        imageSelectLabel = new JLabel("Select an image:");
+        imageSelectPanel.add(imageSelectLabel);
+        imageSelectButtons = new ArrayList<>();
+        // Add a button for each user image.
+        for(String imgName : userImages) {
+            JButton button = new JButton(imgName);
+            button.setActionCommand("createImage " + imgName);
+            button.addActionListener(this);
+            imageSelectButtons.add(button);
+
+            spacer = new JPanel();
+            spacer.setSize(10, 10);
+            imageSelectPanel.add(spacer);
+            imageSelectPanel.add(button);
+        }
         
         // Initalizing Images
         try {
@@ -210,7 +249,7 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
                 break;
             case "image":
                 // Show the popup panel and ask user for the path to the image file.
-                showPopupPanel("Image Name", "createImage", "");
+                showImageSelectPanel();
                 break;
         }
 
@@ -316,6 +355,26 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
     }
 
     
+    // Shows the image select panel.
+    private void showImageSelectPanel() {
+        imageSelectPanel.setSize(imageSelectPanel.getPreferredSize().width + 10,
+            imageSelectPanel.getPreferredSize().height);
+        imageSelectPanel.setLocation(getWidth()/2-imageSelectPanel.getWidth()/2,
+            getHeight()/2-imageSelectPanel.getHeight()/2);
+        add(imageSelectPanel);
+        imageSelectPanel.revalidate();
+
+        repaint();
+    }
+
+
+    // Hides the image select panel.
+    private void hideImageSelectPanel() {
+        remove(imageSelectPanel);
+        repaint();
+    }
+
+    
     // Handle the different commands sent to this object by various action listeners.
     public void actionPerformed(ActionEvent e) {
         // Add a new sprite.
@@ -363,12 +422,12 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
         }
 
         // Creates an image sprite with the specified image path.
-        else if("createImage".equals(e.getActionCommand())) {
-            String imageName = popupPanelTextField.getText();
+        else if("createImage".equals(e.getActionCommand().split(" ")[0])) {
+            String imageName = e.getActionCommand().split(" ")[1];
             JImage image = new JImage(JImage.imageFromPath("userImages\\" + imageName), imageName);
             sprites.add(image);
             setFocus(image);
-            hidePopupPanel();
+            hideImageSelectPanel();
         }
 
         // Sets the canvas size.
@@ -662,6 +721,7 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
             hideDetailsPanel();
             hideOptions();
             hideSpriteSelect();
+            hideImageSelectPanel();
 
             dragPointHeld = -1;
             Point p = e.getPoint();
