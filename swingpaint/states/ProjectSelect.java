@@ -156,7 +156,6 @@ public class ProjectSelect extends JPanel implements ActionListener {
 
         // Different behaviour depending on action.
         if("load".equals(bits[0])) {
-            System.out.println(bits[1]);
             int selectedProjectIndex = Integer.parseInt(bits[1]);
             loadProject.accept(projects.get(selectedProjectIndex));
         }

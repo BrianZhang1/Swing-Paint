@@ -23,6 +23,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
@@ -937,7 +938,7 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
                             ProjectEditor.this.repaint();
                         }
                         catch(NumberFormatException ex) {
-                            System.out.println("Value must be an integer.");
+                            JOptionPane.showMessageDialog(ProjectEditor.this, "Value must be an integer.", "Value Error", JOptionPane.ERROR_MESSAGE);
                         }
                         break;
                     case "height":
@@ -946,7 +947,7 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
                             ProjectEditor.this.repaint();
                         }
                         catch(NumberFormatException ex) {
-                            System.out.println("Value must be an integer.");
+                            JOptionPane.showMessageDialog(ProjectEditor.this, "Value must be an integer.", "Value Error", JOptionPane.ERROR_MESSAGE);
                         }
                         break;
                     case "x":
@@ -955,7 +956,7 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
                             ProjectEditor.this.repaint();
                         }
                         catch(NumberFormatException ex) {
-                            System.out.println("Value must be an integer.");
+                            JOptionPane.showMessageDialog(ProjectEditor.this, "Value must be an integer.", "Value Error", JOptionPane.ERROR_MESSAGE);
                         }
                         break;
                     case "y":
@@ -964,12 +965,17 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
                             ProjectEditor.this.repaint();
                         }
                         catch(NumberFormatException ex) {
-                            System.out.println("Value must be an integer.");
+                            JOptionPane.showMessageDialog(ProjectEditor.this, "Value must be an integer.", "Value Error", JOptionPane.ERROR_MESSAGE);
                         }
                         break;
                     case "color":
                         String rgbString = searchRowByAttribute("color").textField.getText();
-                        focus.setRGBString(rgbString);
+                        try {
+                            focus.setRGBString(rgbString);
+                        }
+                        catch(IllegalArgumentException ex) {
+                            JOptionPane.showMessageDialog(ProjectEditor.this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                        }
                         ProjectEditor.this.repaint();
                         break;
                     case "point":
@@ -982,7 +988,7 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
                                 ProjectEditor.this.repaint();
                             }
                             catch(NumberFormatException ex) {
-                                System.out.println("Value must be an integer.");
+                                JOptionPane.showMessageDialog(ProjectEditor.this, "Value must be an integer.", "Value Error", JOptionPane.ERROR_MESSAGE);
                             }
                             break;
                         }
@@ -993,7 +999,7 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
                                 ProjectEditor.this.repaint();
                             }
                             catch(NumberFormatException ex) {
-                                System.out.println("Value must be an integer.");
+                                JOptionPane.showMessageDialog(ProjectEditor.this, "Value must be an integer.", "Value Error", JOptionPane.ERROR_MESSAGE);
                             }
                             break;
                         }

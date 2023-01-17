@@ -10,6 +10,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import swingpaint.helpers.Project;
@@ -153,7 +154,8 @@ class Main extends JFrame {
                 }
                 else {
                     // Error.
-                    System.out.println("An error has occured while loading data (null sprite).");
+                    JOptionPane.showMessageDialog(this, "An error has occured while loading data (null sprite).",
+                        "Null Sprite Error", JOptionPane.ERROR_MESSAGE);
                 }
                 
                 // Read next line.

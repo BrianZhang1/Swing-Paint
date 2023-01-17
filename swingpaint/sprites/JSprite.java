@@ -138,16 +138,16 @@ public class JSprite extends Rectangle {
         return String.format("%d,%d,%d", color.getRed(), color.getGreen(), color.getBlue());
     }
 
-    public void setRGBString(String rgbString) {
+    public void setRGBString(String rgbString) throws IllegalArgumentException {
         String[] bits = rgbString.split(",");
         try {
             color = new Color(Integer.parseInt(bits[0]), Integer.parseInt(bits[1]), Integer.parseInt(bits[2]));
         }
         catch(NumberFormatException e) {
-            System.out.println("Improper color formatting. Must be formatted as r,g,b.");
+            throw new IllegalArgumentException("Improper color formatting. Color text must be formatted as r,g,b with no spaces.");
         }
         catch(IllegalArgumentException e) {
-            System.out.println("Color value out of bounds. Must be within the range 0-255.");
+            throw new IllegalArgumentException("Color value out of bounds. Must be within the range 0-255.");
         }
     }
 
