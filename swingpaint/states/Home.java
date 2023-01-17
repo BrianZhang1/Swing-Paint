@@ -22,6 +22,7 @@ public class Home extends JPanel implements ActionListener {
     private JButton loadSaveButton;
     private Consumer<String> changeState;
 
+    // Constructor.
     public Home(Consumer<String> changeState) {
         // Initialize variables.
         this.changeState = changeState;

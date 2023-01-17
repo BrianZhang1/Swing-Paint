@@ -27,6 +27,8 @@ public class Project {
         title = project.title;
         width = project.width;
         height = project.height;
+
+        // Copy the sprites.
         for(JSprite sprite : project.sprites) {
             switch(sprite.getType()) {
                 case "rectangle": {

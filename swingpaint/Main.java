@@ -1,13 +1,3 @@
-/*
- * TODO: Error handling (inputs mainly).
- * TODO: Add tutorial and demo, including where examples of where all key concepts are used, project explanation/overview.
- * TODO: update journal with github commits
-
- * TODO: Add layer reordering (move to front/back)
- * TODO: Add duplicate sprite button.
- * TODO: selection pane
- * TODO: Adapters for listeners instead of unused methods.
- */
 package swingpaint;
 
 import java.io.BufferedReader;
@@ -44,6 +34,7 @@ class Main extends JFrame {
 
     // Initialize frame.
     public Main() {
+        // Configure frame.
         setTitle("Swing Paint");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setResizable(false);

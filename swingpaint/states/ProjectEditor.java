@@ -216,6 +216,7 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
     private void createSprite(String type) {
         JSprite newSprite;
 
+        // Create a different sprite depending on the type.
         switch(type) {
             case "rectangle": {
                 int width = 20;
@@ -266,6 +267,7 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
         }
         detailsPanel.scrollPane.setSize(detailsPanel.scrollPane.getPreferredSize().width, height);
 
+        // Add to panel.
         add(detailsPanel.scrollPane);
         detailsPanel.revalidate();
         repaint();
@@ -281,8 +283,11 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
 
     // Shows the sprite selection combo box.
     private void showSpriteSelect() {
+        // Configure.
         spriteSelect.setSize(spriteSelect.getPreferredSize());
         spriteSelect.setLocation(getWidth()-spriteSelect.getSize().width-5, addIconRect.y+addIconRect.height+5);
+
+        // Add to panel.
         add(spriteSelect);
         spriteSelect.showPopup();
         spriteSelect.revalidate();
@@ -299,8 +304,11 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
 
     // Shows the options dropdown list.
     private void showOptions() {
+        // Configure.
         optionsSelect.setSize(optionsSelect.getPreferredSize());
         optionsSelect.setLocation(getWidth()-optionsSelect.getSize().width-5, addIconRect.y+addIconRect.height+5);
+        
+        // Add to panel.
         add(optionsSelect);
         optionsSelect.showPopup();
         optionsSelect.revalidate();
@@ -326,18 +334,21 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
 
     // Shows the popup panel.
     private void showPopupPanel(String labelText, String textFieldCommand, String textFieldValue) {
+        // Configure popup panel.
         popupPanelLabel.setText(labelText);
         popupPanelTextField.setColumns(10);
         popupPanelTextField.setActionCommand(textFieldCommand);
         popupPanelTextField.setText(textFieldValue);
-
         popupPanel.setSize(popupPanel.getPreferredSize());
         // Center the popup panel in frame.
         popupPanel.setLocation(this.getWidth()/2-popupPanel.getWidth()/2, this.getHeight()/2-popupPanel.getHeight()/2);
+
+        // Add to panel.
         add(popupPanel);
         popupPanel.revalidate();
         repaint();
 
+        // Autofocus the text field.
         popupPanelTextField.requestFocusInWindow();
     }
 
@@ -351,13 +362,15 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
     
     // Shows the image select panel.
     private void showImageSelectPanel() {
+        // Configure.
         imageSelectPanel.setSize(imageSelectPanel.getPreferredSize().width + 10,
             imageSelectPanel.getPreferredSize().height);
         imageSelectPanel.setLocation(getWidth()/2-imageSelectPanel.getWidth()/2,
             getHeight()/2-imageSelectPanel.getHeight()/2);
+
+        // Add to panel.
         add(imageSelectPanel);
         imageSelectPanel.revalidate();
-
         repaint();
     }
 
@@ -501,6 +514,7 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
         }
 
 
+        // Write to export file. This file will have all the java code.
         try(PrintWriter pw = new PrintWriter(new FileWriter(".\\export\\Program.java"))) {
             // Begin constructing java program.
             pw.println("import javax.swing.JFrame;");
@@ -721,6 +735,7 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
             hideSpriteSelect();
             hideImageSelectPanel();
 
+            // Initialize variables for later.
             dragPointHeld = -1;
             Point p = e.getPoint();
 
@@ -910,7 +925,10 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
 
         // Handle actions, primarily from Text Fields which update getAttributes().
         public void actionPerformed(ActionEvent e) {
+            // Split event.
             String[] bits = e.getActionCommand().split(" ");
+
+            // If first word is "set", check the next word and set the specified attribute.
             if("set".equals(bits[0])) {
                 switch(bits[1]) {
                     case "width":
@@ -1029,8 +1047,10 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
             private JButton deleteButton;
 
             public ButtonRow() {
+                // Configure.
                 setBackground(Color.GRAY);
 
+                // Create UI.
                 deleteButton = new JButton("Delete");
                 deleteButton.setActionCommand("delete");
                 deleteButton.addActionListener(detailsPanel);

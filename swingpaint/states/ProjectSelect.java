@@ -134,15 +134,16 @@ public class ProjectSelect extends JPanel implements ActionListener {
 
     // Displays a row for each project in projects.
     private void displayProjects(ArrayList<Project> projects) {
+        // First, clear all current visible projects.
         projectsPanel.removeAll();
 
+        // Add all projects given.
         for(int i = 0; i < projects.size(); i++) {
             ProjectRow pr = new ProjectRow(projects.get(i).getTitle(), Integer.toString(i));
             projectsPanel.add(pr);
         }
 
         projectsPanel.revalidate();
-
     }
 
     
