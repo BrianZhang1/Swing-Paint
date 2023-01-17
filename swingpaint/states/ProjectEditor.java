@@ -84,9 +84,6 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
 
         init(changeState, setTitle, framePack, saveProjectCallback, userImages);
 
-        // Canvas has one initial sprite.
-        createSprite("rectangle");
-
         // New projects are initially titled "Untitled".
         setProjectTitle("Untitled");
     }
@@ -220,24 +217,36 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
         JSprite newSprite;
 
         switch(type) {
-            case "rectangle":
-                newSprite = new JRectangle(0, 0, 20, 20);
+            case "rectangle": {
+                int width = 20;
+                int height = 20;
+                int x = getWidth()/2 - width/2;
+                int y = getHeight()/2 - height/2;
+                newSprite = new JRectangle(x, y, width, height);
                 sprites.add(newSprite);
                 setFocus(newSprite);
                 break;
-            case "oval":
-                newSprite = new JOval(0, 0, 20, 20);
+            }
+            case "oval": {
+                int width = 20;
+                int height = 20;
+                int x = getWidth()/2 - width/2;
+                int y = getHeight()/2 - height/2;
+                newSprite = new JOval(x, y, width, height);
                 sprites.add(newSprite);
                 setFocus(newSprite);
                 break;
-            case "polygon":
+            }
+            case "polygon": {
                 // Show the popup panel and ask user for number of points on polygon.
                 showPopupPanel("Number of Points", "createPolygon", "3");
                 break;
-            case "image":
+            }
+            case "image": {
                 // Show the popup panel and ask user for the path to the image file.
                 showImageSelectPanel();
                 break;
+            }
         }
 
         repaint();
@@ -401,6 +410,7 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
         // Creates a polygon with specified number of points in popup panel text field.
         else if("createPolygon".equals(e.getActionCommand())) {
             JSprite newSprite = new JPolygon(JPolygon.createDefaultPolygon(Integer.parseInt(popupPanelTextField.getText())));
+            newSprite.setLocation(getWidth()/2-newSprite.width/2, getHeight()/2-newSprite.height/2);
             sprites.add(newSprite);
             setFocus(newSprite);
             hidePopupPanel();
@@ -410,6 +420,7 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
         else if("createImage".equals(e.getActionCommand().split(" ")[0])) {
             String imageName = e.getActionCommand().split(" ")[1];
             JImage image = new JImage(JImage.imageFromPath("userImages\\" + imageName), imageName);
+            image.setLocation(getWidth()/2-image.width/2, getHeight()/2-image.height/2);
             sprites.add(image);
             setFocus(image);
             hideImageSelectPanel();
