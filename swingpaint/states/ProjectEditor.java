@@ -28,6 +28,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
+import swingpaint.helpers.FilePathHelper;
 import swingpaint.helpers.Project;
 import swingpaint.helpers.VoidCallback;
 import swingpaint.sprites.JImage;
@@ -188,8 +189,8 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
         
         // Initalizing Images
         try {
-            addIcon = ImageIO.read(new File(".\\swingpaint\\assets\\addIcon.png"));
-            optionsIcon = ImageIO.read(new File(".\\swingpaint\\assets\\optionsIcon.png"));
+            addIcon = ImageIO.read(new File(FilePathHelper.bitsToPath(new String[]{"swingpaint", "assets", "addIcon.png"})));
+            optionsIcon = ImageIO.read(new File(FilePathHelper.bitsToPath(new String[]{"swingpaint", "assets", "optionsIcon.png"})));
         }
         catch(IOException e) {
             e.printStackTrace();
@@ -433,7 +434,7 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
         // Creates an image sprite with the specified image path.
         else if("createImage".equals(e.getActionCommand().split(" ")[0])) {
             String imageName = e.getActionCommand().split(" ")[1];
-            JImage image = new JImage(JImage.imageFromPath("userImages\\" + imageName), imageName);
+            JImage image = new JImage(JImage.imageFromName(imageName), imageName);
             image.setLocation(getWidth()/2-image.width/2, getHeight()/2-image.height/2);
             sprites.add(image);
             setFocus(image);
@@ -484,6 +485,7 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
         ArrayList<JImage> jImageList = new ArrayList<>();   // contains all the JImage sprites.
         String prevRGBString = null;
         int curImgIndex = 0;                // Tracks which image is currently being loaded.
+        String sep = System.getProperty("file.separator");
         for(JSprite s : sprites) {
             if("polygon".equals(s.getType())) {
                 containsPolygon = true;
@@ -497,14 +499,14 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
         // Export image files.
         if(containsImage) {
             // Create images directory if does not exist.
-            File exportImagesDirectory = new File("export\\images");
+            File exportImagesDirectory = new File(FilePathHelper.bitsToPath(new String[]{"export", "images"}));
             if(!exportImagesDirectory.exists()) {
                 exportImagesDirectory.mkdir();
             }
 
             // Export image files to images directory.
             for(JImage jimg : jImageList) {
-                File destination = new File("export\\images\\" + jimg.getImageName());
+                File destination = new File(FilePathHelper.bitsToPath(new String[]{"export", "images", jimg.getImageName()}));
                 try {
                     ImageIO.write(jimg.getImage(), jimg.getImageFileExtension(), destination);
                 }
@@ -516,7 +518,7 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
 
 
         // Write to export file. This file will have all the java code.
-        try(PrintWriter pw = new PrintWriter(new FileWriter(".\\export\\Program.java"))) {
+        try(PrintWriter pw = new PrintWriter(new FileWriter(FilePathHelper.bitsToPath(new String[]{"export", "Program.java"})))) {
             // Begin constructing java program.
             pw.println("import javax.swing.JFrame;");
             pw.println("import javax.swing.JPanel;");
@@ -566,7 +568,13 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
                 
                 // Load images into ArrayList.
                 for(JImage jimg : jImageList) {
-                    pw.printf("\t\t\timgs.add(ImageIO.read(new File(\"images\\\\%s\")));%n", jimg.getImageName());
+                    // Check if system uses backslash as separator. If so, must double it.
+                    if("\\".equals(System.getProperty("file.separator"))) {
+                        pw.printf("\t\t\timgs.add(ImageIO.read(new File(\"images%s%s%s\")));%n", sep, sep, jimg.getImageName());
+                    }
+                    else {
+                        pw.printf("\t\t\timgs.add(ImageIO.read(new File(\"images%s%s\")));%n", sep, jimg.getImageName());
+                    }
                 }
 
                 pw.println("\t\t}");
