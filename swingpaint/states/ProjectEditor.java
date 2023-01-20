@@ -445,9 +445,16 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
         else if("setCanvasSize".equals(e.getActionCommand())) {
             String input = popupPanelTextField.getText();
             String[] bits = input.split(",");
-            int width = Integer.parseInt(bits[0]);
-            int height = Integer.parseInt(bits[1]);
-            resizeCanvas(width, height);
+            try {
+                int width = Integer.parseInt(bits[0]);
+                int height = Integer.parseInt(bits[1]);
+                resizeCanvas(width, height);
+            }
+            catch(NumberFormatException ex) {
+                JOptionPane.showMessageDialog(ProjectEditor.this,
+                    "Value must be formatted as 'width,height', with no space. Both values must be integers.",
+                    "Value Error", JOptionPane.ERROR_MESSAGE);
+            }
             hidePopupPanel();
         }
 
