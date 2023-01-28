@@ -1,10 +1,12 @@
 package swingpaint.states;
 
+import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.net.URL;
 import java.util.function.Consumer;
 
 import javax.swing.BoxLayout;
@@ -20,6 +22,7 @@ public class Home extends JPanel implements ActionListener {
     private JLabel titleLabel;
     private JButton newProjectButton;
     private JButton loadSaveButton;
+    private JButton instructionsButton;
     private Consumer<String> changeState;
 
     // Constructor.
@@ -32,7 +35,6 @@ public class Home extends JPanel implements ActionListener {
         setLayout(new GridBagLayout());
 
         // Create UI elements.
-        JPanel spacer;
         centerPanel = new JPanel();
         centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));
 
@@ -55,15 +57,20 @@ public class Home extends JPanel implements ActionListener {
         loadSaveButton.setActionCommand("loadSave");
         loadSaveButton.addActionListener(this);
 
+        instructionsButton = new JButton("Instructions");
+        instructionsButton.setAlignmentX(JButton.CENTER_ALIGNMENT);
+        instructionsButton .setFont(buttonFont);
+        instructionsButton.setActionCommand("openInstructions");
+        instructionsButton.addActionListener(this);
+
+
         centerPanel.add(titleLabel);
-        spacer = new JPanel();
-        spacer.setSize(30, 30);
-        centerPanel.add(spacer);
+        centerPanel.add(new Spacer(30, 30));
         centerPanel.add(newProjectButton);
-        spacer = new JPanel();
-        spacer.setSize(10, 10);
-        centerPanel.add(spacer);
+        centerPanel.add(new Spacer(30, 30));
         centerPanel.add(loadSaveButton);
+        centerPanel.add(new Spacer(30, 30));
+        centerPanel.add(instructionsButton);
         add(centerPanel);
     }
 
@@ -79,6 +86,23 @@ public class Home extends JPanel implements ActionListener {
             case "loadSave":
                 changeState.accept("ProjectSelect");
                 break;
+            case "openInstructions": {
+                Desktop desktop = Desktop.isDesktopSupported() ? Desktop.getDesktop() : null;
+                if (desktop != null && desktop.isSupported(Desktop.Action.BROWSE)) {
+                    try {
+                        desktop.browse(new URL("https://docs.google.com/document/d/1M5Q5zqVk4eiarDhmxFQwS8-e92UszVV2/edit").toURI());
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+                }
+            }
+        }
+    }
+
+
+    private class Spacer extends JPanel {
+        public Spacer(int width, int height) {
+            setSize(width, height);
         }
     }
 }
