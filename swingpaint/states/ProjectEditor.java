@@ -674,6 +674,35 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
     }
 
 
+    // Duplicates a sprite given its index in the sprites array.
+    private void duplicateSprite(int index) {
+        JSprite target = sprites.get(index);
+        JSprite s = null;
+        if(target instanceof JRectangle) {
+            s = new JRectangle((JRectangle)target);
+        }
+        else if(target instanceof JOval) {
+            s = new JOval((JOval)target);
+        }
+        else if(target instanceof JPolygon) {
+            s = new JPolygon((JPolygon)target);
+        }
+        else if(target instanceof JImage) {
+            s = new JImage((JImage)target);
+        }
+        if(s != null) {
+            s.setLocation(s.x+10, s.y+10);
+            sprites.add(s);
+            setFocus(s);
+            hideDetailsPanel();
+            repaint();
+        }
+        else {
+            throw new IllegalArgumentException("Invalid sprite index.");
+        }
+    }
+
+
     // Saves project to be edited in the future.
     private void saveProject() {
         // Create project object with all this projects data and call callback.
@@ -1029,6 +1058,19 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
                     ProjectEditor.this.removeSprite(i);
                 }
             }
+
+            // Duplicate focused sprite.
+            else if("duplicate".equals(bits[0])) {
+                int i = sprites.indexOf(focus);
+                if(i != -1) {
+                    try {
+                        ProjectEditor.this.duplicateSprite(i);
+                    }
+                    catch(IllegalArgumentException ex) {
+                        ex.printStackTrace();
+                    }
+                }
+            }
         }
 
 
@@ -1065,6 +1107,7 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
 
         // A row of buttons. Contains buttons related to sprites (delete, duplicate, etc.)
         private class ButtonRow extends JPanel {
+            private JButton duplicateButton;
             private JButton deleteButton;
 
             public ButtonRow() {
@@ -1072,10 +1115,15 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
                 setBackground(Color.GRAY);
 
                 // Create UI.
+                duplicateButton = new JButton("Duplicate");
+                duplicateButton.setActionCommand("duplicate");
+                duplicateButton.addActionListener(detailsPanel);
+
                 deleteButton = new JButton("Delete");
                 deleteButton.setActionCommand("delete");
                 deleteButton.addActionListener(detailsPanel);
                 
+                add(duplicateButton);
                 add(deleteButton);
             }
         }
