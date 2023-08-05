@@ -51,6 +51,7 @@ public class ProjectEditor extends JPanel implements ActionListener {
     private int dragPointHeld;              // the index of the drag point held. -1 if none are held.
     private LocalDateTime dateCreated;      // creation date of this project
     private List<String> existingProjectNames;  // to ensure no duplicate names
+    private boolean projectModified;        // whether project has been modified.
 
     // Callback variables.
     Consumer<Screen> changeScreen;           // Callback function to change screen.
@@ -75,7 +76,6 @@ public class ProjectEditor extends JPanel implements ActionListener {
     private JLabel confirmSaveLabel;
     private JButton confirmSaveButton1;
     private JButton confirmSaveButton2;
-    private Runnable confirmSaveCallback;
     private JPanel imageSelectPanel;
     private JLabel imageSelectLabel;
     private ArrayList<JButton> imageSelectButtons;
@@ -106,6 +106,7 @@ public class ProjectEditor extends JPanel implements ActionListener {
         this.framePack = framePack;
         this.saveProjectCallback = saveProjectCallback;
         this.existingProjectNames = existingProjectNames;
+
         sprites = new ArrayList<>();
         spriteHeld = false;
 
@@ -147,7 +148,6 @@ public class ProjectEditor extends JPanel implements ActionListener {
         confirmSavePanel.add(spacer);
         confirmSavePanel.add(confirmSaveButton2);
         confirmSavePanel.setSize(confirmSavePanel.getPreferredSize().width+10, confirmSavePanel.getPreferredSize().height);
-        confirmSaveCallback = null;
 
         imageSelectPanel = new JPanel();
         imageSelectPanel.setLayout(new BoxLayout(imageSelectPanel, BoxLayout.X_AXIS));
@@ -201,6 +201,8 @@ public class ProjectEditor extends JPanel implements ActionListener {
             while(!setProjectTitle("Untitled " + i)) ++i;
             dateCreated = LocalDateTime.now();
         }
+
+        projectModified = false;
     }
 
 
@@ -356,12 +358,16 @@ public class ProjectEditor extends JPanel implements ActionListener {
 
 
     // Asks user whether they would like to save and calls callback upon answer.
-    private void showConfirmSave(Runnable callback) {
+    private void showConfirmSave() {
         confirmSavePanel.setLocation(getWidth()/2-confirmSavePanel.getWidth()/2,
             getHeight()/2-confirmSavePanel.getHeight()/2);
         add(confirmSavePanel);
         confirmSavePanel.revalidate();
-        confirmSaveCallback = callback;
+    }
+
+    private void hideConfirmSave() {
+        remove(confirmSavePanel);
+        repaint();
     }
     
     
@@ -372,6 +378,7 @@ public class ProjectEditor extends JPanel implements ActionListener {
         hideSpriteSelect();
         hideImageSelectPanel();
         hidePopupPanel();
+        hideConfirmSave();
     }
 
 
@@ -393,6 +400,7 @@ public class ProjectEditor extends JPanel implements ActionListener {
         project.setDateModified(LocalDateTime.now());
 
         saveProjectCallback.accept(project);
+        projectModified = false;
     }
 
 
@@ -590,6 +598,7 @@ public class ProjectEditor extends JPanel implements ActionListener {
                 newSprite = new JRectangle(x, y, width, height);
                 sprites.add(newSprite);
                 setFocus(newSprite);
+                projectModified = true;
                 break;
             }
             case "oval": {
@@ -600,6 +609,7 @@ public class ProjectEditor extends JPanel implements ActionListener {
                 newSprite = new JOval(x, y, width, height);
                 sprites.add(newSprite);
                 setFocus(newSprite);
+                projectModified = true;
                 break;
             }
             case "polygon": {
@@ -708,7 +718,6 @@ public class ProjectEditor extends JPanel implements ActionListener {
 
 
 
-
     //============================================
     //      HANDLING ACTIONS/INPUTS
     //============================================
@@ -729,7 +738,12 @@ public class ProjectEditor extends JPanel implements ActionListener {
                 export();
             }
             else if("Return Home".equals(selection)) {
-                showConfirmSave(() -> changeScreen.accept(Screen.HOME));
+                if(projectModified) {
+                    showConfirmSave();
+                }
+                else {
+                    changeScreen.accept(Screen.HOME);
+                }
             }
             else if("Set Title".equals(selection)) {
                 showPopupPanel("Project Title", "setTitle", projectTitle);
@@ -753,6 +767,7 @@ public class ProjectEditor extends JPanel implements ActionListener {
                 return;
             }
             hidePopupPanel();
+            projectModified = true;
         }
 
         // Creates a polygon with specified number of points in popup panel text field.
@@ -762,6 +777,7 @@ public class ProjectEditor extends JPanel implements ActionListener {
             sprites.add(newSprite);
             setFocus(newSprite);
             hidePopupPanel();
+            projectModified = true;
         }
 
         // Creates an image sprite with the specified image path.
@@ -772,6 +788,7 @@ public class ProjectEditor extends JPanel implements ActionListener {
             sprites.add(image);
             setFocus(image);
             hideImageSelectPanel();
+            projectModified = true;
         }
 
         // Sets the canvas size.
@@ -789,15 +806,16 @@ public class ProjectEditor extends JPanel implements ActionListener {
                     "Value Error", JOptionPane.ERROR_MESSAGE);
             }
             hidePopupPanel();
+            projectModified = true;
         }
 
         // Reacts to confirm save response.
         else if("confirmSaveYes".equals(e.getActionCommand())) {
             saveProject();
-            confirmSaveCallback.run();
+            changeScreen.accept(Screen.HOME);
         }
         else if("confirmSaveNo".equals(e.getActionCommand())) {
-            confirmSaveCallback.run();
+            changeScreen.accept(Screen.HOME);
         }
     }
 
@@ -820,7 +838,7 @@ public class ProjectEditor extends JPanel implements ActionListener {
                     showSpriteSelect();
                     return;
                 }
-                else if(optionsIconRect.contains(p)) {
+                if(optionsIconRect.contains(p)) {
                     showOptions();
                     return;
                 }
@@ -835,23 +853,18 @@ public class ProjectEditor extends JPanel implements ActionListener {
                             return;
                         }
                     }
+                    removeFocus();
                 }
 
                 // Check if the click was on a sprite.
-                if(dragPointHeld == -1) {
-                    // Loop through backwards so newest sprites get click priority.
-                    for(int i = sprites.size()-1; i >= 0; i--) {
-                        if(sprites.get(i).contains(p)) {
-                            setFocus(sprites.get(i));
-                            spriteHeld = true;
-                            dx = (int)p.getX() - (int)focus.getX();
-                            dy = (int)p.getY() - (int)focus.getY();
-                            break;
-                        }
-                    }
-                    if(!spriteHeld) {
-                        // no sprite was clicked, remove focus.
-                        removeFocus();
+                // Loop through backwards so newest sprites get click priority.
+                for(int i = sprites.size()-1; i >= 0; i--) {
+                    if(sprites.get(i).contains(p)) {
+                        setFocus(sprites.get(i));
+                        spriteHeld = true;
+                        dx = (int)p.getX() - (int)focus.getX();
+                        dy = (int)p.getY() - (int)focus.getY();
+                        return;
                     }
                 }
             }
@@ -875,6 +888,7 @@ public class ProjectEditor extends JPanel implements ActionListener {
 
             // Handle corner resizing.
             if(dragPointHeld != -1) {
+                projectModified = true;
                 focus.handleDragPoint(dragPointHeld, p);
                 focus.moveDragPoints();
                 repaint();
@@ -882,6 +896,7 @@ public class ProjectEditor extends JPanel implements ActionListener {
 
             // Handle sprite click-and-drag movement.
             else if(spriteHeld) {
+                projectModified = true;
                 focus.setLocation((int)p.getX()-dx, (int)p.getY()-dy);
                 focus.moveDragPoints();
                 repaint();
@@ -1019,6 +1034,7 @@ public class ProjectEditor extends JPanel implements ActionListener {
 
         // Handle actions, primarily from Text Fields which update getAttributes().
         public void actionPerformed(ActionEvent e) {
+            projectModified = true;
             // Split event.
             String[] bits = e.getActionCommand().split(" ");
 
