@@ -14,6 +14,8 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import swingpaint.helpers.Screen;
+
 
 // The Home screen is the screen the user begins on.
 public class Home extends JPanel implements ActionListener {
@@ -23,10 +25,10 @@ public class Home extends JPanel implements ActionListener {
     private JButton newProjectButton;
     private JButton loadSaveButton;
     private JButton instructionsButton;
-    private Consumer<String> changeScreen;
+    private Consumer<Screen> changeScreen;
 
     // Constructor.
-    public Home(Consumer<String> changeScreen) {
+    public Home(Consumer<Screen> changeScreen) {
         // Initialize variables.
         this.changeScreen = changeScreen;
 
@@ -81,10 +83,10 @@ public class Home extends JPanel implements ActionListener {
 
         switch(command) {
             case "newProject":
-                changeScreen.accept("ProgramEditorNew");
+                changeScreen.accept(Screen.PROGRAM_EDITOR);
                 break;
             case "loadSave":
-                changeScreen.accept("ProjectSelect");
+                changeScreen.accept(Screen.PROJECT_SELECT);
                 break;
             case "openInstructions": {
                 Desktop desktop = Desktop.isDesktopSupported() ? Desktop.getDesktop() : null;

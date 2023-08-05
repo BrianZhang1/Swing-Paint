@@ -14,6 +14,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import swingpaint.helpers.Project;
+import swingpaint.helpers.Screen;
 import swingpaint.screens.Home;
 import swingpaint.screens.ProjectEditor;
 import swingpaint.screens.ProjectSelect;
@@ -49,7 +50,7 @@ class Main extends JFrame {
         loadData();
 
         // Initial Screen
-        changeScreen("Home");
+        changeScreen(Screen.HOME);
     }
 
 
@@ -195,7 +196,7 @@ class Main extends JFrame {
 
 
     // Changes the screen to newScreen.
-    private void changeScreen(String newScreen) {
+    private void changeScreen(Screen newScreen) {
         // Clear current screen.
         if(currentScreen != null) {
             remove(currentScreen);
@@ -205,17 +206,32 @@ class Main extends JFrame {
         setTitle("Swing Paint");
 
         // Add new screen.
-        if("ProgramEditorNew".equals(newScreen)) {
-            currentScreen = new ProjectEditor(s -> changeScreen(s), s -> setTitle(s), () -> pack(), s -> saveProject(s), userImages);
-        }
-        else if("ProgramEditorLoad".equals(newScreen)) {
-            currentScreen = new ProjectEditor(s -> changeScreen(s), s -> setTitle(s), () -> pack(), s -> saveProject(s), new Project(selectedProject), userImages);
-        }
-        else if("Home".equals(newScreen)) {
-            currentScreen = new Home(s -> changeScreen(s));
-        }
-        else if("ProjectSelect".equals(newScreen)) {
-            currentScreen = new ProjectSelect(projects, s -> loadProject(s), () -> changeScreen("Home"), () -> changeScreen("ProjectSelect"), i -> deleteProject(i));
+        switch(newScreen) {
+            case PROGRAM_EDITOR: {
+                currentScreen = new ProjectEditor(s -> changeScreen(s), 
+                    s -> setTitle(s), 
+                    () -> pack(), 
+                    s -> saveProject(s), 
+                    userImages, 
+                    (selectedProject == null) ? null : new Project(selectedProject)
+                );
+                break;
+            }
+
+            case HOME: {
+                currentScreen = new Home(s -> changeScreen(s));
+                break;
+            }
+
+            case PROJECT_SELECT: {
+                currentScreen = new ProjectSelect(projects, 
+                    project -> loadProject(project), 
+                    () -> changeScreen(Screen.HOME), 
+                    () -> changeScreen(Screen.PROJECT_SELECT), 
+                    i -> deleteProject(i)
+                );
+                break;
+            }
         }
         add(currentScreen);
         currentScreen.requestFocusInWindow();    // set focus on the new screen
@@ -226,7 +242,8 @@ class Main extends JFrame {
     // Called by the ProjectSelect screen. Loads the given project.
     private void loadProject(Project project) {
         selectedProject = project;
-        changeScreen("ProgramEditorLoad");
+        changeScreen(Screen.PROGRAM_EDITOR);
+        selectedProject = null;
     }
 
 

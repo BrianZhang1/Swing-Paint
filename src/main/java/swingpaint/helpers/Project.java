@@ -1,11 +1,12 @@
 package swingpaint.helpers;
 
-import swingpaint.sprites.JSprite;
 import java.util.ArrayList;
+
+import swingpaint.sprites.JImage;
 import swingpaint.sprites.JOval;
 import swingpaint.sprites.JPolygon;
-import swingpaint.sprites.JImage;
 import swingpaint.sprites.JRectangle;
+import swingpaint.sprites.JSprite;
 
 // A Project contains the data of a canvas created by the user.
 public class Project {

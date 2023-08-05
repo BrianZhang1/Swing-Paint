@@ -43,6 +43,4 @@ Example from JAR: `java -jar Swing-Paint.jar`
     * add quit button to home screen
     * no duplicate names in project select
 * Prettify UI so it looks clean instead of like it was made in 1985.
-* Clean up code.
-    * Implement adapters for listeners instead of unused methods.
 * Use a better database.

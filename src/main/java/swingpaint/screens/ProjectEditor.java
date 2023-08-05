@@ -7,9 +7,8 @@ import java.awt.Polygon;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileWriter;
@@ -29,6 +28,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
 import swingpaint.helpers.Project;
+import swingpaint.helpers.Screen;
 import swingpaint.sprites.JImage;
 import swingpaint.sprites.JOval;
 import swingpaint.sprites.JPolygon;
@@ -37,7 +37,7 @@ import swingpaint.sprites.JSprite;
 
 
 // This screen handles all project editing. The main screen of the program.
-public class ProjectEditor extends JPanel implements MouseListener, MouseMotionListener, ActionListener {
+public class ProjectEditor extends JPanel implements ActionListener {
     // Core variables.
     private ArrayList<JSprite> sprites;     // contains all the sprites on the canvas.
     private JSprite focus;                  // the sprite that is currently focused.
@@ -47,7 +47,7 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
     private int dragPointHeld;              // the index of the drag point held. -1 if none are held.
 
     // Callback variables.
-    Consumer<String> changeScreen;           // Callback function to change screen.
+    Consumer<Screen> changeScreen;           // Callback function to change screen.
     Consumer<String> setTitle;              // Callback function to set title of frame.
     Runnable framePack;                     // Callback function to pack frame. Used for resizing.
     Consumer<Project> saveProjectCallback;  // Callback function to save project.
@@ -74,41 +74,12 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
     private JLabel imageSelectLabel;
     private ArrayList<JButton> imageSelectButtons;
 
-
-    // Constructor for new project.
-    public ProjectEditor(Consumer<String> changeScreen,
+    public ProjectEditor(Consumer<Screen> changeScreen,
         Consumer<String> setTitle,
         Runnable framePack,
         Consumer<Project> saveProjectCallback,
-        ArrayList<String> userImages) {
-
-        init(changeScreen, setTitle, framePack, saveProjectCallback, userImages);
-
-        // New projects are initially titled "Untitled".
-        setProjectTitle("Untitled");
-    }
-
-
-    // Initialize from existing project.
-    public ProjectEditor(Consumer<String> changeScreen,
-        Consumer<String> setTitle,
-        Runnable framePack,
-        Consumer<Project> saveProjectCallback,
-        Project project,
-        ArrayList<String> userImages) {
-
-        init(changeScreen, setTitle, framePack, saveProjectCallback, userImages);
-        importProject(project);
-    }
-    
-
-    // Initializes variables and UI.
-    public void init(Consumer<String> changeScreen,
-        Consumer<String> setTitle,
-        Runnable framePack,
-        Consumer<Project> saveProjectCallback,
-        ArrayList<String> userImages
-        ) {
+        ArrayList<String> userImages,
+        Project project) {
 
         // Configuring JPanel
         setPreferredSize(new Dimension(800, 600));
@@ -116,8 +87,8 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
         setLayout(null);
 
         // Adding Listeners
-        addMouseListener(this);
-        addMouseMotionListener(this);
+        addMouseListener(mouseAdapter);
+        addMouseMotionListener(mouseAdapter);
 
         // Initializing variables
         this.changeScreen = changeScreen;
@@ -202,6 +173,20 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
         projectTitleTextField = new JTextField(projectTitle, 10);
         projectTitleTextField.addActionListener(this);
         projectTitleTextField.setActionCommand("setTitle");
+
+
+        // Load project, if applicable.
+        // a non-null project argument signifies an existing project is to be loaded.
+        if(project != null) {
+            // Load project.
+            setProjectTitle(project.getTitle());
+            resizeCanvas(project.getWidth(), project.getHeight());
+            sprites = project.getSprites();
+        }
+        else {
+            // New projects are initially titled "Untitled".
+            setProjectTitle("Untitled");
+        }
     }
 
 
@@ -399,7 +384,7 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
                 export();
             }
             else if("Return Home".equals(selection)) {
-                showConfirmSave(() -> changeScreen.accept("Home"));
+                showConfirmSave(() -> changeScreen.accept(Screen.HOME));
             }
             else if("Set Title".equals(selection)) {
                 showPopupPanel("Project Title", "setTitle", projectTitle);
@@ -464,14 +449,6 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
         else if("confirmSaveNo".equals(e.getActionCommand())) {
             confirmSaveCallback.run();
         }
-    }
-
-
-    // Imports Project data.
-    private void importProject(Project project) {
-        setProjectTitle(project.getTitle());
-        resizeCanvas(project.getWidth(), project.getHeight());
-        sprites = project.getSprites();
     }
 
 
@@ -768,112 +745,103 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
     }
 
 
-    // Implementing Mouse Listener methods 
-    @Override
-    public void mousePressed(MouseEvent e) {
-        if(e.getButton() == MouseEvent.BUTTON1) {
-            // Menus should disappear upon a click which is not on the menu.
-            hideDetailsPanel();
-            hideOptions();
-            hideSpriteSelect();
-            hideImageSelectPanel();
+    // Creating Mouse Adapters to listen for mouse events
+    MouseAdapter mouseAdapter = new MouseAdapter() {
+        @Override
+        public void mousePressed(MouseEvent e) {
+            if(e.getButton() == MouseEvent.BUTTON1) {
+                // Menus should disappear upon a click which is not on the menu.
+                hideDetailsPanel();
+                hideOptions();
+                hideSpriteSelect();
+                hideImageSelectPanel();
 
-            // Initialize variables for later.
-            dragPointHeld = -1;
-            Point p = e.getPoint();
+                // Initialize variables for later.
+                dragPointHeld = -1;
+                Point p = e.getPoint();
 
-            // Check if the click was on a button.
-            if(addIconRect.contains(p)) {
-                showSpriteSelect();
-                return;
-            }
-            else if(optionsIconRect.contains(p)) {
-                showOptions();
-                return;
-            }
+                // Check if the click was on a button.
+                if(addIconRect.contains(p)) {
+                    showSpriteSelect();
+                    return;
+                }
+                else if(optionsIconRect.contains(p)) {
+                    showOptions();
+                    return;
+                }
 
 
-            // Check if the click is on one of the corner rectangles.
-            if(focus != null) {
-                for(int i = 0; i < focus.getDragPoints().length; i++) {
-                    Rectangle r = focus.getDragPoints()[i];
-                    if(r.contains(p)) {
-                        dragPointHeld = i;
-                        return;
+                // Check if the click is on one of the corner rectangles.
+                if(focus != null) {
+                    for(int i = 0; i < focus.getDragPoints().length; i++) {
+                        Rectangle r = focus.getDragPoints()[i];
+                        if(r.contains(p)) {
+                            dragPointHeld = i;
+                            return;
+                        }
+                    }
+                }
+
+                // Check if the click was on a sprite.
+                if(dragPointHeld == -1) {
+                    // Loop through backwards so newest sprites get click priority.
+                    for(int i = sprites.size()-1; i >= 0; i--) {
+                        if(sprites.get(i).contains(p)) {
+                            setFocus(sprites.get(i));
+                            spriteHeld = true;
+                            dx = (int)p.getX() - (int)focus.getX();
+                            dy = (int)p.getY() - (int)focus.getY();
+                            break;
+                        }
+                    }
+                    if(!spriteHeld) {
+                        // no sprite was clicked, remove focus.
+                        removeFocus();
                     }
                 }
             }
 
-            // Check if the click was on a sprite.
-            if(dragPointHeld == -1) {
-                // Loop through backwards so newest sprites get click priority.
+            // Show the details panel if right click on sprite.
+            else if(e.getButton() == MouseEvent.BUTTON3) {
+                Point p = e.getPoint();
                 for(int i = sprites.size()-1; i >= 0; i--) {
                     if(sprites.get(i).contains(p)) {
                         setFocus(sprites.get(i));
-                        spriteHeld = true;
-                        dx = (int)p.getX() - (int)focus.getX();
-                        dy = (int)p.getY() - (int)focus.getY();
+                        showDetailsPanel(0, 0);
                         break;
                     }
                 }
-                if(!spriteHeld) {
-                    // no sprite was clicked, remove focus.
-                    removeFocus();
-                }
             }
         }
 
-        // Show the details panel if right click on sprite.
-        else if(e.getButton() == MouseEvent.BUTTON3) {
+        @Override
+        public void mouseDragged(MouseEvent e) {
             Point p = e.getPoint();
-            for(int i = sprites.size()-1; i >= 0; i--) {
-                if(sprites.get(i).contains(p)) {
-                    setFocus(sprites.get(i));
-                    showDetailsPanel(0, 0);
-                    break;
-                }
+
+            // Handle corner resizing.
+            if(dragPointHeld != -1) {
+                focus.handleDragPoint(dragPointHeld, p);
+                focus.moveDragPoints();
+                repaint();
+            }
+
+            // Handle sprite click-and-drag movement.
+            else if(spriteHeld) {
+                focus.setLocation((int)p.getX()-dx, (int)p.getY()-dy);
+                focus.moveDragPoints();
+                repaint();
             }
         }
-    }
 
-    @Override
-    public void mouseDragged(MouseEvent e) {
-        Point p = e.getPoint();
-
-        // Handle corner resizing.
-        if(dragPointHeld != -1) {
-            focus.handleDragPoint(dragPointHeld, p);
-            focus.moveDragPoints();
-            repaint();
+        @Override
+        public void mouseReleased(MouseEvent e) {
+            // Drop sprite.
+            if(e.getButton() == MouseEvent.BUTTON1) {
+                spriteHeld = false;
+                dragPointHeld = -1;
+            }
         }
-
-        // Handle sprite click-and-drag movement.
-        else if(spriteHeld) {
-            focus.setLocation((int)p.getX()-dx, (int)p.getY()-dy);
-            focus.moveDragPoints();
-            repaint();
-        }
-    }
-
-    @Override
-    public void mouseReleased(MouseEvent e) {
-        // Drop sprite.
-        if(e.getButton() == MouseEvent.BUTTON1) {
-            spriteHeld = false;
-            dragPointHeld = -1;
-        }
-    }
-
-    // Unused mouse listener methods. Adapter to be implemented.
-    public void mouseClicked(MouseEvent e) {
-    }
-    public void mouseEntered(MouseEvent e) {
-    }
-    public void mouseExited(MouseEvent e) {
-    }
-    public void mouseMoved(MouseEvent e) {
-    }
-
+    };
 
 
     // The details panel allows the user to view and edit attributes of a focused sprite.
