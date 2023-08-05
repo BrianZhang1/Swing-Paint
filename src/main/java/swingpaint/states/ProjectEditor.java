@@ -189,8 +189,8 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
         
         // Initalizing Images
         try {
-            addIcon = ImageIO.read(new File(FilePathHelper.bitsToPath(new String[]{"swingpaint", "assets", "addIcon.png"})));
-            optionsIcon = ImageIO.read(new File(FilePathHelper.bitsToPath(new String[]{"swingpaint", "assets", "optionsIcon.png"})));
+            addIcon = ImageIO.read(getClass().getResource("/resources/addIcon.png"));
+            optionsIcon = ImageIO.read(getClass().getResource("/resources/optionsIcon.png"));
         }
         catch(IOException e) {
             e.printStackTrace();
