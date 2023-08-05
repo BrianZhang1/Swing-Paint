@@ -53,7 +53,7 @@ public class Home extends JPanel implements ActionListener {
         newProjectButton.setActionCommand("newProject");
         newProjectButton.addActionListener(this);
 
-        loadSaveButton = new JButton("Load Save");
+        loadSaveButton = new JButton("Load Project");
         loadSaveButton.setAlignmentX(JButton.CENTER_ALIGNMENT);
         loadSaveButton.setFont(buttonFont);
         loadSaveButton.setActionCommand("loadSave");
