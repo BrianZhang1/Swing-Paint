@@ -52,6 +52,7 @@ public class ProjectEditor extends JPanel implements ActionListener {
     private LocalDateTime dateCreated;      // creation date of this project
     private List<String> existingProjectNames;  // to ensure no duplicate names
     private boolean projectModified;        // whether project has been modified.
+    private boolean userImagesAvailable;    // whether the user has loaded any images.
 
     // Callback variables.
     Consumer<Screen> changeScreen;           // Callback function to change screen.
@@ -106,7 +107,8 @@ public class ProjectEditor extends JPanel implements ActionListener {
         this.framePack = framePack;
         this.saveProjectCallback = saveProjectCallback;
         this.existingProjectNames = existingProjectNames;
-
+        userImagesAvailable = userImages.size() > 0;
+        
         sprites = new ArrayList<>();
         spriteHeld = false;
 
@@ -126,6 +128,7 @@ public class ProjectEditor extends JPanel implements ActionListener {
         popupPanelLabel = new JLabel();
         popupPanelTextField = new JTextField();
         popupPanelTextField.addActionListener(this);
+        popupPanelTextField.addKeyListener(keyAdapter);
         popupPanel.add(popupPanelLabel);
         popupPanel.add(popupPanelTextField);
 
@@ -618,8 +621,15 @@ public class ProjectEditor extends JPanel implements ActionListener {
                 break;
             }
             case "image": {
-                // Show the popup panel and ask user for the path to the image file.
-                showImageSelectPanel();
+                if(userImagesAvailable) {
+                    // Show the popup panel and ask user for the path to the image file.
+                    showImageSelectPanel();
+                }
+                else {
+                    JOptionPane.showMessageDialog(this,
+                        "No images available. Add images to userImages folder.",
+                        "No Images", JOptionPane.ERROR_MESSAGE);
+                }
                 break;
             }
         }
@@ -761,7 +771,7 @@ public class ProjectEditor extends JPanel implements ActionListener {
         else if("setTitle".equals(e.getActionCommand())) {
             String newTitle = popupPanelTextField.getText();
             if(!setProjectTitle(newTitle)) {
-                JOptionPane.showMessageDialog(ProjectEditor.this,
+                JOptionPane.showMessageDialog(this,
                     "Title of project cannot be identical to an existing project.",
                     "Duplicate Title", JOptionPane.ERROR_MESSAGE);
                 return;
@@ -920,6 +930,8 @@ public class ProjectEditor extends JPanel implements ActionListener {
         public void keyReleased(KeyEvent e) {
             switch(e.getKeyCode()) {
                 case KeyEvent.VK_ESCAPE: {
+                    System.out.println("fasld");
+                    hideAllMenus();
                     removeFocus();
                     break;
                 }

@@ -36,5 +36,4 @@ Example from JAR: `java -jar Swing-Paint.jar`
     * custom drag corner lengths
     * add button options for dropdown list textboxes
     * remove color for images in details panel
-    * add quit button to home screen
 * Use a better database.
