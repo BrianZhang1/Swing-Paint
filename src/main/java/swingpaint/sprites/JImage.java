@@ -9,8 +9,6 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
-import swingpaint.helpers.FilePathHelper;
-
 
 // Image sprite.
 public class JImage extends JSprite {
@@ -69,7 +67,7 @@ public class JImage extends JSprite {
 
     // Returns a BufferedImage given an image name, assuming it is in the appropriate directory.
     public static BufferedImage imageFromName(String imageName) {
-        return imageFromPath(FilePathHelper.bitsToPath(new String[]{"userImages", imageName}));
+        return imageFromPath("userImages/" + imageName);
     }
 
 

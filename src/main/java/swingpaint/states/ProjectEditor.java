@@ -28,7 +28,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
-import swingpaint.helpers.FilePathHelper;
 import swingpaint.helpers.Project;
 import swingpaint.sprites.JImage;
 import swingpaint.sprites.JOval;
@@ -505,14 +504,14 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
         // Export image files.
         if(containsImage) {
             // Create images directory if does not exist.
-            File exportImagesDirectory = new File(FilePathHelper.bitsToPath(new String[]{"export", "images"}));
+            File exportImagesDirectory = new File("export/images");
             if(!exportImagesDirectory.exists()) {
                 exportImagesDirectory.mkdir();
             }
 
             // Export image files to images directory.
             for(JImage jimg : jImageList) {
-                File destination = new File(FilePathHelper.bitsToPath(new String[]{"export", "images", jimg.getImageName()}));
+                File destination = new File("export/images/" + jimg.getImageName());
                 try {
                     ImageIO.write(jimg.getImage(), jimg.getImageFileExtension(), destination);
                 }
@@ -524,7 +523,7 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
 
 
         // Write to export file. This file will have all the java code.
-        try(PrintWriter pw = new PrintWriter(new FileWriter(FilePathHelper.bitsToPath(new String[]{"export", "Program.java"})))) {
+        try(PrintWriter pw = new PrintWriter(new FileWriter("export/Program.java"))) {
             // Begin constructing java program.
             pw.println("import javax.swing.JFrame;");
             pw.println("import javax.swing.JPanel;");
