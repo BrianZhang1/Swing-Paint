@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -223,7 +224,10 @@ class Main extends JFrame {
                     () -> pack(), 
                     s -> saveProject(s), 
                     userImages, 
-                    (selectedProject == null) ? null : new Project(selectedProject)
+                    (selectedProject == null) ? null : new Project(selectedProject),
+                    projects.stream()
+                        .map(p -> p.getTitle())
+                        .collect(Collectors.toList())
                 );
                 break;
             }

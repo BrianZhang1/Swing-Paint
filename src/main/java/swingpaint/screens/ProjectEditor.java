@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Consumer;
 
 import javax.imageio.ImageIO;
@@ -49,6 +50,7 @@ public class ProjectEditor extends JPanel implements ActionListener {
                                             // relative cursor position when moving sprites (click and drag).
     private int dragPointHeld;              // the index of the drag point held. -1 if none are held.
     private LocalDateTime dateCreated;      // creation date of this project
+    private List<String> existingProjectNames;  // to ensure no duplicate names
 
     // Callback variables.
     Consumer<Screen> changeScreen;           // Callback function to change screen.
@@ -78,12 +80,15 @@ public class ProjectEditor extends JPanel implements ActionListener {
     private JLabel imageSelectLabel;
     private ArrayList<JButton> imageSelectButtons;
 
-    public ProjectEditor(Consumer<Screen> changeScreen,
-        Consumer<String> setTitle,
-        Runnable framePack,
-        Consumer<Project> saveProjectCallback,
-        ArrayList<String> userImages,
-        Project project) {
+    public ProjectEditor(
+            Consumer<Screen> changeScreen,
+            Consumer<String> setTitle,
+            Runnable framePack,
+            Consumer<Project> saveProjectCallback,
+            ArrayList<String> userImages,
+            Project project,
+            List<String> existingProjectNames
+        ) {
 
         // Configuring JPanel
         setPreferredSize(new Dimension(800, 600));
@@ -100,6 +105,7 @@ public class ProjectEditor extends JPanel implements ActionListener {
         this.setTitle = setTitle;
         this.framePack = framePack;
         this.saveProjectCallback = saveProjectCallback;
+        this.existingProjectNames = existingProjectNames;
         sprites = new ArrayList<>();
         spriteHeld = false;
 
@@ -190,8 +196,9 @@ public class ProjectEditor extends JPanel implements ActionListener {
             dateCreated = project.getDateCreated();
         }
         else {
-            // New projects are initially titled "Untitled".
-            setProjectTitle("Untitled");
+            // increment number until unique title is found
+            int i = 1;
+            while(!setProjectTitle("Untitled " + i)) ++i;
             dateCreated = LocalDateTime.now();
         }
     }
@@ -284,12 +291,17 @@ public class ProjectEditor extends JPanel implements ActionListener {
     }
 
 
-    // Changes the title of the project.
-    private void setProjectTitle(String newTitle) {
+    // Changes the title of the project. Returns true upon successful change.
+    private boolean setProjectTitle(String newTitle) {
+        // verify unique title
+        if(existingProjectNames.stream().anyMatch(newTitle::equals)) return false;
+
         projectTitle = newTitle;
 
         // Change the title of the frame to match new title.
         setTitle.accept("Swing Paint - " + newTitle);
+
+        return true;
     }
 
 
@@ -734,7 +746,12 @@ public class ProjectEditor extends JPanel implements ActionListener {
         // Set the title.
         else if("setTitle".equals(e.getActionCommand())) {
             String newTitle = popupPanelTextField.getText();
-            setProjectTitle(newTitle);
+            if(!setProjectTitle(newTitle)) {
+                JOptionPane.showMessageDialog(ProjectEditor.this,
+                    "Title of project cannot be identical to an existing project.",
+                    "Duplicate Title", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
             hidePopupPanel();
         }
 

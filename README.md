@@ -40,4 +40,3 @@ Example from JAR: `java -jar Swing-Paint.jar`
     * add quit button to home screen
     * no duplicate names in project select
 * Use a better database.
-* implement internal database using map
