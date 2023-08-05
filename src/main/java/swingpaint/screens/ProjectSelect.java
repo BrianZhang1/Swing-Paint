@@ -1,4 +1,4 @@
-package swingpaint.states;
+package swingpaint.screens;
 
 import java.awt.BorderLayout;
 import java.awt.Color;

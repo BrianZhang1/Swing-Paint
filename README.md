@@ -45,5 +45,4 @@ Example from JAR: `java -jar Swing-Paint.jar`
 * Prettify UI so it looks clean instead of like it was made in 1985.
 * Clean up code.
     * Implement adapters for listeners instead of unused methods.
-    * change "state" to "screen" for less confusion
 * Use a better database.

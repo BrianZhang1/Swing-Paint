@@ -14,20 +14,20 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import swingpaint.helpers.Project;
+import swingpaint.screens.Home;
+import swingpaint.screens.ProjectEditor;
+import swingpaint.screens.ProjectSelect;
 import swingpaint.sprites.JImage;
 import swingpaint.sprites.JOval;
 import swingpaint.sprites.JPolygon;
 import swingpaint.sprites.JRectangle;
 import swingpaint.sprites.JSprite;
-import swingpaint.states.Home;
-import swingpaint.states.ProjectEditor;
-import swingpaint.states.ProjectSelect;
 
 
 
-// Class that handles higher-level functions (switching between states, file handling).
+// Class that handles higher-level functions (switching between screens, file handling).
 class Main extends JFrame {
-    private JPanel currentState;    // the current state
+    private JPanel currentScreen;    // the current screen
     ArrayList<Project> projects;    // All projects.
     Project selectedProject;        // The data for the selected project (selected in ProjectSelect).
     ArrayList<String> userImages;     // The names of all the images in the userImage directory.
@@ -48,8 +48,8 @@ class Main extends JFrame {
         // Load data.
         loadData();
 
-        // Initial State
-        changeState("Home");
+        // Initial Screen
+        changeScreen("Home");
     }
 
 
@@ -194,39 +194,39 @@ class Main extends JFrame {
     }
 
 
-    // Changes the state (screen) to newState.
-    private void changeState(String newState) {
-        // Clear current state.
-        if(currentState != null) {
-            remove(currentState);
+    // Changes the screen to newScreen.
+    private void changeScreen(String newScreen) {
+        // Clear current screen.
+        if(currentScreen != null) {
+            remove(currentScreen);
         }
 
         // Reset frame title.
         setTitle("Swing Paint");
 
-        // Add new state.
-        if("ProgramEditorNew".equals(newState)) {
-            currentState = new ProjectEditor(s -> changeState(s), s -> setTitle(s), () -> pack(), s -> saveProject(s), userImages);
+        // Add new screen.
+        if("ProgramEditorNew".equals(newScreen)) {
+            currentScreen = new ProjectEditor(s -> changeScreen(s), s -> setTitle(s), () -> pack(), s -> saveProject(s), userImages);
         }
-        else if("ProgramEditorLoad".equals(newState)) {
-            currentState = new ProjectEditor(s -> changeState(s), s -> setTitle(s), () -> pack(), s -> saveProject(s), new Project(selectedProject), userImages);
+        else if("ProgramEditorLoad".equals(newScreen)) {
+            currentScreen = new ProjectEditor(s -> changeScreen(s), s -> setTitle(s), () -> pack(), s -> saveProject(s), new Project(selectedProject), userImages);
         }
-        else if("Home".equals(newState)) {
-            currentState = new Home(s -> changeState(s));
+        else if("Home".equals(newScreen)) {
+            currentScreen = new Home(s -> changeScreen(s));
         }
-        else if("ProjectSelect".equals(newState)) {
-            currentState = new ProjectSelect(projects, s -> loadProject(s), () -> changeState("Home"), () -> changeState("ProjectSelect"), i -> deleteProject(i));
+        else if("ProjectSelect".equals(newScreen)) {
+            currentScreen = new ProjectSelect(projects, s -> loadProject(s), () -> changeScreen("Home"), () -> changeScreen("ProjectSelect"), i -> deleteProject(i));
         }
-        add(currentState);
-        currentState.requestFocusInWindow();    // set focus on the new state
+        add(currentScreen);
+        currentScreen.requestFocusInWindow();    // set focus on the new screen
         pack();
     }
 
 
-    // Called by the ProjectSelect state. Loads the given project.
+    // Called by the ProjectSelect screen. Loads the given project.
     private void loadProject(Project project) {
         selectedProject = project;
-        changeState("ProgramEditorLoad");
+        changeScreen("ProgramEditorLoad");
     }
 
 

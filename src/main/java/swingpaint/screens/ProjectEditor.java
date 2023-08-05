@@ -1,4 +1,4 @@
-package swingpaint.states;
+package swingpaint.screens;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -36,7 +36,7 @@ import swingpaint.sprites.JRectangle;
 import swingpaint.sprites.JSprite;
 
 
-// This state handles all project editing. The main state of the program.
+// This screen handles all project editing. The main screen of the program.
 public class ProjectEditor extends JPanel implements MouseListener, MouseMotionListener, ActionListener {
     // Core variables.
     private ArrayList<JSprite> sprites;     // contains all the sprites on the canvas.
@@ -47,7 +47,7 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
     private int dragPointHeld;              // the index of the drag point held. -1 if none are held.
 
     // Callback variables.
-    Consumer<String> changeState;           // Callback function to change state.
+    Consumer<String> changeScreen;           // Callback function to change screen.
     Consumer<String> setTitle;              // Callback function to set title of frame.
     Runnable framePack;                     // Callback function to pack frame. Used for resizing.
     Consumer<Project> saveProjectCallback;  // Callback function to save project.
@@ -76,13 +76,13 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
 
 
     // Constructor for new project.
-    public ProjectEditor(Consumer<String> changeState,
+    public ProjectEditor(Consumer<String> changeScreen,
         Consumer<String> setTitle,
         Runnable framePack,
         Consumer<Project> saveProjectCallback,
         ArrayList<String> userImages) {
 
-        init(changeState, setTitle, framePack, saveProjectCallback, userImages);
+        init(changeScreen, setTitle, framePack, saveProjectCallback, userImages);
 
         // New projects are initially titled "Untitled".
         setProjectTitle("Untitled");
@@ -90,20 +90,20 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
 
 
     // Initialize from existing project.
-    public ProjectEditor(Consumer<String> changeState,
+    public ProjectEditor(Consumer<String> changeScreen,
         Consumer<String> setTitle,
         Runnable framePack,
         Consumer<Project> saveProjectCallback,
         Project project,
         ArrayList<String> userImages) {
 
-        init(changeState, setTitle, framePack, saveProjectCallback, userImages);
+        init(changeScreen, setTitle, framePack, saveProjectCallback, userImages);
         importProject(project);
     }
     
 
     // Initializes variables and UI.
-    public void init(Consumer<String> changeState,
+    public void init(Consumer<String> changeScreen,
         Consumer<String> setTitle,
         Runnable framePack,
         Consumer<Project> saveProjectCallback,
@@ -120,7 +120,7 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
         addMouseMotionListener(this);
 
         // Initializing variables
-        this.changeState = changeState;
+        this.changeScreen = changeScreen;
         this.setTitle = setTitle;
         this.framePack = framePack;
         this.saveProjectCallback = saveProjectCallback;
@@ -399,7 +399,7 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
                 export();
             }
             else if("Return Home".equals(selection)) {
-                showConfirmSave(() -> changeState.accept("Home"));
+                showConfirmSave(() -> changeScreen.accept("Home"));
             }
             else if("Set Title".equals(selection)) {
                 showPopupPanel("Project Title", "setTitle", projectTitle);

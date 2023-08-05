@@ -1,4 +1,4 @@
-package swingpaint.states;
+package swingpaint.screens;
 
 import java.awt.Desktop;
 import java.awt.Dimension;
@@ -15,7 +15,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 
-// The Home state is the screen the user begins on.
+// The Home screen is the screen the user begins on.
 public class Home extends JPanel implements ActionListener {
     // UI Variables.
     private JPanel centerPanel;
@@ -23,12 +23,12 @@ public class Home extends JPanel implements ActionListener {
     private JButton newProjectButton;
     private JButton loadSaveButton;
     private JButton instructionsButton;
-    private Consumer<String> changeState;
+    private Consumer<String> changeScreen;
 
     // Constructor.
-    public Home(Consumer<String> changeState) {
+    public Home(Consumer<String> changeScreen) {
         // Initialize variables.
-        this.changeState = changeState;
+        this.changeScreen = changeScreen;
 
         // Configure JPanel.
         setPreferredSize(new Dimension(800, 600));
@@ -81,10 +81,10 @@ public class Home extends JPanel implements ActionListener {
 
         switch(command) {
             case "newProject":
-                changeState.accept("ProgramEditorNew");
+                changeScreen.accept("ProgramEditorNew");
                 break;
             case "loadSave":
-                changeState.accept("ProjectSelect");
+                changeScreen.accept("ProjectSelect");
                 break;
             case "openInstructions": {
                 Desktop desktop = Desktop.isDesktopSupported() ? Desktop.getDesktop() : null;
