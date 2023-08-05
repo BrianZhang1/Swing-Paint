@@ -138,7 +138,11 @@ public class ProjectSelect extends JPanel implements ActionListener {
 
         // Add all projects given.
         for(int i = 0; i < projects.size(); i++) {
-            ProjectRow pr = new ProjectRow(projects.get(i).getTitle(), Integer.toString(i));
+            ProjectRow pr = new ProjectRow(
+                projects.get(i).getTitle(), 
+                Integer.toString(i), 
+                projects.get(i).getDateModified().toString()
+            );
             projectsPanel.add(pr);
         }
 
@@ -248,14 +252,21 @@ public class ProjectSelect extends JPanel implements ActionListener {
     // Represents a single row which contains the details of one project.
     private class ProjectRow extends JPanel {
         private JLabel titleLabel;
+        private JLabel dateLabel;
         private JButton loadButton;
         private JButton deleteButton;
 
-        public ProjectRow(String title, String actionCommand) {
+        public ProjectRow(String title, String actionCommand, String dateModified) {
             setLayout(new FlowLayout(FlowLayout.LEFT));
             titleLabel = new JLabel(title);
             titleLabel.setFont(new Font(titleLabel.getFont().getName(), Font.PLAIN, 24));
             titleLabel.setBorder(new EmptyBorder(0, 0, 0, 50));
+
+            // parse date so it looks neater
+            dateModified = dateModified.split("\\.")[0].replace("T", " ");
+            dateLabel = new JLabel(dateModified);
+            dateLabel.setFont(new Font(dateLabel.getFont().getName(), Font.PLAIN, 16));
+            dateLabel.setBorder(new EmptyBorder(0, 0, 0, 50));
 
             loadButton = new JButton("Load");
             loadButton.addActionListener(ProjectSelect.this);
@@ -265,6 +276,7 @@ public class ProjectSelect extends JPanel implements ActionListener {
             deleteButton.setActionCommand("delete " + actionCommand);
 
             add(titleLabel);
+            add(dateLabel);
             add(loadButton);
             add(deleteButton);
         }

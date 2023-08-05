@@ -1,5 +1,6 @@
 package swingpaint.helpers;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 import swingpaint.sprites.JImage;
@@ -13,6 +14,8 @@ public class Project {
     private String title;       // title of project.
     private int width, height;  // dimensions of project.
     private ArrayList<JSprite> sprites;  // contains all sprites in project.
+    private LocalDateTime dateCreated;      // project creation date
+    private LocalDateTime dateModified;     // project last modified date
 
 
     // Constructor to initialize attributes.
@@ -28,6 +31,8 @@ public class Project {
         title = project.title;
         width = project.width;
         height = project.height;
+        dateCreated = project.dateCreated;
+        dateModified = project.dateModified;
 
         // Copy the sprites.
         for(JSprite sprite : project.sprites) {
@@ -89,5 +94,24 @@ public class Project {
 
     public void addSprite(JSprite sprite) {
         this.sprites.add(sprite);
+    }
+
+    public LocalDateTime getDateCreated() {
+        return dateCreated;
+    }
+
+
+    public void setDateCreated(LocalDateTime dateCreated) {
+        this.dateCreated = dateCreated;
+    }
+
+
+    public LocalDateTime getDateModified() {
+        return dateModified;
+    }
+
+
+    public void setDateModified(LocalDateTime dateModified) {
+        this.dateModified = dateModified;
     }
 }

@@ -7,6 +7,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 import javax.swing.JFrame;
@@ -87,6 +88,8 @@ class Main extends JFrame {
                         String projectSizeBits = bits[2].split("=")[1];
                         project.setWidth(Integer.parseInt(projectSizeBits.split(",")[0]));
                         project.setHeight(Integer.parseInt(projectSizeBits.split(",")[1]));
+                        project.setDateCreated(LocalDateTime.parse(bits[3].split("=")[1]));
+                        project.setDateModified(LocalDateTime.parse(bits[3].split("=")[1]));
                         line = br.readLine();
                         continue;
                     }
@@ -178,7 +181,14 @@ class Main extends JFrame {
         try(PrintWriter pw = new PrintWriter(new FileWriter("data.txt"))) {
             for(Project project : projects) {
                 // Write header metadata.
-                pw.println(String.format("ProjectStart;title=%s;size=%d,%d", project.getTitle(), project.getWidth(), project.getHeight()));     
+                pw.println(String.format(
+                    "ProjectStart;title=%s;size=%d,%d;created=%s;modified=%s", 
+                    project.getTitle(), 
+                    project.getWidth(), 
+                    project.getHeight(),
+                    project.getDateCreated().toString(),
+                    project.getDateModified().toString()
+                ));     
 
                 // Write sprite data.
                 for(JSprite sprite : project.getSprites()) {

@@ -16,6 +16,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.function.Consumer;
 
@@ -40,13 +41,14 @@ import swingpaint.sprites.JSprite;
 
 // This screen handles all project editing. The main screen of the program.
 public class ProjectEditor extends JPanel implements ActionListener {
-    // Core variables.
+    // General variables.
     private ArrayList<JSprite> sprites;     // contains all the sprites on the canvas.
     private JSprite focus;                  // the sprite that is currently focused.
     private boolean spriteHeld;             // whether a sprite is held (clicked and held).
     private int dx, dy;                     // x & y displacement of cursor from sprite, used to maintain
                                             // relative cursor position when moving sprites (click and drag).
     private int dragPointHeld;              // the index of the drag point held. -1 if none are held.
+    private LocalDateTime dateCreated;      // creation date of this project
 
     // Callback variables.
     Consumer<Screen> changeScreen;           // Callback function to change screen.
@@ -185,10 +187,12 @@ public class ProjectEditor extends JPanel implements ActionListener {
             setProjectTitle(project.getTitle());
             resizeCanvas(project.getWidth(), project.getHeight());
             sprites = project.getSprites();
+            dateCreated = project.getDateCreated();
         }
         else {
             // New projects are initially titled "Untitled".
             setProjectTitle("Untitled");
+            dateCreated = LocalDateTime.now();
         }
     }
 
@@ -373,6 +377,8 @@ public class ProjectEditor extends JPanel implements ActionListener {
         project.setWidth(getWidth());
         project.setHeight(getHeight());
         project.setSprites(sprites);
+        project.setDateCreated(dateCreated);
+        project.setDateModified(LocalDateTime.now());
 
         saveProjectCallback.accept(project);
     }
