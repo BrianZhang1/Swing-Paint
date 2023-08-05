@@ -30,7 +30,6 @@ import javax.swing.JTextField;
 
 import swingpaint.helpers.FilePathHelper;
 import swingpaint.helpers.Project;
-import swingpaint.helpers.VoidCallback;
 import swingpaint.sprites.JImage;
 import swingpaint.sprites.JOval;
 import swingpaint.sprites.JPolygon;
@@ -41,8 +40,8 @@ import swingpaint.sprites.JSprite;
 // This state handles all project editing. The main state of the program.
 public class ProjectEditor extends JPanel implements MouseListener, MouseMotionListener, ActionListener {
     // Core variables.
-    private ArrayList<JSprite> sprites;      // contains all the sprites on the canvas.
-    private JSprite focus;                   // the sprite that is currently focused.
+    private ArrayList<JSprite> sprites;     // contains all the sprites on the canvas.
+    private JSprite focus;                  // the sprite that is currently focused.
     private boolean spriteHeld;             // whether a sprite is held (clicked and held).
     private int dx, dy;                     // x & y displacement of cursor from sprite, used to maintain
                                             // relative cursor position when moving sprites (click and drag).
@@ -51,8 +50,8 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
     // Callback variables.
     Consumer<String> changeState;           // Callback function to change state.
     Consumer<String> setTitle;              // Callback function to set title of frame.
-    VoidCallback framePack;                 // Callback function to pack frame. Used for resizing.
-    Consumer<Project> saveProjectCallback;            // Callback function to save project.
+    Runnable framePack;                     // Callback function to pack frame. Used for resizing.
+    Consumer<Project> saveProjectCallback;  // Callback function to save project.
 
     // UI Elements.
     private BufferedImage addIcon;          // Icon to add new sprites.
@@ -71,7 +70,7 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
     private JLabel confirmSaveLabel;
     private JButton confirmSaveButton1;
     private JButton confirmSaveButton2;
-    private VoidCallback confirmSaveCallback;
+    private Runnable confirmSaveCallback;
     private JPanel imageSelectPanel;
     private JLabel imageSelectLabel;
     private ArrayList<JButton> imageSelectButtons;
@@ -80,7 +79,7 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
     // Constructor for new project.
     public ProjectEditor(Consumer<String> changeState,
         Consumer<String> setTitle,
-        VoidCallback framePack,
+        Runnable framePack,
         Consumer<Project> saveProjectCallback,
         ArrayList<String> userImages) {
 
@@ -94,7 +93,7 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
     // Initialize from existing project.
     public ProjectEditor(Consumer<String> changeState,
         Consumer<String> setTitle,
-        VoidCallback framePack,
+        Runnable framePack,
         Consumer<Project> saveProjectCallback,
         Project project,
         ArrayList<String> userImages) {
@@ -107,7 +106,7 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
     // Initializes variables and UI.
     public void init(Consumer<String> changeState,
         Consumer<String> setTitle,
-        VoidCallback framePack,
+        Runnable framePack,
         Consumer<Project> saveProjectCallback,
         ArrayList<String> userImages
         ) {
@@ -461,10 +460,10 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
         // Reacts to confirm save response.
         else if("confirmSaveYes".equals(e.getActionCommand())) {
             saveProject();
-            confirmSaveCallback.accept();
+            confirmSaveCallback.run();
         }
         else if("confirmSaveNo".equals(e.getActionCommand())) {
-            confirmSaveCallback.accept();
+            confirmSaveCallback.run();
         }
     }
 
@@ -720,12 +719,12 @@ public class ProjectEditor extends JPanel implements MouseListener, MouseMotionL
     private void resizeCanvas(int width, int height) {
         setPreferredSize(new Dimension(width, height));
         layoutComponents();
-        framePack.accept();
+        framePack.run();
     }
 
 
     // Asks user whether they would like to save and calls callback upon answer.
-    private void showConfirmSave(VoidCallback callback) {
+    private void showConfirmSave(Runnable callback) {
         confirmSavePanel.setLocation(getWidth()/2-confirmSavePanel.getWidth()/2,
             getHeight()/2-confirmSavePanel.getHeight()/2);
         add(confirmSavePanel);

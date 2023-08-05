@@ -21,7 +21,6 @@ import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
 import swingpaint.helpers.Project;
-import swingpaint.helpers.VoidCallback;
 
 
 // A screen where the user can select one of the saved projects to edit.
@@ -45,13 +44,13 @@ public class ProjectSelect extends JPanel implements ActionListener {
 
     // Callbacks
     private Consumer<Project> loadProject;           // Callback method to load a project in the ProgramEditor.
-    private VoidCallback returnHome;                // Callback method to return to home page.
-    private VoidCallback reloadProjectSelect;       // Callback method to reload project select page.
+    private Runnable returnHome;                // Callback method to return to home page.
+    private Runnable reloadProjectSelect;       // Callback method to reload project select page.
     private Consumer<Integer> deleteProjectCallback;       // Callback method to reload project select page.
 
 
     // Main constructor.
-    public ProjectSelect(ArrayList<Project> projects, Consumer<Project> loadProject, VoidCallback returnHome, VoidCallback reloadProjectSelect, Consumer<Integer> deleteProjectCallback) {
+    public ProjectSelect(ArrayList<Project> projects, Consumer<Project> loadProject, Runnable returnHome, Runnable reloadProjectSelect, Consumer<Integer> deleteProjectCallback) {
         // Initialize variables.
         this.projects = projects;
         this.loadProject = loadProject;
@@ -164,7 +163,7 @@ public class ProjectSelect extends JPanel implements ActionListener {
             deleteProject(selectedProjectIndex);
         }
         else if("returnHome".equals(bits[0])) {
-            returnHome.accept();
+            returnHome.run();
         }
         else if("sortByName".equals(bits[0])) {
             sortByName(sortAscending);
@@ -178,7 +177,7 @@ public class ProjectSelect extends JPanel implements ActionListener {
     // Deletes project from save.
     private void deleteProject(int index) {
         deleteProjectCallback.accept(index);
-        reloadProjectSelect.accept();
+        reloadProjectSelect.run();
     }
 
 
