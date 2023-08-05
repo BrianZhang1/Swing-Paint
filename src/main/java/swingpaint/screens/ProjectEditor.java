@@ -7,6 +7,8 @@ import java.awt.Polygon;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
@@ -89,6 +91,7 @@ public class ProjectEditor extends JPanel implements ActionListener {
         // Adding Listeners
         addMouseListener(mouseAdapter);
         addMouseMotionListener(mouseAdapter);
+        addKeyListener(keyAdapter);
 
         // Initializing variables
         this.changeScreen = changeScreen;
@@ -167,7 +170,7 @@ public class ProjectEditor extends JPanel implements ActionListener {
         // Initalize rects for buttons.
         addIconRect = new Rectangle(0, 0, addIcon.getWidth(), addIcon.getHeight());
         optionsIconRect = new Rectangle(0, 0, optionsIcon.getWidth(), optionsIcon.getHeight());
-        layoutComponents();
+        layoutIcons();
 
         // Initialize Project Title Text Field which sets the title of the working project.
         projectTitleTextField = new JTextField(projectTitle, 10);
@@ -191,54 +194,23 @@ public class ProjectEditor extends JPanel implements ActionListener {
 
 
     // Lays out components. Used mainly after resizing of project.
-    private void layoutComponents() {
+    private void layoutIcons() {
         addIconRect.setLocation(getPreferredSize().width-addIcon.getWidth()-5, 5);
         optionsIconRect.setLocation(addIconRect.x-optionsIcon.getWidth()-5, addIconRect.y);
     }
 
 
-    // Creates a sprite on the canvas.
-    private void createSprite(String type) {
-        JSprite newSprite;
-
-        // Create a different sprite depending on the type.
-        switch(type) {
-            case "rectangle": {
-                int width = 20;
-                int height = 20;
-                int x = getWidth()/2 - width/2;
-                int y = getHeight()/2 - height/2;
-                newSprite = new JRectangle(x, y, width, height);
-                sprites.add(newSprite);
-                setFocus(newSprite);
-                break;
-            }
-            case "oval": {
-                int width = 20;
-                int height = 20;
-                int x = getWidth()/2 - width/2;
-                int y = getHeight()/2 - height/2;
-                newSprite = new JOval(x, y, width, height);
-                sprites.add(newSprite);
-                setFocus(newSprite);
-                break;
-            }
-            case "polygon": {
-                // Show the popup panel and ask user for number of points on polygon.
-                showPopupPanel("Number of Points", "createPolygon", "3");
-                break;
-            }
-            case "image": {
-                // Show the popup panel and ask user for the path to the image file.
-                showImageSelectPanel();
-                break;
-            }
-        }
-
-        repaint();
+    // Resizes the canvas to width and height in text field.
+    private void resizeCanvas(int width, int height) {
+        setPreferredSize(new Dimension(width, height));
+        layoutIcons();
+        framePack.run();
     }
 
 
+    //============================================
+    //      SHOWING/HIDING PANELS
+    //============================================
     // Shows the details panel.
     private void showDetailsPanel(int x, int y) {
         // Update, resize, and relocate.
@@ -366,90 +338,45 @@ public class ProjectEditor extends JPanel implements ActionListener {
         repaint();
     }
 
-    
-    // Handle the different commands sent to this object by various action listeners.
-    public void actionPerformed(ActionEvent e) {
-        // Add a new sprite.
-        if("add sprite".equals(e.getActionCommand())) {
-            String selection = (String)spriteSelect.getSelectedItem();
-            hideSpriteSelect();
-            createSprite(selection);
-        }
 
-        // Execute an option command.
-        else if("execute option".equals(e.getActionCommand())) {
-            String selection = (String)optionsSelect.getSelectedItem();
-            hideOptions();
-            if("Export".equals(selection)) {
-                export();
-            }
-            else if("Return Home".equals(selection)) {
-                showConfirmSave(() -> changeScreen.accept(Screen.HOME));
-            }
-            else if("Set Title".equals(selection)) {
-                showPopupPanel("Project Title", "setTitle", projectTitle);
-            }
-            else if("Save Project".equals(selection)) {
-                saveProject();
-            }
-            else if("Resize Canvas".equals(selection)) {
-                String currentCanvasSize = String.format("%s,%s", Integer.toString(getWidth()), Integer.toString(getHeight()));
-                showPopupPanel("New Dimensions (width,height)", "setCanvasSize", currentCanvasSize);
-            }
-        }
-
-        // Set the title.
-        else if("setTitle".equals(e.getActionCommand())) {
-            String newTitle = popupPanelTextField.getText();
-            setProjectTitle(newTitle);
-            hidePopupPanel();
-        }
-
-        // Creates a polygon with specified number of points in popup panel text field.
-        else if("createPolygon".equals(e.getActionCommand())) {
-            JSprite newSprite = new JPolygon(JPolygon.createDefaultPolygon(Integer.parseInt(popupPanelTextField.getText())));
-            newSprite.setLocation(getWidth()/2-newSprite.width/2, getHeight()/2-newSprite.height/2);
-            sprites.add(newSprite);
-            setFocus(newSprite);
-            hidePopupPanel();
-        }
-
-        // Creates an image sprite with the specified image path.
-        else if("createImage".equals(e.getActionCommand().split(" ")[0])) {
-            String imageName = e.getActionCommand().split(" ")[1];
-            JImage image = new JImage(JImage.imageFromName(imageName), imageName);
-            image.setLocation(getWidth()/2-image.width/2, getHeight()/2-image.height/2);
-            sprites.add(image);
-            setFocus(image);
-            hideImageSelectPanel();
-        }
-
-        // Sets the canvas size.
-        else if("setCanvasSize".equals(e.getActionCommand())) {
-            String input = popupPanelTextField.getText();
-            String[] bits = input.split(",");
-            try {
-                int width = Integer.parseInt(bits[0]);
-                int height = Integer.parseInt(bits[1]);
-                resizeCanvas(width, height);
-            }
-            catch(NumberFormatException ex) {
-                JOptionPane.showMessageDialog(ProjectEditor.this,
-                    "Value must be formatted as 'width,height', with no space. Both values must be integers.",
-                    "Value Error", JOptionPane.ERROR_MESSAGE);
-            }
-            hidePopupPanel();
-        }
-
-        // Reacts to confirm save response.
-        else if("confirmSaveYes".equals(e.getActionCommand())) {
-            saveProject();
-            confirmSaveCallback.run();
-        }
-        else if("confirmSaveNo".equals(e.getActionCommand())) {
-            confirmSaveCallback.run();
-        }
+    // Asks user whether they would like to save and calls callback upon answer.
+    private void showConfirmSave(Runnable callback) {
+        confirmSavePanel.setLocation(getWidth()/2-confirmSavePanel.getWidth()/2,
+            getHeight()/2-confirmSavePanel.getHeight()/2);
+        add(confirmSavePanel);
+        confirmSavePanel.revalidate();
+        confirmSaveCallback = callback;
     }
+    
+    
+    // Hides all menus.
+    private void hideAllMenus() {
+        hideDetailsPanel();
+        hideOptions();
+        hideSpriteSelect();
+        hideImageSelectPanel();
+        hidePopupPanel();
+    }
+
+
+    
+    //============================================
+    //      PROJECT HANDLING
+    //      Saving/export project.
+    //============================================
+
+    // Saves project to be edited in the future.
+    private void saveProject() {
+        // Create project object with all this projects data and call callback.
+        Project project = new Project();
+        project.setTitle(projectTitle);
+        project.setWidth(getWidth());
+        project.setHeight(getHeight());
+        project.setSprites(sprites);
+
+        saveProjectCallback.accept(project);
+    }
+
 
 
     // Exports the canvas to a Java Swing code file.
@@ -627,6 +554,53 @@ public class ProjectEditor extends JPanel implements ActionListener {
 
 
 
+    //============================================
+    //      HANDLING SPRITES
+    //      Creating/removing/duplicating sprites, manipulating focus, etc.
+    //============================================
+    // Creates a sprite on the canvas.
+    private void createSprite(String type) {
+        JSprite newSprite;
+
+        // Create a different sprite depending on the type.
+        switch(type) {
+            case "rectangle": {
+                int width = 20;
+                int height = 20;
+                int x = getWidth()/2 - width/2;
+                int y = getHeight()/2 - height/2;
+                newSprite = new JRectangle(x, y, width, height);
+                sprites.add(newSprite);
+                setFocus(newSprite);
+                break;
+            }
+            case "oval": {
+                int width = 20;
+                int height = 20;
+                int x = getWidth()/2 - width/2;
+                int y = getHeight()/2 - height/2;
+                newSprite = new JOval(x, y, width, height);
+                sprites.add(newSprite);
+                setFocus(newSprite);
+                break;
+            }
+            case "polygon": {
+                // Show the popup panel and ask user for number of points on polygon.
+                showPopupPanel("Number of Points", "createPolygon", "3");
+                break;
+            }
+            case "image": {
+                // Show the popup panel and ask user for the path to the image file.
+                showImageSelectPanel();
+                break;
+            }
+        }
+
+        repaint();
+    }
+
+
+
     // Changes the focused sprite.
     private void setFocus(JSprite s) {
         focus = s;
@@ -637,6 +611,7 @@ public class ProjectEditor extends JPanel implements ActionListener {
     // Unfocuses sprite.
     private void removeFocus() {
         focus = null;
+        repaint();
     }
 
 
@@ -678,37 +653,6 @@ public class ProjectEditor extends JPanel implements ActionListener {
     }
 
 
-    // Saves project to be edited in the future.
-    private void saveProject() {
-        // Create project object with all this projects data and call callback.
-        Project project = new Project();
-        project.setTitle(projectTitle);
-        project.setWidth(getWidth());
-        project.setHeight(getHeight());
-        project.setSprites(sprites);
-
-        saveProjectCallback.accept(project);
-    }
-
-
-    // Resizes the canvas to width and height in text field.
-    private void resizeCanvas(int width, int height) {
-        setPreferredSize(new Dimension(width, height));
-        layoutComponents();
-        framePack.run();
-    }
-
-
-    // Asks user whether they would like to save and calls callback upon answer.
-    private void showConfirmSave(Runnable callback) {
-        confirmSavePanel.setLocation(getWidth()/2-confirmSavePanel.getWidth()/2,
-            getHeight()/2-confirmSavePanel.getHeight()/2);
-        add(confirmSavePanel);
-        confirmSavePanel.revalidate();
-        confirmSaveCallback = callback;
-    }
-
-
     // Paints the sprites on the canvas.
     @Override
     public void paintComponent(Graphics g) {
@@ -745,16 +689,104 @@ public class ProjectEditor extends JPanel implements ActionListener {
     }
 
 
-    // Creating Mouse Adapters to listen for mouse events
+
+
+    //============================================
+    //      HANDLING ACTIONS/INPUTS
+    //============================================
+    // Handle the different commands sent to this object by various action listeners.
+    public void actionPerformed(ActionEvent e) {
+        // Add a new sprite.
+        if("add sprite".equals(e.getActionCommand())) {
+            String selection = (String)spriteSelect.getSelectedItem();
+            hideSpriteSelect();
+            createSprite(selection);
+        }
+
+        // Execute an option command.
+        else if("execute option".equals(e.getActionCommand())) {
+            String selection = (String)optionsSelect.getSelectedItem();
+            hideOptions();
+            if("Export".equals(selection)) {
+                export();
+            }
+            else if("Return Home".equals(selection)) {
+                showConfirmSave(() -> changeScreen.accept(Screen.HOME));
+            }
+            else if("Set Title".equals(selection)) {
+                showPopupPanel("Project Title", "setTitle", projectTitle);
+            }
+            else if("Save Project".equals(selection)) {
+                saveProject();
+            }
+            else if("Resize Canvas".equals(selection)) {
+                String currentCanvasSize = String.format("%s,%s", Integer.toString(getWidth()), Integer.toString(getHeight()));
+                showPopupPanel("New Dimensions (width,height)", "setCanvasSize", currentCanvasSize);
+            }
+        }
+
+        // Set the title.
+        else if("setTitle".equals(e.getActionCommand())) {
+            String newTitle = popupPanelTextField.getText();
+            setProjectTitle(newTitle);
+            hidePopupPanel();
+        }
+
+        // Creates a polygon with specified number of points in popup panel text field.
+        else if("createPolygon".equals(e.getActionCommand())) {
+            JSprite newSprite = new JPolygon(JPolygon.createDefaultPolygon(Integer.parseInt(popupPanelTextField.getText())));
+            newSprite.setLocation(getWidth()/2-newSprite.width/2, getHeight()/2-newSprite.height/2);
+            sprites.add(newSprite);
+            setFocus(newSprite);
+            hidePopupPanel();
+        }
+
+        // Creates an image sprite with the specified image path.
+        else if("createImage".equals(e.getActionCommand().split(" ")[0])) {
+            String imageName = e.getActionCommand().split(" ")[1];
+            JImage image = new JImage(JImage.imageFromName(imageName), imageName);
+            image.setLocation(getWidth()/2-image.width/2, getHeight()/2-image.height/2);
+            sprites.add(image);
+            setFocus(image);
+            hideImageSelectPanel();
+        }
+
+        // Sets the canvas size.
+        else if("setCanvasSize".equals(e.getActionCommand())) {
+            String input = popupPanelTextField.getText();
+            String[] bits = input.split(",");
+            try {
+                int width = Integer.parseInt(bits[0]);
+                int height = Integer.parseInt(bits[1]);
+                resizeCanvas(width, height);
+            }
+            catch(NumberFormatException ex) {
+                JOptionPane.showMessageDialog(ProjectEditor.this,
+                    "Value must be formatted as 'width,height', with no space. Both values must be integers.",
+                    "Value Error", JOptionPane.ERROR_MESSAGE);
+            }
+            hidePopupPanel();
+        }
+
+        // Reacts to confirm save response.
+        else if("confirmSaveYes".equals(e.getActionCommand())) {
+            saveProject();
+            confirmSaveCallback.run();
+        }
+        else if("confirmSaveNo".equals(e.getActionCommand())) {
+            confirmSaveCallback.run();
+        }
+    }
+
+
+
+    // Creating Mouse Adapter to listen for mouse events
     MouseAdapter mouseAdapter = new MouseAdapter() {
         @Override
         public void mousePressed(MouseEvent e) {
             if(e.getButton() == MouseEvent.BUTTON1) {
                 // Menus should disappear upon a click which is not on the menu.
-                hideDetailsPanel();
-                hideOptions();
-                hideSpriteSelect();
-                hideImageSelectPanel();
+                hideAllMenus();
 
                 // Initialize variables for later.
                 dragPointHeld = -1;
@@ -842,8 +874,36 @@ public class ProjectEditor extends JPanel implements ActionListener {
             }
         }
     };
+    
+
+    // Creating Key Adapter to listen for mouse events
+    KeyAdapter keyAdapter = new KeyAdapter() {
+        @Override
+        public void keyReleased(KeyEvent e) {
+            switch(e.getKeyCode()) {
+                case KeyEvent.VK_ESCAPE: {
+                    removeFocus();
+                    break;
+                }
+                
+                case KeyEvent.VK_BACK_SPACE: {
+                    if(focus != null) {
+                        int spriteIndex = sprites.indexOf(focus);
+                        if(spriteIndex != -1) {
+                            removeSprite(spriteIndex);
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+    };
 
 
+
+    //============================================
+    //      DETAILS PANEL
+    //============================================
     // The details panel allows the user to view and edit attributes of a focused sprite.
     private class DetailsPanel extends JPanel implements ActionListener {
         private ArrayList<AttributeRow> attributeRows;    // Each row is assigned an attribute.

@@ -33,8 +33,6 @@ Example from JAR: `java -jar Swing-Paint.jar`
     * Add layer reordering (option to move sprites front/back).
     * Add no images found when trying to create an image while the userImages directory is empty.
     * Click and drag to select and move/edit multiple sprites at once.
-    * backspace to delete selected sprite
-    * escape to close panels
     * custom drag corner lengths
     * add button options for dropdown list textboxes
     * don't ask to save if no changes made
@@ -42,5 +40,4 @@ Example from JAR: `java -jar Swing-Paint.jar`
     * remove color for images in details panel
     * add quit button to home screen
     * no duplicate names in project select
-* Prettify UI so it looks clean instead of like it was made in 1985.
 * Use a better database.
