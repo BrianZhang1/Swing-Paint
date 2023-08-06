@@ -6,7 +6,7 @@ import java.awt.Font;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.net.URL;
+import java.net.URI;
 import java.util.function.Consumer;
 
 import javax.swing.BoxLayout;
@@ -92,7 +92,7 @@ public class Home extends JPanel implements ActionListener {
                 Desktop desktop = Desktop.isDesktopSupported() ? Desktop.getDesktop() : null;
                 if (desktop != null && desktop.isSupported(Desktop.Action.BROWSE)) {
                     try {
-                        desktop.browse(new URL("https://docs.google.com/document/d/1M5Q5zqVk4eiarDhmxFQwS8-e92UszVV2/edit").toURI());
+                        desktop.browse(new URI("https://docs.google.com/document/d/1M5Q5zqVk4eiarDhmxFQwS8-e92UszVV2/edit"));
                     } catch (Exception ex) {
                         ex.printStackTrace();
                     }
