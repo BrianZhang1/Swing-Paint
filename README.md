@@ -5,9 +5,11 @@ Swing Paint began as a school project. Although I submitted it for my eleventh-g
 
 Learn all about the development process [here](https://drive.google.com/drive/folders/1pDX1jO8diyv3K6tVwmyDM7JcqeXboh26?usp=sharing). The linked folder includes a project proposal and a development journal from before I moved this project to GitHub.  
 
+Built with Maven! I keep a jar file on top level so you can easily give the program a try.  
+
 ## Running the Program
 
-Simply clone and execute the Swing-Paint.jar file.  
+Simply clone the project and run the swingpaint.jar file.  
 Voila! Easy, right?  
 
 --  

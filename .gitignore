@@ -4,3 +4,4 @@ userImages/
 export/
 target/
 compile.txt
+.vscode/

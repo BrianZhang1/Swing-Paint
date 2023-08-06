@@ -172,8 +172,8 @@ public class ProjectEditor extends JPanel implements ActionListener {
         
         // Initalizing Images
         try {
-            addIcon = ImageIO.read(getClass().getResource("/resources/addIcon.png"));
-            optionsIcon = ImageIO.read(getClass().getResource("/resources/optionsIcon.png"));
+            addIcon = ImageIO.read(getClass().getResource("/addIcon.png"));
+            optionsIcon = ImageIO.read(getClass().getResource("/optionsIcon.png"));
         }
         catch(IOException e) {
             e.printStackTrace();
