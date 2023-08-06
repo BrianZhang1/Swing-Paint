@@ -33,9 +33,9 @@ Example from JAR: `java -jar Swing-Paint.jar`
 
 * Features/convenience changes
     * Add layer reordering (option to move sprites front/back).
-    * Add no images found when trying to create an image while the userImages directory is empty.
     * Click and drag to select and move/edit multiple sprites at once.
-    * custom drag corner lengths
+    * custom drag corner lengths (new custom settings screen?)
     * add button options for dropdown list textboxes
     * remove color for images in details panel
+    * drag and drop GUI creation with swing components? (swingeasygui)
 * Use a better database.
