@@ -3,12 +3,12 @@ package swingpaint.screens;
 import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.net.URI;
 import java.util.function.Consumer;
 
+import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -20,11 +20,11 @@ import swingpaint.helpers.Screen;
 // The Home screen is the screen the user begins on.
 public class Home extends JPanel implements ActionListener {
     // UI Variables.
-    private JPanel centerPanel;
     private JLabel titleLabel;
     private JButton newProjectButton;
     private JButton loadSaveButton;
     private JButton instructionsButton;
+    private JButton settingsButton;
     private Consumer<Screen> changeScreen;
 
     // Constructor.
@@ -34,46 +34,47 @@ public class Home extends JPanel implements ActionListener {
 
         // Configure JPanel.
         setPreferredSize(new Dimension(800, 600));
-        setLayout(new GridBagLayout());
-
-        // Create UI elements.
-        centerPanel = new JPanel();
-        centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));
+        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
         titleLabel = new JLabel("Swing Paint");
         titleLabel.setFont(new Font(titleLabel.getFont().getName(), Font.PLAIN, 60));
-        titleLabel.setAlignmentX(JButton.CENTER_ALIGNMENT);
+        titleLabel.setAlignmentX(CENTER_ALIGNMENT);
 
         Font buttonFont = new Font(titleLabel.getFont().getName(), Font.PLAIN, 40);
 
         newProjectButton = new JButton("New Project");
-        newProjectButton.setAlignmentX(JButton.CENTER_ALIGNMENT);
+        newProjectButton.setAlignmentX(CENTER_ALIGNMENT);
         newProjectButton.setFont(buttonFont);
         newProjectButton.setSize(getPreferredSize());
         newProjectButton.setActionCommand("newProject");
         newProjectButton.addActionListener(this);
 
         loadSaveButton = new JButton("Load Project");
-        loadSaveButton.setAlignmentX(JButton.CENTER_ALIGNMENT);
+        loadSaveButton.setAlignmentX(CENTER_ALIGNMENT);
         loadSaveButton.setFont(buttonFont);
         loadSaveButton.setActionCommand("loadSave");
         loadSaveButton.addActionListener(this);
 
         instructionsButton = new JButton("Instructions");
-        instructionsButton.setAlignmentX(JButton.CENTER_ALIGNMENT);
-        instructionsButton .setFont(buttonFont);
+        instructionsButton.setAlignmentX(CENTER_ALIGNMENT);
+        instructionsButton.setFont(buttonFont);
         instructionsButton.setActionCommand("openInstructions");
         instructionsButton.addActionListener(this);
 
+        settingsButton = new JButton("Settings");
+        settingsButton.setAlignmentX(CENTER_ALIGNMENT);
+        settingsButton.setFont(buttonFont);
+        settingsButton.setActionCommand("openSettings");
+        settingsButton.addActionListener(this);
 
-        centerPanel.add(titleLabel);
-        centerPanel.add(new Spacer(30, 30));
-        centerPanel.add(newProjectButton);
-        centerPanel.add(new Spacer(30, 30));
-        centerPanel.add(loadSaveButton);
-        centerPanel.add(new Spacer(30, 30));
-        centerPanel.add(instructionsButton);
-        add(centerPanel);
+
+        add(Box.createVerticalGlue());
+        add(titleLabel);
+        add(newProjectButton);
+        add(loadSaveButton);
+        add(instructionsButton);
+        add(settingsButton);
+        add(Box.createVerticalGlue());
     }
 
 
@@ -97,14 +98,11 @@ public class Home extends JPanel implements ActionListener {
                         ex.printStackTrace();
                     }
                 }
+                break;
             }
-        }
-    }
-
-
-    private class Spacer extends JPanel {
-        public Spacer(int width, int height) {
-            setSize(width, height);
+            case "openSettings": {
+                changeScreen.accept(Screen.SETTINGS);
+            }
         }
     }
 }

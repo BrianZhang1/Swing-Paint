@@ -12,23 +12,6 @@ Built with Maven! I keep a jar file on top level so you can easily give the prog
 Simply clone the project and run the swingpaint.jar file.  
 Voila! Easy, right?  
 
---  
-**Building from Command Line**  
-Mainly for my own reference haha.
-
-1. Compilation  
-Source files (.java) -> bytecode (.class) to be interpreted by JVM.  
-example: `javac -d target -sourcepath src/main/java src/main/java/swingpaint/Main.java`  
-
-2. Compressing into JAR (optional)  
-Combines and compresses class files into one file.  
-example: `jar --create --file Swing-Paint.jar --main-class swingpaint.Main -C target .`  
-example (short): `jar cfe Swing-Paint.jar swingpaint.Main -C target .`  
-
-3. Executing Program  
-Example from compiled files: `java -cp target swingpaint.Main`  
-Example from JAR: `java -jar Swing-Paint.jar`  
-
 ## Planned Features (todo)
 
 * Features/convenience changes

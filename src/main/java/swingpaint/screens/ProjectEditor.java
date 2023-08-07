@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -33,6 +34,7 @@ import javax.swing.JTextField;
 
 import swingpaint.helpers.Project;
 import swingpaint.helpers.Screen;
+import swingpaint.screens.Settings.Setting;
 import swingpaint.sprites.JImage;
 import swingpaint.sprites.JOval;
 import swingpaint.sprites.JPolygon;
@@ -88,7 +90,8 @@ public class ProjectEditor extends JPanel implements ActionListener {
             Consumer<Project> saveProjectCallback,
             ArrayList<String> userImages,
             Project project,
-            List<String> existingProjectNames
+            List<String> existingProjectNames,
+            LinkedHashMap<Setting, Integer> settings
         ) {
 
         // Configuring JPanel

@@ -9,6 +9,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.stream.Collectors;
 
 import javax.swing.JFrame;
@@ -20,6 +22,8 @@ import swingpaint.helpers.Screen;
 import swingpaint.screens.Home;
 import swingpaint.screens.ProjectEditor;
 import swingpaint.screens.ProjectSelect;
+import swingpaint.screens.Settings;
+import swingpaint.screens.Settings.Setting;
 import swingpaint.sprites.JImage;
 import swingpaint.sprites.JOval;
 import swingpaint.sprites.JPolygon;
@@ -34,6 +38,7 @@ class Main extends JFrame {
     ArrayList<Project> projects;    // All projects.
     Project selectedProject;        // The data for the selected project (selected in ProjectSelect).
     ArrayList<String> userImages;     // The names of all the images in the userImage directory.
+    LinkedHashMap<Setting, Integer> settings;   // user settings.
     
 
     // Initialize frame.
@@ -47,6 +52,11 @@ class Main extends JFrame {
         selectedProject = null;
         projects = new ArrayList<>();
         userImages = new ArrayList<>();
+        settings = new LinkedHashMap<>();
+        // TODO load settings from file
+        Arrays.asList(Settings.Setting.values()).forEach(setting -> {
+            settings.put(setting, setting.getDefaultValue());
+        });
 
         // Load data.
         loadData();
@@ -227,7 +237,8 @@ class Main extends JFrame {
                     (selectedProject == null) ? null : new Project(selectedProject),
                     projects.stream()
                         .map(p -> p.getTitle())
-                        .collect(Collectors.toList())
+                        .collect(Collectors.toList()),
+                    settings
                 );
                 break;
             }
@@ -244,6 +255,11 @@ class Main extends JFrame {
                     () -> changeScreen(Screen.PROJECT_SELECT), 
                     i -> deleteProject(i)
                 );
+                break;
+            }
+
+            case SETTINGS: {
+                currentScreen = new Settings(() -> changeScreen(Screen.HOME), settings);
                 break;
             }
         }
