@@ -1,5 +1,6 @@
 package swingpaint.screens;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
@@ -58,12 +59,21 @@ public class Settings extends JPanel {
         titleLabel = new JLabel("Settings");
         titleLabel.setFont(titleLabel.getFont().deriveFont(Font.PLAIN, 30));
         titleLabel.setAlignmentX(LEFT_ALIGNMENT);
-        titleLabel.setOpaque(true);
         c = new GridBagConstraints();
         c.gridx = 0;
         c.anchor = GridBagConstraints.LINE_START;
         c.insets = new Insets(20, 20, 20, 20);
         add(titleLabel, c);
+
+        JLabel wipLabel = new JLabel("Note: this page is in development and altering the settings has no effect on the program.");
+        wipLabel.setFont(wipLabel.getFont().deriveFont(Font.PLAIN, 12));
+        wipLabel.setAlignmentX(LEFT_ALIGNMENT);
+        wipLabel.setForeground(Color.RED);
+        c = new GridBagConstraints();
+        c.gridx = 0;
+        c.anchor = GridBagConstraints.LINE_START;
+        c.insets = new Insets(0, 20, 10, 20);
+        add(wipLabel, c);
 
         // create a label, text field, and button for each setting
         settings.forEach((setting, value) -> {
