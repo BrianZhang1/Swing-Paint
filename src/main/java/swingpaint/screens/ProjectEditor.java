@@ -95,7 +95,8 @@ public class ProjectEditor extends JPanel implements ActionListener {
         ) {
 
         // Configuring JPanel
-        setPreferredSize(new Dimension(800, 600));
+        setPreferredSize(new Dimension(settings.get(Setting.DEFAULT_PROJECT_WIDTH), 
+            settings.get(Setting.DEFAULT_PROJECT_LENGTH)));
         setFocusable(true);
         setLayout(null);
 
