@@ -3,13 +3,14 @@ package swingpaint.screens;
 import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.net.URI;
 import java.util.function.Consumer;
 
-import javax.swing.Box;
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -34,11 +35,16 @@ public class Home extends JPanel implements ActionListener {
 
         // Configure JPanel.
         setPreferredSize(new Dimension(800, 600));
-        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        setLayout(new GridBagLayout());
+        GridBagConstraints c;
 
         titleLabel = new JLabel("Swing Paint");
         titleLabel.setFont(new Font(titleLabel.getFont().getName(), Font.PLAIN, 60));
-        titleLabel.setAlignmentX(CENTER_ALIGNMENT);
+        c = new GridBagConstraints();
+        c.gridx = 0;
+        c.gridy = 0;
+        c.insets = new Insets(30, 30, 30, 30);
+        add(titleLabel, c);
 
         Font buttonFont = new Font(titleLabel.getFont().getName(), Font.PLAIN, 40);
 
@@ -48,33 +54,44 @@ public class Home extends JPanel implements ActionListener {
         newProjectButton.setSize(getPreferredSize());
         newProjectButton.setActionCommand("newProject");
         newProjectButton.addActionListener(this);
+        c = new GridBagConstraints();
+        c.gridx = 0;
+        c.gridy = 1;
+        c.insets = new Insets(5, 5, 5, 5);
+        add(newProjectButton, c);
 
         loadSaveButton = new JButton("Load Project");
         loadSaveButton.setAlignmentX(CENTER_ALIGNMENT);
         loadSaveButton.setFont(buttonFont);
         loadSaveButton.setActionCommand("loadSave");
         loadSaveButton.addActionListener(this);
+        c = new GridBagConstraints();
+        c.gridx = 0;
+        c.gridy = 2;
+        c.insets = new Insets(5, 5, 5, 5);
+        add(loadSaveButton, c);
 
         instructionsButton = new JButton("Instructions");
         instructionsButton.setAlignmentX(CENTER_ALIGNMENT);
         instructionsButton.setFont(buttonFont);
         instructionsButton.setActionCommand("openInstructions");
         instructionsButton.addActionListener(this);
+        c = new GridBagConstraints();
+        c.gridx = 0;
+        c.gridy = 3;
+        c.insets = new Insets(5, 5, 5, 5);
+        add(instructionsButton, c);
 
         settingsButton = new JButton("Settings");
         settingsButton.setAlignmentX(CENTER_ALIGNMENT);
         settingsButton.setFont(buttonFont);
         settingsButton.setActionCommand("openSettings");
         settingsButton.addActionListener(this);
-
-
-        add(Box.createVerticalGlue());
-        add(titleLabel);
-        add(newProjectButton);
-        add(loadSaveButton);
-        add(instructionsButton);
-        add(settingsButton);
-        add(Box.createVerticalGlue());
+        c = new GridBagConstraints();
+        c.gridx = 0;
+        c.gridy = 4;
+        c.insets = new Insets(5, 5, 5, 5);
+        add(settingsButton, c);
     }
 
 

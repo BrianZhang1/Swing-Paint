@@ -15,10 +15,7 @@ Voila! Easy, right?
 ## Planned Features (todo)
 
 * Features/convenience changes
-    * Add layer reordering (option to move sprites front/back).
     * Click and drag to select and move/edit multiple sprites at once.
-    * custom drag corner lengths (new custom settings screen?)
     * add button options for dropdown list textboxes
     * remove color for images in details panel
-    * drag and drop GUI creation with swing components? (swingeasygui)
 * Use a better database.
