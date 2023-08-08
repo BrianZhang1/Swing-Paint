@@ -6,7 +6,7 @@
 
   <groupId>swingpaint</groupId>
   <artifactId>swingpaint</artifactId>
-  <version>1.0-SNAPSHOT</version>
+  <version>1.0</version>
 
   <name>Swing-Paint</name>
   <packaging>jar</packaging>

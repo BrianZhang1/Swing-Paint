@@ -7,6 +7,8 @@ Learn all about the development process [here](https://drive.google.com/drive/fo
 
 Built with Maven! I keep a jar file on top level so you can easily give the program a try.  
 
+Stable version: release 1.0  
+
 ## Running the Program
 
 Simply clone the project and run the swingpaint.jar file.  
