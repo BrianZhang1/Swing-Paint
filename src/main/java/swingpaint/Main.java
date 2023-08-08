@@ -34,7 +34,7 @@ import swingpaint.sprites.JSprite;
 
 // Class that handles higher-level functions (switching between screens, file handling).
 class Main extends JFrame {
-    private JPanel currentScreen;    // the current screen
+    JPanel currentScreen;    // the current screen
     ArrayList<Project> projects;    // All projects.
     Project selectedProject;        // The data for the selected project (selected in ProjectSelect).
     ArrayList<String> userImages;     // The names of all the images in the userImage directory.
