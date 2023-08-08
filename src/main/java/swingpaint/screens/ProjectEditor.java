@@ -79,6 +79,7 @@ public class ProjectEditor extends JPanel implements ActionListener {
     private JPanel popupPanel;
     private JLabel popupPanelLabel;
     private JTextField popupPanelTextField;
+    private JButton popupPanelButton;
     private JPanel confirmSavePanel;
     private JLabel confirmSaveLabel;
     private JButton confirmSaveButton1;
@@ -138,8 +139,11 @@ public class ProjectEditor extends JPanel implements ActionListener {
         popupPanelTextField = new JTextField();
         popupPanelTextField.addActionListener(this);
         popupPanelTextField.addKeyListener(keyAdapter);
+        popupPanelButton = new JButton("Set");
+        popupPanelButton.addActionListener(this);
         popupPanel.add(popupPanelLabel);
         popupPanel.add(popupPanelTextField);
+        popupPanel.add(popupPanelButton);
 
         confirmSavePanel = new JPanel();
         confirmSavePanel.setLayout(new BoxLayout(confirmSavePanel, BoxLayout.X_AXIS));
@@ -326,6 +330,7 @@ public class ProjectEditor extends JPanel implements ActionListener {
         popupPanelTextField.setColumns(10);
         popupPanelTextField.setActionCommand(textFieldCommand);
         popupPanelTextField.setText(textFieldValue);
+        popupPanelButton.setActionCommand(textFieldCommand);;
         popupPanel.setSize(popupPanel.getPreferredSize());
         // Center the popup panel in frame.
         popupPanel.setLocation(this.getWidth()/2-popupPanel.getWidth()/2, this.getHeight()/2-popupPanel.getHeight()/2);
@@ -990,7 +995,6 @@ public class ProjectEditor extends JPanel implements ActionListener {
         public void keyReleased(KeyEvent e) {
             switch(e.getKeyCode()) {
                 case KeyEvent.VK_ESCAPE: {
-                    System.out.println("fasld");
                     hideAllMenus();
                     removeFocus();
                     break;
