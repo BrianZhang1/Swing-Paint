@@ -51,6 +51,7 @@ public class ProjectEditor extends JPanel implements ActionListener {
     private int dx, dy;                     // x & y displacement of cursor from sprite, used to maintain
                                             // relative cursor position when moving sprites (click and drag).
     private int dragPointHeld;              // the index of the drag point held. -1 if none are held.
+    private int dragPointLength;            // the length of each drag point.
     private LocalDateTime dateCreated;      // creation date of this project
     private List<String> existingProjectNames;  // to ensure no duplicate names
     private boolean projectModified;        // whether project has been modified.
@@ -112,6 +113,7 @@ public class ProjectEditor extends JPanel implements ActionListener {
         this.saveProjectCallback = saveProjectCallback;
         this.existingProjectNames = existingProjectNames;
         userImagesAvailable = userImages.size() > 0;
+        dragPointLength = settings.get(Setting.DRAG_POINT_LENGTH);
         
         sprites = new ArrayList<>();
         spriteHeld = false;
@@ -536,6 +538,7 @@ public class ProjectEditor extends JPanel implements ActionListener {
             // Now, convert each sprite into java swing code.
             for(int i = 0; i < sprites.size(); i++) {
                 JSprite s = sprites.get(i);
+                Rectangle bounds = s.getBounds();
                 String RGBString = s.getRGBString();
                 // Skip the color statement if no color change is needed.
                 if(!RGBString.equals(prevRGBString)) {
@@ -544,11 +547,11 @@ public class ProjectEditor extends JPanel implements ActionListener {
                 prevRGBString = RGBString;
                 switch(s.getType()) {
                     case "rectangle": {
-                        pw.printf("\t\tg.fillRect(%d, %d, %d, %d);%n", s.x, s.y, s.width, s.height);
+                        pw.printf("\t\tg.fillRect(%d, %d, %d, %d);%n", bounds.x, bounds.y, bounds.width, bounds.height);
                         break;
                     }
                     case "oval": {
-                        pw.printf("\t\tg.fillOval(%d, %d, %d, %d);%n", s.x, s.y, s.width, s.height);
+                        pw.printf("\t\tg.fillOval(%d, %d, %d, %d);%n", bounds.x, bounds.y, bounds.width, bounds.height);
                         break;
                     }
                     case "polygon": {
@@ -570,7 +573,7 @@ public class ProjectEditor extends JPanel implements ActionListener {
                     }
 
                     case "image": {
-                        pw.printf("\t\tg.drawImage(imgs.get(%d), %d, %d, null);%n", curImgIndex, s.x, s.y);
+                        pw.printf("\t\tg.drawImage(imgs.get(%d), %d, %d, null);%n", curImgIndex, bounds.x, bounds.y);
                         curImgIndex++;
 
                         break;
@@ -646,7 +649,6 @@ public class ProjectEditor extends JPanel implements ActionListener {
     // Changes the focused sprite.
     private void setFocus(JSprite s) {
         focus = s;
-        s.moveDragPoints();
     }
 
 
@@ -683,7 +685,8 @@ public class ProjectEditor extends JPanel implements ActionListener {
             s = new JImage((JImage)target);
         }
         if(s != null) {
-            s.setLocation(s.x+10, s.y+10);
+            Rectangle bounds = s.getBounds();
+            s.setLocation(bounds.x+10, bounds.y+10);
             sprites.add(s);
             setFocus(s);
             hideDetailsPanel();
@@ -702,26 +705,27 @@ public class ProjectEditor extends JPanel implements ActionListener {
 
         // For-loop which paints each sprite individually.
         for(JSprite sprite : sprites) {
+            Rectangle bounds = sprite.getBounds();
             g.setColor(sprite.getColor());
             if("rectangle".equals(sprite.getType())) {
-                g.fillRect(sprite.x, sprite.y, sprite.width, sprite.height);
+                g.fillRect(bounds.x, bounds.y, bounds.width, bounds.height);
             }
             else if("oval".equals(sprite.getType())) {
-                g.fillOval(sprite.x, sprite.y, sprite.width, sprite.height);
+                g.fillOval(bounds.x, bounds.y, bounds.width, bounds.height);
             }
             else if("polygon".equals(sprite.getType())) {
                 g.fillPolygon(((JPolygon)sprite).getPolygon());
             }
             else if("image".equals(sprite.getType())) {
-                g.drawImage(((JImage)sprite).getImage(), sprite.x, sprite.y, null);
+                g.drawImage(((JImage)sprite).getImage(), bounds.x, bounds.y, null);
             }
         }
 
         // If there is a focused sprite, paint the corner rectangles as well (for resizing).
         if(focus != null) {
-            for(Rectangle r : focus.getDragPoints()) {
-                g.setColor(Color.BLUE);
-                g.fillRect(r.x, r.y, r.width, r.height);
+            g.setColor(Color.BLUE);
+            for(Point c : focus.getCorners()) {
+                g.fillRect(c.x-dragPointLength/2, c.y-dragPointLength/2, dragPointLength, dragPointLength);
             }
         }
 
@@ -787,7 +791,8 @@ public class ProjectEditor extends JPanel implements ActionListener {
         // Creates a polygon with specified number of points in popup panel text field.
         else if("createPolygon".equals(e.getActionCommand())) {
             JSprite newSprite = new JPolygon(JPolygon.createDefaultPolygon(Integer.parseInt(popupPanelTextField.getText())));
-            newSprite.setLocation(getWidth()/2-newSprite.width/2, getHeight()/2-newSprite.height/2);
+            Rectangle bounds = newSprite.getBounds();
+            newSprite.setLocation(getWidth()/2-bounds.width/2, getHeight()/2-bounds.height/2);
             sprites.add(newSprite);
             setFocus(newSprite);
             hidePopupPanel();
@@ -797,10 +802,11 @@ public class ProjectEditor extends JPanel implements ActionListener {
         // Creates an image sprite with the specified image path.
         else if("createImage".equals(e.getActionCommand().split(" ")[0])) {
             String imageName = e.getActionCommand().split(" ")[1];
-            JImage image = new JImage(JImage.imageFromName(imageName), imageName);
-            image.setLocation(getWidth()/2-image.width/2, getHeight()/2-image.height/2);
-            sprites.add(image);
-            setFocus(image);
+            JImage sprite = new JImage(JImage.imageFromName(imageName), imageName);
+            Rectangle bounds = sprite.getBounds();
+            sprite.setLocation(getWidth()/2-bounds.width/2, getHeight()/2-bounds.height/2);
+            sprites.add(sprite);
+            setFocus(sprite);
             hideImageSelectPanel();
             projectModified = true;
         }
@@ -860,9 +866,11 @@ public class ProjectEditor extends JPanel implements ActionListener {
 
                 // Check if the click is on one of the corner rectangles.
                 if(focus != null) {
-                    for(int i = 0; i < focus.getDragPoints().length; i++) {
-                        Rectangle r = focus.getDragPoints()[i];
-                        if(r.contains(p)) {
+                    Point[] corners = focus.getCorners();
+                    for(int i = 0; i < corners.length; i++) {
+                        Point c = corners[i];
+                        Rectangle dragPoint = new Rectangle(c.x-dragPointLength/2, c.y-dragPointLength/2, dragPointLength, dragPointLength);
+                        if(dragPoint.contains(p)) {
                             dragPointHeld = i;
                             return;
                         }
@@ -873,11 +881,12 @@ public class ProjectEditor extends JPanel implements ActionListener {
                 // Check if the click was on a sprite.
                 // Loop through backwards so newest sprites get click priority.
                 for(int i = sprites.size()-1; i >= 0; i--) {
-                    if(sprites.get(i).contains(p)) {
+                    Rectangle bounds = sprites.get(i).getBounds();
+                    if(bounds.contains(p)) {
                         setFocus(sprites.get(i));
                         spriteHeld = true;
-                        dx = (int)p.getX() - (int)focus.getX();
-                        dy = (int)p.getY() - (int)focus.getY();
+                        dx = (int)p.getX() - (int)bounds.getX();
+                        dy = (int)p.getY() - (int)bounds.getY();
                         return;
                     }
                 }
@@ -887,7 +896,7 @@ public class ProjectEditor extends JPanel implements ActionListener {
             else if(e.getButton() == MouseEvent.BUTTON3) {
                 Point p = e.getPoint();
                 for(int i = sprites.size()-1; i >= 0; i--) {
-                    if(sprites.get(i).contains(p)) {
+                    if(sprites.get(i).getBounds().contains(p)) {
                         setFocus(sprites.get(i));
                         showDetailsPanel(0, 0);
                         break;
@@ -900,11 +909,56 @@ public class ProjectEditor extends JPanel implements ActionListener {
         public void mouseDragged(MouseEvent e) {
             Point p = e.getPoint();
 
-            // Handle corner resizing.
+            // Handle resizing by drag points.
             if(dragPointHeld != -1) {
                 projectModified = true;
-                focus.handleDragPoint(dragPointHeld, p);
-                focus.moveDragPoints();
+
+                // resizing of JPolygons by points are handled differently from other sprites.
+                if(focus instanceof JPolygon) {
+                    ((JPolygon)focus).movePoint(dragPointHeld, p.x, p.y);
+                }
+                else {
+                    Rectangle bounds = focus.getBounds();
+                    int x = bounds.x;
+                    int y = bounds.y;
+                    int width = bounds.width;
+                    int height = bounds.height;
+                    switch(dragPointHeld) {
+                        case 0: {
+                            int diffX = x - p.x;
+                            width += diffX;
+                            x -= diffX;
+
+                            int diffY = y - p.y;
+                            height += diffY;
+                            y -= diffY;
+                            break;
+                        }
+                        case 1: {
+                            width = p.x - x;
+
+                            int diffY = y - p.y;
+                            height += diffY;
+                            y -= diffY;
+                            break;
+                        }
+                        case 2: {
+                            int diffX = x - p.x;
+                            width += diffX;
+                            x -= diffX;
+
+                            height = p.y - y;
+                            break;
+                        }
+                        case 3: {
+                            width = p.x - x;
+                            height = p.y - y;
+                            break;
+                        }
+                    }
+                    focus.setLocation(x, y);
+                    focus.setSize(width, height);
+                }
                 repaint();
             }
 
@@ -912,7 +966,6 @@ public class ProjectEditor extends JPanel implements ActionListener {
             else if(spriteHeld) {
                 projectModified = true;
                 focus.setLocation((int)p.getX()-dx, (int)p.getY()-dy);
-                focus.moveDragPoints();
                 repaint();
             }
         }
@@ -1004,18 +1057,19 @@ public class ProjectEditor extends JPanel implements ActionListener {
                 }
 
                 // If not a point, then proceed normally.
+                Rectangle bounds = s.getBounds();
                 switch(attribute) {
                     case "x":
-                        attributeRows.add(new AttributeRow(attribute, "X", 4, Integer.toString(s.x), "set x"));
+                        attributeRows.add(new AttributeRow(attribute, "X", 4, Integer.toString(bounds.x), "set x"));
                         break;
                     case "y":
-                        attributeRows.add(new AttributeRow(attribute, "Y", 4, Integer.toString(s.y), "set y"));
+                        attributeRows.add(new AttributeRow(attribute, "Y", 4, Integer.toString(bounds.y), "set y"));
                         break;
                     case "width":
-                        attributeRows.add(new AttributeRow(attribute, "Width", 4,Integer.toString(s.width) ,"set width"));
+                        attributeRows.add(new AttributeRow(attribute, "Width", 4,Integer.toString(bounds.width) ,"set width"));
                         break;
                     case "height":
-                        attributeRows.add(new AttributeRow(attribute, "Height", 4, Integer.toString(s.height), "set height"));
+                        attributeRows.add(new AttributeRow(attribute, "Height", 4, Integer.toString(bounds.height), "set height"));
                         break;
                     case "color":
                         attributeRows.add(new AttributeRow(attribute, "Color", 8, String.format("%d,%d,%d", s.getColor().getRed(), s.getColor().getGreen(), s.getColor().getBlue()), "set color"));
@@ -1056,10 +1110,11 @@ public class ProjectEditor extends JPanel implements ActionListener {
 
             // If first word is "set", check the next word and set the specified attribute.
             if("set".equals(bits[0])) {
+                Rectangle bounds = focus.getBounds();
                 switch(bits[1]) {
                     case "width":
                         try {
-                            focus.setSize(Integer.parseInt(searchRowByAttribute("width").textField.getText()), (int)focus.getHeight());
+                            focus.setSize(Integer.parseInt(searchRowByAttribute("width").textField.getText()), bounds.height);
                             ProjectEditor.this.repaint();
                         }
                         catch(NumberFormatException ex) {
@@ -1068,7 +1123,7 @@ public class ProjectEditor extends JPanel implements ActionListener {
                         break;
                     case "height":
                         try {
-                            focus.setSize((int)focus.getWidth(), Integer.parseInt(searchRowByAttribute("height").textField.getText()));
+                            focus.setSize(bounds.width, Integer.parseInt(searchRowByAttribute("height").textField.getText()));
                             ProjectEditor.this.repaint();
                         }
                         catch(NumberFormatException ex) {
@@ -1077,7 +1132,7 @@ public class ProjectEditor extends JPanel implements ActionListener {
                         break;
                     case "x":
                         try {
-                            focus.setLocation(Integer.parseInt(searchRowByAttribute("x").textField.getText()), (int)focus.getY());
+                            focus.setLocation(Integer.parseInt(searchRowByAttribute("x").textField.getText()), bounds.y);
                             ProjectEditor.this.repaint();
                         }
                         catch(NumberFormatException ex) {
@@ -1086,7 +1141,7 @@ public class ProjectEditor extends JPanel implements ActionListener {
                         break;
                     case "y":
                         try {
-                            focus.setLocation((int)focus.getX(), Integer.parseInt(searchRowByAttribute("y").textField.getText()));
+                            focus.setLocation(bounds.x, Integer.parseInt(searchRowByAttribute("y").textField.getText()));
                             ProjectEditor.this.repaint();
                         }
                         catch(NumberFormatException ex) {

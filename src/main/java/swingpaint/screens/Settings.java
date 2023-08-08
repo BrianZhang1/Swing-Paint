@@ -19,7 +19,7 @@ import javax.swing.JTextField;
 public class Settings extends JPanel {
     // All configurable settings.
     public static enum Setting {
-        LENGTH_OF_RESIZE_BUTTON ("Length of Resize Button", 5),
+        DRAG_POINT_LENGTH ("Length of Corner-Resize rectangles.", 5),
         DEFAULT_PROJECT_WIDTH ("Default Project Width", 800),
         DEFAULT_PROJECT_LENGTH ("Default Project Length", 600);
 

@@ -7,32 +7,32 @@ import java.util.ArrayList;
 
 
 // Base class for all sprites.
-public class JSprite extends Rectangle {
+public class JSprite {
+    protected Rectangle bounds;
     protected ArrayList<String> attributes;
-    protected Rectangle[] dragPoints;       // an array of rectangles; each represent one handle
+    protected Point[] corners;              // each point represents a corner of this sprite
                                             // point of the sprite. Used for resizing sprites with mouse.
-    final protected int CORNER_LENGTH = 5;    // length of each corner rectangle.
     protected Color color;
     protected String type;
 
 
     // Construct from individual dimensions.
     public JSprite(int x, int y, int width, int height) {
-        super(x, y, width, height);
+        bounds = new Rectangle(x, y, width, height);
         init();
     }
 
 
     // Construct from rectangle.
     public JSprite(Rectangle r) {
-        super(r);
+        bounds = new Rectangle(r);
         init();
     }
 
 
     // Clone constructor.
     public JSprite(JSprite s) {
-        super(s.x, s.y, s.width, s.height);
+        bounds = new Rectangle(s.bounds);
 
         // Clone attributes.
         attributes = new ArrayList<>();
@@ -41,9 +41,9 @@ public class JSprite extends Rectangle {
         }
 
         // Clone dragPoints.
-        dragPoints = new Rectangle[s.dragPoints.length];
-        for(int i = 0; i < s.dragPoints.length; i++) {
-            dragPoints[i] = new Rectangle(s.dragPoints[i]);
+        corners = new Point[s.corners.length];
+        for(int i = 0; i < s.corners.length; i++) {
+            corners[i] = new Point(s.corners[i]);
         }
 
         // Clone color.
@@ -68,72 +68,39 @@ public class JSprite extends Rectangle {
         color = Color.BLACK;
 
         // Initializing drag points.
-        dragPoints = new Rectangle[4];
-        for(int i = 0; i < dragPoints.length; i++) {
-            dragPoints[i] = new Rectangle(0, 0, CORNER_LENGTH, CORNER_LENGTH);
+        corners = new Point[4];
+        for(int i = 0; i < corners.length; i++) {
+            corners[i] = new Point();
         }
+        updateCorners();
+    }
+
+    // Moves the corners to the corners of this sprite.
+    public void updateCorners() {
+        corners[0].setLocation(bounds.x, bounds.y); // top left
+        corners[1].setLocation(bounds.x+bounds.width, bounds.y); // top right
+        corners[2].setLocation(bounds.x, bounds.y+bounds.height); // bottom left
+        corners[3].setLocation(bounds.x+bounds.width, bounds.y+bounds.height); // bottom right
     }
 
 
-    // Moves the drag points. Called upon changing focused sprite.
-    public void moveDragPoints() {
-        int l = CORNER_LENGTH;
-        dragPoints[0].setLocation(x-l/2, y-l/2); // top left
-        dragPoints[1].setLocation(x+width-l/2, y-l/2); // top right
-        dragPoints[2].setLocation(x-l/2, y+height-l/2); // bottom left
-        dragPoints[3].setLocation(x+width-l/2, y+height-l/2); // bottom right
-    }
-
-
-    // Handles resizing of sprite by drag points.
-    public void handleDragPoint(int dragPointHeld, Point p) {
-        if(dragPointHeld == 0) {
-            int diffX = x - p.x;
-            width += diffX;
-            x -= diffX;
-
-            int diffY = y - p.y;
-            height += diffY;
-            y -= diffY;
-        }
-        else if(dragPointHeld == 1) {
-            width = p.x - x;
-
-            int diffY = y - p.y;
-            height += diffY;
-            y -= diffY;
-        }
-        else if(dragPointHeld == 2) {
-            int diffX = x - p.x;
-            width += diffX;
-            x -= diffX;
-
-            height = p.y - y;
-        }
-        else if(dragPointHeld == 3) {
-            width = p.x - x;
-            height = p.y - y;
-        }
-    }
-
-
-    // Drag points should adjust to resizes.
-    @Override
     public void setSize(int width, int height) {
-        super.setSize(width, height);
-        moveDragPoints();
+        bounds.setSize(width, height);
+        updateCorners();
     }
 
 
-    // Drag points should adjust to new location.
-    @Override
     public void setLocation(int x, int y) {
-        super.setLocation(x, y);
-        moveDragPoints();
+        bounds.setLocation(x, y);
+        updateCorners();
     }
 
 
     // Getters and setters.
+    public Rectangle getBounds() {
+        return new Rectangle(bounds);
+    }
+
     public String getRGBString() {
         return String.format("%d,%d,%d", color.getRed(), color.getGreen(), color.getBlue());
     }
@@ -171,8 +138,8 @@ public class JSprite extends Rectangle {
         this.color = color;
     }
 
-    public Rectangle[] getDragPoints() {
-        return dragPoints;
+    public Point[] getCorners() {
+        return corners;
     }
 
 }
