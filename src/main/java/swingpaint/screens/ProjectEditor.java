@@ -4,6 +4,7 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Polygon;
 import java.awt.Rectangle;
@@ -1023,7 +1024,6 @@ public class ProjectEditor extends JPanel implements ActionListener {
             scrollPane = new JScrollPane(this);
 
             setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-            setBounds(0, 0, 200, 30*attributeRows.size());
             setBackground(Color.GREEN);
         }
 
@@ -1080,11 +1080,9 @@ public class ProjectEditor extends JPanel implements ActionListener {
                         attributeRows.add(new AttributeRow(attribute, "Type", 8, s.getType(), "set type"));
                         break;
                 }
-            }
 
-            // Make rows alternating colors (orange and pink)
-            for(int i = 0; i < attributeRows.size(); i++) {
                 AttributeRow r = attributeRows.get(i);
+                // Make rows alternating colors (orange and pink)
                 if(i%2 == 0) {
                     r.setBackground(Color.ORANGE);
                 }
@@ -1131,7 +1129,7 @@ public class ProjectEditor extends JPanel implements ActionListener {
             c = new GridBagConstraints();
             c.gridx = 0;
             c.gridy = 1;
-            c.anchor = GridBagConstraints.LINE_END;
+            c.anchor = GridBagConstraints.LINE_START;
             buttonPanel.add(layerDownButton, c);
 
             JButton duplicateButton = new JButton("Duplicate");
@@ -1140,7 +1138,7 @@ public class ProjectEditor extends JPanel implements ActionListener {
             c = new GridBagConstraints();
             c.gridx = 1;
             c.gridy = 0;
-            c.anchor = GridBagConstraints.LINE_START;
+            c.anchor = GridBagConstraints.LINE_END;
             buttonPanel.add(duplicateButton, c);
 
             JButton deleteButton = new JButton("Delete");
@@ -1284,13 +1282,27 @@ public class ProjectEditor extends JPanel implements ActionListener {
 
             public AttributeRow(String attribute, String labelText, int fieldColumns, String fieldText, String command) {
                 this.attribute = attribute;
+
+                setLayout(new GridBagLayout());
+                GridBagConstraints c;
+
                 label = new JLabel(labelText);
+                c = new GridBagConstraints();
+                c.gridx = 0;
+                c.gridy = 0;
+                c.weightx = 1;
+                c.anchor = GridBagConstraints.LINE_START;
+                c.insets = new Insets(0, 10, 0, 0);
+                add(label, c);
+
                 textField = new JTextField(fieldColumns);
                 textField.setActionCommand(command);
                 textField.setText(fieldText);
+                c = new GridBagConstraints();
+                c.gridx = 1;
+                c.gridy = 0;
+                add(textField, c);
 
-                add(label);
-                add(textField);
             }
         }
     }
