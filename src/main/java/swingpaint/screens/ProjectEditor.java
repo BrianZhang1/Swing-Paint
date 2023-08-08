@@ -2,6 +2,8 @@ package swingpaint.screens;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.Point;
 import java.awt.Polygon;
 import java.awt.Rectangle;
@@ -1094,11 +1096,63 @@ public class ProjectEditor extends JPanel implements ActionListener {
                 add(r);
             }
 
-            // Add button row.
-            add(new ButtonRow());
+            // Add buttons related to sprites (delete, duplicate, etc.)
+            JPanel buttonPanel = new JPanel();
+            buttonPanel.setBackground(Color.GRAY);
+            buttonPanel.setLayout(new GridBagLayout());
+            GridBagConstraints c;
 
-            // Set the size of the container.
-            setSize(getPreferredSize());
+            JButton layerUpButton = new JButton("Move layer up");
+            layerUpButton.addActionListener(e -> {
+                ArrayList<JSprite> sprites = ProjectEditor.this.sprites;
+                int index = sprites.indexOf(focus);
+                if(index == sprites.size()-1) return;  // already at front
+                JSprite tmp = focus;
+                sprites.remove(index);
+                sprites.add(index+1, tmp);
+                ProjectEditor.this.repaint();
+            });
+            c = new GridBagConstraints();
+            c.gridx = 0;
+            c.gridy = 0;
+            c.anchor = GridBagConstraints.LINE_START;
+            buttonPanel.add(layerUpButton, c);
+
+            JButton layerDownButton = new JButton("Move layer down");
+            layerDownButton.addActionListener(e -> {
+                ArrayList<JSprite> sprites = ProjectEditor.this.sprites;
+                int index = sprites.indexOf(focus);
+                if(index == 0) return;  // already at back
+                JSprite tmp = focus;
+                sprites.remove(index);
+                sprites.add(index-1, tmp);
+                ProjectEditor.this.repaint();
+            });
+            c = new GridBagConstraints();
+            c.gridx = 0;
+            c.gridy = 1;
+            c.anchor = GridBagConstraints.LINE_END;
+            buttonPanel.add(layerDownButton, c);
+
+            JButton duplicateButton = new JButton("Duplicate");
+            duplicateButton.setActionCommand("duplicate");
+            duplicateButton.addActionListener(detailsPanel);
+            c = new GridBagConstraints();
+            c.gridx = 1;
+            c.gridy = 0;
+            c.anchor = GridBagConstraints.LINE_START;
+            buttonPanel.add(duplicateButton, c);
+
+            JButton deleteButton = new JButton("Delete");
+            deleteButton.setActionCommand("delete");
+            deleteButton.addActionListener(detailsPanel);
+            c = new GridBagConstraints();
+            c.gridx = 1;
+            c.gridy = 1;
+            c.anchor = GridBagConstraints.LINE_END;
+            buttonPanel.add(deleteButton, c);
+
+            add(buttonPanel);
         }
 
 
@@ -1239,30 +1293,5 @@ public class ProjectEditor extends JPanel implements ActionListener {
                 add(textField);
             }
         }
-
-
-        // A row of buttons. Contains buttons related to sprites (delete, duplicate, etc.)
-        private class ButtonRow extends JPanel {
-            private JButton duplicateButton;
-            private JButton deleteButton;
-
-            public ButtonRow() {
-                // Configure.
-                setBackground(Color.GRAY);
-
-                // Create UI.
-                duplicateButton = new JButton("Duplicate");
-                duplicateButton.setActionCommand("duplicate");
-                duplicateButton.addActionListener(detailsPanel);
-
-                deleteButton = new JButton("Delete");
-                deleteButton.setActionCommand("delete");
-                deleteButton.addActionListener(detailsPanel);
-                
-                add(duplicateButton);
-                add(deleteButton);
-            }
-        }
-        
     }
 }
