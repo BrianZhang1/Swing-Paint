@@ -217,7 +217,7 @@ class Main extends JFrame {
 
 
     // Changes the screen to newScreen.
-    private void changeScreen(Screen newScreen) {
+    void changeScreen(Screen newScreen) {
         // Clear current screen.
         if(currentScreen != null) {
             remove(currentScreen);
@@ -270,7 +270,7 @@ class Main extends JFrame {
 
 
     // Called by the ProjectSelect screen. Loads the given project.
-    private void loadProject(Project project) {
+    void loadProject(Project project) {
         selectedProject = project;
         changeScreen(Screen.PROGRAM_EDITOR);
         selectedProject = null;
@@ -278,13 +278,13 @@ class Main extends JFrame {
 
 
     // Saves a project.
-    private void saveProject(Project project) {
+    void saveProject(Project project) {
         projects.add(project);
         writeData();
     }
 
     // Deletes a project.
-    private void deleteProject(int targetIndex) {
+    void deleteProject(int targetIndex) {
         projects.remove(targetIndex);
         writeData();
     }
