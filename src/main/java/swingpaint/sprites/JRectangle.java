@@ -28,7 +28,7 @@ public class JRectangle extends JSprite {
     @Override
     public String toString() {
         return String.format("type=%s;x=%d;y=%d;width=%d;height=%d;color=%s",
-            type, x, y, width, height, getRGBString());
+            type, bounds.x, bounds.y, bounds.width, bounds.height, getRGBString());
     }
 
 

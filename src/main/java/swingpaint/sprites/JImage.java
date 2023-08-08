@@ -2,7 +2,6 @@ package swingpaint.sprites;
 
 import java.awt.Graphics2D;
 import java.awt.Image;
-import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -81,14 +80,6 @@ public class JImage extends JSprite {
     }
 
 
-    // Images must resize when drag points are moved.
-    @Override
-    public void handleDragPoint(int dragPointHeld, Point p) {
-        super.handleDragPoint(dragPointHeld, p);
-        fitImage();
-    }
-    
-    
     // setSize should refit image.
     @Override
     public void setSize(int width, int height) {
@@ -99,7 +90,7 @@ public class JImage extends JSprite {
 
     // Fits the image to the bounds of this sprite's rectangle.
     private void fitImage() {
-        image = resize(originalImage, width, height);
+        image = resize(originalImage, bounds.width, bounds.height);
     }
 
 
@@ -126,7 +117,7 @@ public class JImage extends JSprite {
     @Override
     public String toString() {
         return String.format("type=%s;x=%d;y=%d;width=%d;height=%d;imageName=%s",
-            type, x, y, width, height, imageName);
+            type, bounds.x, bounds.y, bounds.width, bounds.height, imageName);
     }
 
 
