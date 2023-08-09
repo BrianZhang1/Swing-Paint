@@ -1096,7 +1096,6 @@ public class ProjectEditor extends JPanel implements ActionListener {
                     r.setBackground(Color.PINK);
                 }
 
-                r.textField.addActionListener(this);
                 add(r);
             }
 
@@ -1285,6 +1284,7 @@ public class ProjectEditor extends JPanel implements ActionListener {
             private String attribute;
             private JLabel label;
             private JTextField textField;
+            private JButton setButton;
 
             public AttributeRow(String attribute, String labelText, int fieldColumns, String fieldText, String command) {
                 this.attribute = attribute;
@@ -1303,12 +1303,20 @@ public class ProjectEditor extends JPanel implements ActionListener {
 
                 textField = new JTextField(fieldColumns);
                 textField.setActionCommand(command);
+                textField.addActionListener(detailsPanel);
                 textField.setText(fieldText);
                 c = new GridBagConstraints();
                 c.gridx = 1;
                 c.gridy = 0;
                 add(textField, c);
 
+                setButton = new JButton("Set");
+                setButton.setActionCommand(command);
+                setButton.addActionListener(detailsPanel);
+                c = new GridBagConstraints();
+                c.gridx = 2;
+                c.gridy = 0;
+                add(setButton, c);
             }
         }
     }
