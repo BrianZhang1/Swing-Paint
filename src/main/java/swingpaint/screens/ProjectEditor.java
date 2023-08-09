@@ -311,9 +311,6 @@ public class ProjectEditor extends JPanel implements ActionListener {
 
     // Changes the title of the project. Returns true upon successful change.
     private boolean setProjectTitle(String newTitle) {
-        // verify unique title
-        if(existingProjectNames.stream().anyMatch(newTitle::equals)) return false;
-
         projectTitle = newTitle;
 
         // Change the title of the frame to match new title.
@@ -786,11 +783,16 @@ public class ProjectEditor extends JPanel implements ActionListener {
         // Set the title.
         else if("setTitle".equals(e.getActionCommand())) {
             String newTitle = popupPanelTextField.getText();
-            if(!setProjectTitle(newTitle)) {
+
+            // verify unique title
+            if(existingProjectNames.stream().anyMatch(newTitle::equals)) {
                 JOptionPane.showMessageDialog(this,
                     "Title of project cannot be identical to an existing project.",
                     "Duplicate Title", JOptionPane.ERROR_MESSAGE);
                 return;
+            }
+            else {
+                setProjectTitle(newTitle);
             }
             hidePopupPanel();
             projectModified = true;

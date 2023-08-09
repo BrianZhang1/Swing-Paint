@@ -337,6 +337,14 @@ class Main extends JFrame {
 
     // Saves a project.
     void saveProject(Project project) {
+        // replace project if it already exists
+        for(int i = 0; i < projects.size(); ++i) {
+            if(projects.get(i).getTitle() == project.getTitle()) {
+                projects.remove(i);
+                break;
+            }
+        }
+
         projects.add(project);
         writeData();
     }
