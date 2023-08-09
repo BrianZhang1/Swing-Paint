@@ -24,6 +24,11 @@ public class JImage extends JSprite {
         this.originalImage = image;
         this.image = originalImage;
         this.imageName = imageName;
+
+        // remove color attribute (not applicable for images)
+        for(int i = 0; i < attributes.size(); ++i) {
+            if(attributes.get(i).equals("color")) attributes.remove(i);
+        };
     }
 
 
