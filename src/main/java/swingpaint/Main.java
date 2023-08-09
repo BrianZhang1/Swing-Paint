@@ -286,7 +286,7 @@ class Main extends JFrame {
 
         // Add new screen.
         switch(newScreen) {
-            case PROGRAM_EDITOR: {
+            case PROJECT_EDITOR: {
                 currentScreen = new ProjectEditor(s -> changeScreen(s), 
                     s -> setTitle(s), 
                     () -> pack(), 
@@ -330,7 +330,7 @@ class Main extends JFrame {
     // Called by the ProjectSelect screen. Loads the given project.
     void loadProject(Project project) {
         selectedProject = project;
-        changeScreen(Screen.PROGRAM_EDITOR);
+        changeScreen(Screen.PROJECT_EDITOR);
         selectedProject = null;
     }
 

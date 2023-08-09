@@ -101,7 +101,7 @@ public class Home extends JPanel implements ActionListener {
 
         switch(command) {
             case "newProject":
-                changeScreen.accept(Screen.PROGRAM_EDITOR);
+                changeScreen.accept(Screen.PROJECT_EDITOR);
                 break;
             case "loadSave":
                 changeScreen.accept(Screen.PROJECT_SELECT);
