@@ -1060,31 +1060,31 @@ public class ProjectEditor extends JPanel implements ActionListener {
                     else if("y".equals(bits[2])) {
                         attributeRows.add(new AttributeRow(attribute, String.format("Point %s Y", bits[1]), 4, Integer.toString(polygon.ypoints[pointIndex]), "set " + attribute));
                     }
-
-                    continue;
                 }
 
                 // If not a point, then proceed normally.
-                Rectangle bounds = s.getBounds();
-                switch(attribute) {
-                    case "x":
-                        attributeRows.add(new AttributeRow(attribute, "X", 4, Integer.toString(bounds.x), "set x"));
-                        break;
-                    case "y":
-                        attributeRows.add(new AttributeRow(attribute, "Y", 4, Integer.toString(bounds.y), "set y"));
-                        break;
-                    case "width":
-                        attributeRows.add(new AttributeRow(attribute, "Width", 4,Integer.toString(bounds.width) ,"set width"));
-                        break;
-                    case "height":
-                        attributeRows.add(new AttributeRow(attribute, "Height", 4, Integer.toString(bounds.height), "set height"));
-                        break;
-                    case "color":
-                        attributeRows.add(new AttributeRow(attribute, "Color", 8, String.format("%d,%d,%d", s.getColor().getRed(), s.getColor().getGreen(), s.getColor().getBlue()), "set color"));
-                        break;
-                    case "type":
-                        attributeRows.add(new AttributeRow(attribute, "Type", 8, s.getType(), "set type"));
-                        break;
+                else {
+                    Rectangle bounds = s.getBounds();
+                    switch(attribute) {
+                        case "x":
+                            attributeRows.add(new AttributeRow(attribute, "X", 4, Integer.toString(bounds.x), "set x"));
+                            break;
+                        case "y":
+                            attributeRows.add(new AttributeRow(attribute, "Y", 4, Integer.toString(bounds.y), "set y"));
+                            break;
+                        case "width":
+                            attributeRows.add(new AttributeRow(attribute, "Width", 4,Integer.toString(bounds.width) ,"set width"));
+                            break;
+                        case "height":
+                            attributeRows.add(new AttributeRow(attribute, "Height", 4, Integer.toString(bounds.height), "set height"));
+                            break;
+                        case "color":
+                            attributeRows.add(new AttributeRow(attribute, "Color", 8, String.format("%d,%d,%d", s.getColor().getRed(), s.getColor().getGreen(), s.getColor().getBlue()), "set color"));
+                            break;
+                        case "type":
+                            attributeRows.add(new AttributeRow(attribute, "Type", 8, s.getType(), "set type"));
+                            break;
+                    }
                 }
 
                 AttributeRow r = attributeRows.get(i);
