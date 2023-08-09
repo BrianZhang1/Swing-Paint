@@ -1,12 +1,7 @@
 package swingpaint;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -16,6 +11,8 @@ import java.util.stream.Collectors;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import swingpaint.helpers.Project;
 import swingpaint.helpers.Screen;
@@ -85,45 +82,33 @@ class Main extends JFrame {
 
 
         // Read project data.
-        Project project = new Project();    // stores current project while reading data.
-        String bits[];                      // for splitting.
-        try(BufferedReader br = new BufferedReader(new FileReader("data.txt"))) {
-            String line = br.readLine();
-            while(line != null) {
-                // Check if starts new project.
-                try {
-                    if("ProjectStart".equals(line.substring(0, "ProjectStart".length()))) {
-                        // Load metadata.
-                        bits = line.split(";");
-                        project.setTitle(bits[1].split("=")[1]);
-                        String projectSizeBits = bits[2].split("=")[1];
-                        project.setWidth(Integer.parseInt(projectSizeBits.split(",")[0]));
-                        project.setHeight(Integer.parseInt(projectSizeBits.split(",")[1]));
-                        project.setDateCreated(LocalDateTime.parse(bits[3].split("=")[1]));
-                        project.setDateModified(LocalDateTime.parse(bits[3].split("=")[1]));
-                        line = br.readLine();
-                        continue;
-                    }
-                }
-                catch(StringIndexOutOfBoundsException e) {
-                    // do nothing. Raised by String.substring().
-                }
+        ObjectMapper mapper = new ObjectMapper();
+        JsonData jsonData = null;
+        try {
+            jsonData = mapper.readValue(new File("data.json"), JsonData.class);
+        }
+        catch(FileNotFoundException e) {
+            // do nothing. File will be created on next writeData() call.
+            return;
+        }
+        catch(Exception e) {
+            e.printStackTrace();
+        }
 
-                try {
-                    if("ProjectEnd".equals(line.substring(0, "ProjectEnd".length()))) {
-                        // End of project data.
-                        projects.add(project);
-                        project = new Project();
-                        line = br.readLine();
-                        continue;
-                    }
-                }
-                catch(StringIndexOutOfBoundsException e) {
-                    // do nothing. Raised by String.substring().
-                }
-
-                // Read sprite data.
-                bits = line.split(";");
+        Project project = new Project();
+        String bits[];  // for storing the result of String.split()
+        ArrayList<JsonProject> jsonProjects = jsonData.getProjects();
+        for(JsonProject jsonProject : jsonProjects) {
+            project = new Project();
+            project.setTitle(jsonProject.getTitle());
+            project.setWidth(jsonProject.getWidth());
+            project.setHeight(jsonProject.getHeight());
+            project.setDateCreated(LocalDateTime.parse(jsonProject.getDateCreated()));
+            project.setDateModified(LocalDateTime.parse(jsonProject.getDateModified()));
+            ArrayList<String> spritesData = jsonProject.getSprites();
+            if(spritesData == null) continue;
+            for(String spriteData : jsonProject.getSprites()) {
+                bits = spriteData.split(";");
                 String type = bits[0].split("=")[1];
                 JSprite sprite = null;
                 switch(type) {
@@ -172,47 +157,120 @@ class Main extends JFrame {
                     JOptionPane.showMessageDialog(this, "An error has occured while loading data (null sprite).",
                         "Null Sprite Error", JOptionPane.ERROR_MESSAGE);
                 }
-                
-                // Read next line.
-                line = br.readLine();
             }
-        }
-        catch(FileNotFoundException e) {
-            // do nothing. Leave projects empty.
-        }
-        catch(IOException e) {
-            e.printStackTrace();
-        }
 
+            projects.add(project);
+        }
+        
     }
 
 
     // Writes projects to data file.
     private void writeData() {
-        try(PrintWriter pw = new PrintWriter(new FileWriter("data.txt"))) {
-            for(Project project : projects) {
-                // Write header metadata.
-                pw.println(String.format(
-                    "ProjectStart;title=%s;size=%d,%d;created=%s;modified=%s", 
-                    project.getTitle(), 
-                    project.getWidth(), 
-                    project.getHeight(),
-                    project.getDateCreated().toString(),
-                    project.getDateModified().toString()
-                ));     
-
-                // Write sprite data.
-                for(JSprite sprite : project.getSprites()) {
-                    pw.println(sprite.toString());
-                }
-
-                // Mark end of this project.
-                pw.println("ProjectEnd");
-            }
+        JsonData jsonData = new JsonData(projects);
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            mapper.writeValue(new File("data.json"), jsonData);
         }
-        catch(IOException e) {
+        catch(Exception e) {
             e.printStackTrace();
         }
+    }
+
+
+    private static class JsonData {
+        private ArrayList<JsonProject> projects;
+
+        private JsonData(ArrayList<Project> projects) {
+            this.projects = new ArrayList<>();
+            for(Project project : projects) {
+                this.projects.add(new JsonProject(project));
+            }
+        }
+
+        private JsonData() {
+        }
+
+        public ArrayList<JsonProject> getProjects() {
+            return projects;
+        }
+
+        public void setProjects(ArrayList<JsonProject> projects) {
+            this.projects = projects;
+        }
+    }
+
+
+    private static class JsonProject {
+        private String title;
+        private int width, height;
+        private String dateModified, dateCreated;
+        private ArrayList<String> sprites;
+
+        private JsonProject(Project project) {
+            title = project.getTitle();
+            width = project.getWidth();
+            height = project.getHeight();
+            dateModified = project.getDateCreated().toString();
+            dateCreated = project.getDateModified().toString();
+            sprites = new ArrayList<>();
+            for(JSprite sprite : project.getSprites()) {
+                sprites.add(sprite.toString());
+            }
+        }
+
+        private JsonProject() {
+
+        }
+
+        public String getTitle() {
+            return title;
+        }
+
+        public void setTitle(String title) {
+            this.title = title;
+        }
+
+        public int getWidth() {
+            return width;
+        }
+
+        public void setWidth(int width) {
+            this.width = width;
+        }
+
+        public int getHeight() {
+            return height;
+        }
+
+        public void setHeight(int height) {
+            this.height = height;
+        }
+
+        public String getDateModified() {
+            return dateModified;
+        }
+
+        public void setDateModified(String dateModified) {
+            this.dateModified = dateModified;
+        }
+
+        public String getDateCreated() {
+            return dateCreated;
+        }
+
+        public void setDateCreated(String dateCreated) {
+            this.dateCreated = dateCreated;
+        }
+
+        public ArrayList<String> getSprites() {
+            return sprites;
+        }
+
+        public void setSprites(ArrayList<String> sprites) {
+            this.sprites = sprites;
+        }
+
     }
 
 
