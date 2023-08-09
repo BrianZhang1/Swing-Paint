@@ -1,5 +1,6 @@
 package swingpaint;
 
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.time.LocalDateTime;
@@ -142,8 +143,14 @@ class Main extends JFrame {
                         String imageName = bits[5].split("=")[1];
 
                         // Create JImage
-                        JImage ji = new JImage(JImage.imageFromName(imageName), imageName, x, y, width, height);
-                        sprite = ji;
+                        BufferedImage img = JImage.imageFromName(imageName);
+                        if(img != null) {
+                            JImage ji = new JImage(img, imageName, x, y, width, height);
+                            sprite = ji;
+                        }
+                        else {
+                            System.out.println("Null image sprite error.");
+                        }
                         break;
                     }
                 }
