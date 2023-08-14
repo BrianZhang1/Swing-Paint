@@ -454,8 +454,11 @@ public class ProjectEditor extends JPanel implements ActionListener {
             }
 
             // Export image files to images directory.
-            for(JImage jimg : jImageList) {
-                File destination = new File("export/images/" + jimg.getImageName());
+            for(int i = 0; i < jImageList.size(); ++i) {
+                JImage jimg = jImageList.get(i);
+                String[] imgNameBits = jimg.getImageName().split("\\.");
+                String imgName = imgNameBits[0] + i + "." + imgNameBits[1]; // insert number before file extension
+                File destination = new File("export/images/" + imgName);
                 try {
                     ImageIO.write(jimg.getImage(), jimg.getImageFileExtension(), destination);
                 }
@@ -516,13 +519,16 @@ public class ProjectEditor extends JPanel implements ActionListener {
                 pw.println("\t\ttry {");
                 
                 // Load images into ArrayList.
-                for(JImage jimg : jImageList) {
+                for(int i = 0; i < jImageList.size(); ++i) {
+                    JImage jimg = jImageList.get(i);
+                    String[] imgNameBits = jimg.getImageName().split("\\.");
+                    String imgName = imgNameBits[0] + i + "." + imgNameBits[1]; // insert number before file extension
                     // Check if system uses backslash as separator. If so, must double it.
                     if("\\".equals(System.getProperty("file.separator"))) {
-                        pw.printf("\t\t\timgs.add(ImageIO.read(new File(\"images%s%s%s\")));%n", sep, sep, jimg.getImageName());
+                        pw.printf("\t\t\timgs.add(ImageIO.read(new File(\"images%s%s%s\")));%n", sep, sep, imgName);
                     }
                     else {
-                        pw.printf("\t\t\timgs.add(ImageIO.read(new File(\"images%s%s\")));%n", sep, jimg.getImageName());
+                        pw.printf("\t\t\timgs.add(ImageIO.read(new File(\"images%s%s\")));%n", sep, imgName);
                     }
                 }
 
