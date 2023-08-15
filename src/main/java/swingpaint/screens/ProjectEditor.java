@@ -872,10 +872,12 @@ public class ProjectEditor extends JPanel implements ActionListener {
                 // Check if the click was on a button.
                 if(addIconRect.contains(p)) {
                     showSpriteSelect();
+                    removeFocus();
                     return;
                 }
                 if(optionsIconRect.contains(p)) {
                     showOptions();
+                    removeFocus();
                     return;
                 }
 
