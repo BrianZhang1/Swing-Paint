@@ -3,7 +3,7 @@
 
 Swing Paint is an interactive tool designed to simplify creating Java Swing graphics through a drag-and-drop interface.
 
-Watch a quick demonstration here: https://youtu.be/k0-VAX2wg_k  
+Watch a quick demonstration here: https://youtu.be/HUjDok2mIwg  
 
 Built with Maven! A jar file is kept on top level so you can easily give the program a try.
 Simply clone and double-click the jar file to open Swing Paint.
